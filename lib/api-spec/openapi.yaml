@@ -3,20 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: FalconTrust RAG Candidate API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: rag
+    description: RAG candidate pipeline
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +25,154 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /rag/status:
+    get:
+      operationId: getRagStatus
+      tags: [rag]
+      summary: Get ingestion and index status
+      responses:
+        "200":
+          description: Current RAG status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RagStatus"
+
+  /rag/documents:
+    get:
+      operationId: listDocuments
+      tags: [rag]
+      summary: List all ingested documents
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RagDocument"
+
+  /rag/chunks:
+    get:
+      operationId: listChunks
+      tags: [rag]
+      summary: List all chunks in the index
+      parameters:
+        - in: query
+          name: documentId
+          schema:
+            type: string
+          description: Filter by document ID
+      responses:
+        "200":
+          description: List of chunks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RagChunk"
+
+  /rag/ingest:
+    post:
+      operationId: ingestDocuments
+      tags: [rag]
+      summary: Ingest pre-loaded source PDFs
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestInput"
+      responses:
+        "200":
+          description: Ingestion result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResult"
+
+  /rag/reset:
+    post:
+      operationId: resetIndex
+      tags: [rag]
+      summary: Reset the vector index and all ingested data
+      responses:
+        "200":
+          description: Reset result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetResult"
+
+  /rag/query:
+    post:
+      operationId: ragQuery
+      tags: [rag]
+      summary: Query the RAG pipeline
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryInput"
+      responses:
+        "200":
+          description: RAG answer with citations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResult"
+
+  /rag/upload:
+    post:
+      operationId: uploadDocument
+      tags: [rag]
+      summary: Upload a PDF file for ingestion
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UploadInput"
+      responses:
+        "200":
+          description: Upload and ingestion result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResult"
+
+  /rag/reports:
+    get:
+      operationId: getReports
+      tags: [rag]
+      summary: Get comparison reports
+      responses:
+        "200":
+          description: Comparison reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComparisonReport"
+
+  /rag/test-model:
+    get:
+      operationId: testModel
+      tags: [rag]
+      summary: Test Ollama model connectivity
+      responses:
+        "200":
+          description: Model connectivity test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelTestResult"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +183,271 @@ components:
       required:
         - status
 
+    RagStatus:
+      type: object
+      required: [documentCount, chunkCount, vectorCount, ready, embeddingModel, generationModel, ollamaBaseUrl]
+      properties:
+        documentCount:
+          type: integer
+        chunkCount:
+          type: integer
+        vectorCount:
+          type: integer
+        ready:
+          type: boolean
+        embeddingModel:
+          type: string
+        generationModel:
+          type: string
+        ollamaBaseUrl:
+          type: string
+        lastIngestedAt:
+          type: ["string", "null"]
+        notes:
+          type: array
+          items:
+            type: string
+
+    RagDocument:
+      type: object
+      required: [id, filename, pageCount, chunkCount, ingestedAt, status]
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        pageCount:
+          type: integer
+        chunkCount:
+          type: integer
+        ingestedAt:
+          type: string
+        status:
+          type: string
+        cleaningFlags:
+          type: array
+          items:
+            type: string
+
+    RagChunk:
+      type: object
+      required: [chunkId, documentId, sourceFile, pageStart, pageEnd, text]
+      properties:
+        chunkId:
+          type: string
+        documentId:
+          type: string
+        sourceFile:
+          type: string
+        pageStart:
+          type: integer
+        pageEnd:
+          type: integer
+        sectionPath:
+          type: ["string", "null"]
+        text:
+          type: string
+        cleaningFlags:
+          type: array
+          items:
+            type: string
+        qualityNotes:
+          type: array
+          items:
+            type: string
+
+    IngestInput:
+      type: object
+      properties:
+        rebuild:
+          type: boolean
+        documentIds:
+          type: array
+          items:
+            type: string
+
+    IngestResult:
+      type: object
+      required: [success, documentsIngested, chunksCreated, vectorsCreated, durationMs]
+      properties:
+        success:
+          type: boolean
+        documentsIngested:
+          type: integer
+        chunksCreated:
+          type: integer
+        vectorsCreated:
+          type: integer
+        durationMs:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        cleanupReport:
+          type: object
+          additionalProperties: true
+
+    ResetResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    QueryInput:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        topK:
+          type: integer
+        includeEvidence:
+          type: boolean
+        includeDebug:
+          type: boolean
+
+    QueryResult:
+      type: object
+      required: [answer, confidence, confidenceReason, sources, retrievedChunks, warnings, durationMs]
+      properties:
+        answer:
+          type: string
+        confidence:
+          type: string
+        confidenceReason:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnswerSource"
+        retrievedChunks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetrievedChunk"
+        warnings:
+          type: array
+          items:
+            type: string
+        durationMs:
+          type: integer
+        debugTrace:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    AnswerSource:
+      type: object
+      required: [sourceFile, pageStart, pageEnd, snippet, supportLevel]
+      properties:
+        sourceFile:
+          type: string
+        pageStart:
+          type: integer
+        pageEnd:
+          type: integer
+        sectionPath:
+          type: ["string", "null"]
+        snippet:
+          type: string
+        supportLevel:
+          type: string
+        score:
+          type: number
+
+    RetrievedChunk:
+      type: object
+      required: [chunkId, documentId, sourceFile, pageStart, pageEnd, text, score, retrievalMethod]
+      properties:
+        chunkId:
+          type: string
+        documentId:
+          type: string
+        sourceFile:
+          type: string
+        pageStart:
+          type: integer
+        pageEnd:
+          type: integer
+        sectionPath:
+          type: ["string", "null"]
+        text:
+          type: string
+        score:
+          type: number
+        vectorScore:
+          type: number
+        bm25Score:
+          type: number
+        rerankScore:
+          type: number
+        retrievalMethod:
+          type: string
+        cleaningFlags:
+          type: array
+          items:
+            type: string
+
+    UploadInput:
+      type: object
+      required: [filename]
+      properties:
+        filename:
+          type: string
+          description: Name of uploaded file (actual file sent as multipart/form-data)
+
+    ComparisonReport:
+      type: object
+      required: [id, question, candidateAnswer, candidateConfidence, candidateSources, evidenceQuality, classification, createdAt]
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        candidateAnswer:
+          type: string
+        candidateConfidence:
+          type: string
+        candidateSources:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        evidenceQuality:
+          type: string
+        classification:
+          type: string
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ModelTestResult:
+      type: object
+      required: [embeddingOk, generationOk, embeddingModel, generationModel, ollamaBaseUrl]
+      properties:
+        embeddingOk:
+          type: boolean
+        generationOk:
+          type: boolean
+        embeddingModel:
+          type: string
+        generationModel:
+          type: string
+        ollamaBaseUrl:
+          type: string
+        embeddingError:
+          type: ["string", "null"]
+        generationError:
+          type: ["string", "null"]
+        embeddingDims:
+          type: ["integer", "null"]
+        generationSample:
+          type: ["string", "null"]

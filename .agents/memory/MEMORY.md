@@ -1,0 +1,3 @@
+- [pdf-parse Node.js compat](pdf-parse-nodejs.md) — Always use pdf-parse@1.1.1 in Node.js; v2 crashes with DOMMatrix/browser deps.
+- [Orval TanStack Query v5 options](orval-tanstack-v5.md) — Generated hooks require queryKey in the query options when using TanStack Query v5.
+- [RAG pipeline architecture](rag-pipeline-arch.md) — Flat JSON vector store (cosine sim) chosen over ChromaDB to avoid server deps; RRF fusion for hybrid retrieval.

@@ -1,0 +1,147 @@
+We are going to focus the next lane on one improvement area only: OCR cleanup quality before embedding.
+
+Do not move on to reranking, Chroma, model changes, confidence scoring, or broad app refactors yet unless directly needed to prove OCR cleanup improvement.
+
+Goal:
+Improve the candidate RAG app’s OCR/layout cleanup so the text being chunked and embedded is cleaner, less noisy, and more useful for retrieval and answer generation.
+
+Context:
+Your verification report showed OCR cleanup is only PARTIAL. Known remaining artifacts include:
+- FL E E
+- Flz.M
+- eco- nomics
+- social constrnctions
+- JEM_Blank_Layout 1 2/28/2017 8:31 AM Page 1
+- Journal of Emergency Management Vol. ... headers that survive cleanup
+- editorial board / issue frontmatter chunks
+- page/layout annotation junk
+- references/index/ads/noise that can still pollute retrieval
+
+Primary task:
+Build a bounded OCR Cleanup Improvement Lane.
+
+Required deliverables:
+
+1. Capture raw extraction output
+
+Save raw extracted text before cleanup for each PDF.
+
+Suggested path:
+
+candidate-rag/data/raw-documents/
+
+For every document, preserve:
+- source filename
+- page number if available
+- raw text
+- extraction warnings if any
+
+This is required so we can prove raw → clean → chunk → embedding flow.
+
+2. Build an OCR artifact detector
+
+Add code that detects known artifact patterns and produces a report.
+
+Track at least:
+- broken hyphenation
+- layout strings like *_Layout
+- journal header/footer lines
+- page number artifacts
+- editorial board/frontmatter blocks
+- subscription/copyright/ISSN artifacts
+- isolated spaced letters like FL E E
+- obvious OCR substitutions from the known corpus, such as Flz.M
+- suspicious short-line column fragments
+- repeated boilerplate
+- reference-only chunks
+- chunks with high noise ratio
+
+3. Improve cleanup
+
+Improve cleanup before chunking and embedding.
+
+Focus on rules/techniques that are safe and testable:
+- remove layout annotation lines
+- fix hyphenation with trailing spaces, such as eco- nomics
+- remove/normalize recurring journal headers
+- suppress editorial board and frontmatter chunks
+- remove cover/logo/image descriptor artifacts when they are not useful
+- improve reference/index/ad suppression
+- improve column/layout cleanup if possible
+- improve document-specific cleanup profiles for JEM articles vs the flood risk book if useful
+
+Do not over-clean in a way that removes meaningful content.
+
+4. Add before/after proof
+
+Create a markdown report at:
+
+docs/rag-experiments/replit-rag-candidate/10-ocr-cleanup-improvement-report.md
+
+The report must include:
+
+- baseline artifact counts before improvement
+- artifact counts after improvement
+- at least 5 raw-vs-clean examples
+- at least 5 clean-vs-chunk examples
+- examples showing previously bad artifacts removed
+- examples showing meaningful content preserved
+- exact code files/functions changed
+- known cleanup gaps that remain
+
+5. Re-ingest and rebuild vectors
+
+After improving cleanup:
+- re-run ingestion on the nine PDFs
+- rebuild chunks and embeddings
+- confirm embeddings are generated from cleaned text, not raw text
+- record total document count, chunk count, vector count, and changed chunk count compared with the prior run
+
+6. Retrieval/answer impact test
+
+Run the same 10 test questions from the verification report again.
+
+For each question, compare:
+- previous top retrieved chunks vs new top retrieved chunks
+- whether noisy chunks disappeared
+- whether source relevance improved
+- whether answer quality improved, stayed the same, or got worse
+- whether citations are cleaner
+- whether confidence still looks reasonable
+
+Do not claim answer improvement if only cleanup improved but retrieval/answer quality did not measurably change.
+
+7. Final OCR lane verdict
+
+Use this verdict format:
+
+- IMPROVED — OCR cleanup measurably better and retrieval/answers not harmed
+- PARTIAL — cleanup improved, but retrieval/answer improvement is mixed or unproven
+- NO CHANGE — cleanup changes did not materially improve artifacts
+- REGRESSION — cleanup removed useful content or made retrieval worse
+
+8. GitHub handoff
+
+When the OCR cleanup lane is complete:
+- commit the changes
+- push to a new GitHub branch
+- do not push to main
+- do not touch production branches
+- do not include secrets
+- include all reports needed for Codex review
+
+Suggested branch name:
+
+experiment/replit-ocr-cleanup-lane
+
+Final response should include:
+- branch name
+- commit hash
+- exact files changed
+- exact commands run
+- report path
+- OCR lane verdict
+- what Codex should verify next
+
+Important:
+This lane is not complete until the report proves what changed and how to reproduce it. Proof matters more than claiming improvement.

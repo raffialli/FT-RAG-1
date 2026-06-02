@@ -2,6 +2,8 @@
   "documentId": "Flood_Risk_Management-OCR_1780399724237_pdf",
   "filename": "Flood_Risk_Management-OCR_1780399724237.pdf",
   "cleaningFlags": [
+    "fixed-hyphenation",
+    "repaired-ocr-substitutions",
     "removed-frontmatter"
   ]
 }

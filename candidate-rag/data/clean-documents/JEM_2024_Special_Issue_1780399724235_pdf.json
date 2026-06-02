@@ -2,6 +2,10 @@
   "documentId": "JEM_2024_Special_Issue_1780399724235_pdf",
   "filename": "JEM_2024_Special_Issue_1780399724235.pdf",
   "cleaningFlags": [
+    "fixed-hyphenation",
+    "removed-layout-annotations",
+    "removed-logo-artifacts",
+    "removed-journal-headers",
     "removed-frontmatter",
     "removed-ads"
   ]

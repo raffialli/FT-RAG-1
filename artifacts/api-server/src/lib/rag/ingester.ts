@@ -35,6 +35,7 @@ const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(WORKSPACE_ROOT, "candidat
 const DOCS_MANIFEST_PATH = path.join(DATA_DIR, "manifests", "documents.json");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const CLEAN_DOCS_DIR = path.join(DATA_DIR, "clean-documents");
+const RAW_DOCS_DIR = path.join(DATA_DIR, "raw-documents");
 const CHUNKS_DIR = path.join(DATA_DIR, "chunks");
 const SOURCE_PDFS_DIR = process.env.SOURCE_PDFS_DIR ?? path.join(WORKSPACE_ROOT, "attached_assets");
 
@@ -149,6 +150,9 @@ export async function ingestPdf(
       warnings,
     };
   }
+
+  // Save raw extracted text before any cleanup (for before/after proof)
+  saveRawDocument(documentId, filename, fullText, pageTexts, numpages);
 
   // Clean OCR text
   const cleaned = cleanOcrText(fullText, filename);
@@ -311,6 +315,33 @@ export async function ingestUploadedFile(filePath: string): Promise<IngestResult
     warnings,
     cleanupReport: { [result.doc.filename]: result.doc.cleaningFlags },
   };
+}
+
+function saveRawDocument(
+  documentId: string,
+  filename: string,
+  fullText: string,
+  pageTexts: string[],
+  numpages: number
+): void {
+  fs.mkdirSync(RAW_DOCS_DIR, { recursive: true });
+  // Save raw text
+  fs.writeFileSync(path.join(RAW_DOCS_DIR, `${documentId}.raw.txt`), fullText);
+  // Save raw metadata with page-level text
+  fs.writeFileSync(
+    path.join(RAW_DOCS_DIR, `${documentId}.raw.json`),
+    JSON.stringify(
+      {
+        documentId,
+        filename,
+        numpages,
+        extractedAt: new Date().toISOString(),
+        pageTexts,
+      },
+      null,
+      2
+    )
+  );
 }
 
 function saveCleanDocument(documentId: string, filename: string, text: string, flags: string[]): void {

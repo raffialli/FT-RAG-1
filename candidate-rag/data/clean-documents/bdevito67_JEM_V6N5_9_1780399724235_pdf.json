@@ -1,5 +1,8 @@
 {
   "documentId": "bdevito67_JEM_V6N5_9_1780399724235_pdf",
   "filename": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
-  "cleaningFlags": []
+  "cleaningFlags": [
+    "fixed-hyphenation",
+    "removed-journal-headers"
+  ]
 }

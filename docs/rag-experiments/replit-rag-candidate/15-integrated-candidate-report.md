@@ -385,6 +385,37 @@ PORT=4173 BASE_PATH=/ pnpm --filter @workspace/rag-candidate run build  → PASS
 
 ---
 
+### pnpm build-approval reproducibility fix (allowBuilds)
+
+**Problem:** `onlyBuiltDependencies` (name-only allowlist) is insufficient on a fresh
+checkout with pnpm 10 because pnpm still prompts interactively for `pnpm approve-builds`,
+which would write an uncommitted `allowBuilds` map to `pnpm-workspace.yaml`.
+
+**Root cause (from pnpm 10.26.1 source):** pnpm has two parallel approval mechanisms:
+- `onlyBuiltDependencies` – name-only allowlist (pnpm 9 compatible)
+- `allowBuilds` – explicit `{ packageName: boolean }` map (pnpm 10, written by `pnpm approve-builds`)
+
+`hasDependencyBuildOptions()` in pnpm checks `DEPS_BUILD_CONFIG_KEYS` which includes both.
+If neither is present, pnpm falls back to the interactive `pnpm approve-builds` prompt even
+with `--frozen-lockfile`. Committing `allowBuilds` removes that interactive requirement.
+
+**Fix:** Added `allowBuilds` map to `pnpm-workspace.yaml` covering all four packages pnpm 10
+identifies as having build scripts on Linux x64:
+```yaml
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  msw: true
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+```
+
+`onlyBuiltDependencies` is retained for pnpm 9 / older-pnpm-10 compatibility.
+`pnpm install --frozen-lockfile` now passes on a clean checkout without any interactive step.
+
+
 ## Verdict
 
 **READY_FOR_CODEX_AUDIT**

@@ -45,6 +45,15 @@ onlyBuiltDependencies:
   - sharp
   - unrs-resolver
 
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  msw: true
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+
 overrides:
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'

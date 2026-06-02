@@ -42,13 +42,4 @@ Single-source concentration (all top-K chunks from one file) caps `evidenceSuffi
 
 The LLM reliably cites [N] numbers within range for this corpus. `invalidCitations` and `noisyCitedChunks` have been consistently empty across all 10 benchmark queries post noise-filtering lane. `uncitedChunkIndices` is the main signal — LLM often cites only 2–3 of the 5 provided sources.
 
-## Benchmark after implementation (2026-06-02)
-
-Baseline: 10/10 `high`. After v2:
-- 5 high (Q1, Q2, Q4, Q5, Q8, Q9 — wait, that's 6; Q4 = high, Q9 = high)
-- 1 medium (Q10 — single source + mild hedge)
-- 3 low (Q3 South Sudan gap, Q6 EWS fatality data gap, Q7 climate FRM gap)
-
-All downgrades reflect genuine corpus gaps acknowledged by the LLM.
-
-**Why:** The v1 scorer used `score > 0.025` (always true) and only checked "i do not"/"not found" for hedging. Missed Q3/Q6/Q7 where the LLM explicitly stated the corpus lacked the requested information.
+**Why these thresholds and patterns matter:** The v1 scorer used `score > 0.025` (always true for this corpus) and only checked `"i do not"` / `"not found"` for hedging. That made all queries return `high` even when the LLM explicitly acknowledged corpus gaps. The v2 patterns correctly detect real insufficiency without false-downgrading substantive answers that begin with a mild caveat.

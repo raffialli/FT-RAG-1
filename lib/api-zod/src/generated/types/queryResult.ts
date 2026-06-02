@@ -6,13 +6,18 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AnswerSource } from './answerSource';
+import type { CitationValidation } from './citationValidation';
+import type { EvidenceSufficiency } from './evidenceSufficiency';
+import type { QueryResultConfidence } from './queryResultConfidence';
 import type { QueryResultDebugTrace } from './queryResultDebugTrace';
 import type { RetrievedChunk } from './retrievedChunk';
 
 export interface QueryResult {
   answer: string;
-  confidence: string;
+  confidence: QueryResultConfidence;
   confidenceReason: string;
+  evidenceSufficiency: EvidenceSufficiency;
+  citationValidation: CitationValidation;
   sources: AnswerSource[];
   retrievedChunks: RetrievedChunk[];
   warnings: string[];

@@ -314,16 +314,69 @@ components:
         includeDebug:
           type: boolean
 
+    EvidenceSufficiency:
+      type: string
+      enum: [sufficient, partial, weak, insufficient]
+      description: |
+        Coarse evidence quality verdict derived from retrieved chunk count,
+        source diversity, section quality, and hedging detection.
+        - sufficient: ≥3 direct-score chunks from ≥2 sources, no severe hedging
+        - partial: ≥2 direct-score chunks OR single source with HQ sections
+        - weak: ≥1 direct-score chunk or partial-score chunks present
+        - insufficient: no evidence or LLM indicated corpus lacks the information
+
+    CitationValidation:
+      type: object
+      required: [citedNumbers, validCitations, invalidCitations, uncitedChunkIndices, noisyCitedChunks, allValid, warnings]
+      properties:
+        citedNumbers:
+          type: array
+          items:
+            type: integer
+          description: All citation numbers [N] found in the answer text
+        validCitations:
+          type: array
+          items:
+            type: integer
+          description: Citation numbers that reference existing, low-noise chunks
+        invalidCitations:
+          type: array
+          items:
+            type: integer
+          description: Citation numbers that reference non-existent sources
+        uncitedChunkIndices:
+          type: array
+          items:
+            type: integer
+          description: 1-based indices of retrieved chunks not cited in the answer
+        noisyCitedChunks:
+          type: array
+          items:
+            type: integer
+          description: Citation numbers whose chunks have noiseScore ≥ 0.5
+        allValid:
+          type: boolean
+          description: True if all cited numbers are valid, non-empty, and non-noisy
+        warnings:
+          type: array
+          items:
+            type: string
+
     QueryResult:
       type: object
-      required: [answer, confidence, confidenceReason, sources, retrievedChunks, warnings, durationMs]
+      required: [answer, confidence, confidenceReason, evidenceSufficiency, citationValidation, sources, retrievedChunks, warnings, durationMs]
       properties:
         answer:
           type: string
         confidence:
           type: string
+          enum: [high, medium, low, insufficient]
         confidenceReason:
           type: string
+        evidenceSufficiency:
+          $ref: "#/components/schemas/EvidenceSufficiency"
+        citationValidation:
+          $ref: "#/components/schemas/CitationValidation"
         sources:
           type: array
           items:

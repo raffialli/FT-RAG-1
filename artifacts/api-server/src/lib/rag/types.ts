@@ -60,10 +60,24 @@ export interface AnswerSource {
   score: number;
 }
 
+export type EvidenceSufficiency = "sufficient" | "partial" | "weak" | "insufficient";
+
+export interface CitationValidation {
+  citedNumbers: number[];
+  validCitations: number[];
+  invalidCitations: number[];
+  uncitedChunkIndices: number[];
+  noisyCitedChunks: number[];
+  allValid: boolean;
+  warnings: string[];
+}
+
 export interface QueryResult {
   answer: string;
   confidence: "high" | "medium" | "low" | "insufficient";
   confidenceReason: string;
+  evidenceSufficiency: EvidenceSufficiency;
+  citationValidation: CitationValidation;
   sources: AnswerSource[];
   retrievedChunks: RetrievedChunk[];
   warnings: string[];

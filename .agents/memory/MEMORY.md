@@ -3,3 +3,4 @@
 - [RAG pipeline architecture](rag-pipeline-arch.md) — Flat JSON vector store (cosine sim) chosen over ChromaDB; RRF fusion for hybrid retrieval; embeddings run locally via transformers.js.
 - [Ollama Cloud limitations](ollama-cloud-limits.md) — /api/embed is NOT available on Ollama Cloud; only /api/chat and /api/generate work; no embedding models in the 40-model catalog.
 - [HuggingFace transformers esbuild](hf-transformers-esbuild.md) — Must mark @huggingface/transformers external in esbuild; add onnxruntime-node to onlyBuiltDependencies in pnpm-workspace.yaml.
+- [RAG confidence score calibration](rag-confidence-scoring.md) — Score thresholds for this corpus: SCORE_DIRECT=0.22, SCORE_PARTIAL=0.12; hedging detection must be two-tier (severe vs mild) with full-answer scan, not first-N-chars.

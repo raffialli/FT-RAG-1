@@ -7,8 +7,10 @@
  */
 
 export * from './answerSource';
+export * from './citationValidation';
 export * from './comparisonReport';
 export * from './comparisonReportCandidateSourcesItem';
+export * from './evidenceSufficiency';
 export * from './healthStatus';
 export * from './ingestInput';
 export * from './ingestResult';
@@ -17,6 +19,7 @@ export * from './listChunksParams';
 export * from './modelTestResult';
 export * from './queryInput';
 export * from './queryResult';
+export * from './queryResultConfidence';
 export * from './queryResultDebugTrace';
 export * from './ragChunk';
 export * from './ragDocument';

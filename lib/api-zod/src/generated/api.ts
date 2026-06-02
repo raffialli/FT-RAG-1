@@ -109,8 +109,18 @@ export const RagQueryBody = zod.object({
 
 export const RagQueryResponse = zod.object({
   "answer": zod.string(),
-  "confidence": zod.string(),
+  "confidence": zod.enum(['high', 'medium', 'low', 'insufficient']),
   "confidenceReason": zod.string(),
+  "evidenceSufficiency": zod.enum(['sufficient', 'partial', 'weak', 'insufficient']).describe('Coarse evidence quality verdict derived from retrieved chunk count,\nsource diversity, section quality, and hedging detection.\n- sufficient: ≥3 direct-score chunks from ≥2 sources, no severe hedging\n- partial: ≥2 direct-score chunks OR single source with HQ sections\n- weak: ≥1 direct-score chunk or partial-score chunks present\n- insufficient: no evidence or LLM indicated corpus lacks the information\n'),
+  "citationValidation": zod.object({
+  "citedNumbers": zod.array(zod.number()).describe('All citation numbers [N] found in the answer text'),
+  "validCitations": zod.array(zod.number()).describe('Citation numbers that reference existing, low-noise chunks'),
+  "invalidCitations": zod.array(zod.number()).describe('Citation numbers that reference non-existent sources'),
+  "uncitedChunkIndices": zod.array(zod.number()).describe('1-based indices of retrieved chunks not cited in the answer'),
+  "noisyCitedChunks": zod.array(zod.number()).describe('Citation numbers whose chunks have noiseScore ≥ 0.5'),
+  "allValid": zod.boolean().describe('True if all cited numbers are valid, non-empty, and non-noisy'),
+  "warnings": zod.array(zod.string())
+}),
   "sources": zod.array(zod.object({
   "sourceFile": zod.string(),
   "pageStart": zod.number(),

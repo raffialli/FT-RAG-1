@@ -1,0 +1,139 @@
+Start a new improvement lane while Codex audits the pushed reference/noise filtering branch.
+
+Branch rules:
+
+* Create a new branch:
+  `experiment/replit-confidence-citation-validation-lane`
+* Branch from the current best local candidate state, including reference/noise filtering work.
+* Do not push this branch until I explicitly approve.
+* Do not merge to main.
+* Do not overwrite or rewrite:
+  `experiment/replit-reference-noise-filtering-lane`
+* If Codex reports that the reference/noise filtering branch failed audit, stop this lane and wait for instructions.
+
+Lane goal:
+Improve answer reliability by making confidence scoring, citation validation, and evidence sufficiency more accurate.
+
+We want the app to give better, more accurate client-facing answers by ensuring answers are grounded in useful retrieved evidence and citations actually support the claims.
+
+Focus only on:
+
+* confidence scoring
+* citation validation
+* evidence sufficiency
+* grounding checks
+* “not enough evidence” behavior
+* source quality used for final answer
+
+Do not work on:
+
+* Chroma
+* embedding model changes
+* broad UI redesign
+* AWS/S3
+* production deploys
+* unrelated RAG rewrites
+
+Required work:
+
+1. Baseline current behavior
+
+Run the 10 benchmark questions and record:
+
+* answer
+* confidence
+* confidence reason
+* top retrieved chunks
+* source file/page/sectionPath
+* noiseCategory/noiseScore
+* citations used
+* whether answer is actually supported by cited sources
+
+Pay special attention to:
+
+* Q7
+* Q9
+* any answer that says “not enough information” but still reports high confidence
+* any answer with high confidence from weak or noisy evidence
+
+2. Improve confidence scoring
+
+Confidence must account for:
+
+* number of useful supporting chunks
+* retrieval score quality
+* section quality, such as Abstract/Result/Discussion/Method vs Reference/Noise
+* noiseScore/noiseCategory
+* whether citations are valid
+* whether the answer is hedged
+* whether evidence directly supports the answer
+* whether top chunks are diverse or just repeated adjacent chunks
+
+Hard rules:
+
+* If citations are missing or invalid, confidence cannot be high.
+* If evidence is mostly weak/noisy/reference/citation-heavy, confidence cannot be high.
+* If the answer says the corpus does not contain enough information, confidence should be low or insufficient.
+* If fewer than 2 useful supporting chunks exist, confidence should usually not be high.
+* If the top retrieved chunks are off-topic, confidence must be downgraded.
+
+3. Add citation validation
+
+Validate:
+
+* cited source numbers exist
+* cited source chunks are present
+* cited source chunks were not filtered out
+* cited source chunks are not hard-noise chunks
+* cited snippets contain meaningful support for the answer
+* answer does not cite sources that do not support the claim
+
+4. Add evidence sufficiency status
+
+Each answer should include an evidence status:
+
+* `sufficient`
+* `partial`
+* `weak`
+* `insufficient`
+
+This should be visible in the API response and, if easy, in the UI.
+
+5. Add proof report
+
+Create:
+
+`docs/rag-experiments/replit-rag-candidate/13-confidence-citation-validation-report.md`
+
+Report must include:
+
+* baseline problems found
+* exact files/functions changed
+* before/after confidence table for 10 questions
+* examples where confidence was correctly downgraded
+* examples where high confidence remains justified
+* citation validation examples
+* remaining gaps
+* whether answer quality improved, stayed same, or regressed
+
+6. Verdict
+
+Use one:
+
+* `IMPROVED` — confidence/citation behavior is more honest and no answer-quality regression
+* `PARTIAL` — better but some issues remain
+* `NO CHANGE` — validation did not materially improve
+* `REGRESSION` — useful answers were incorrectly downgraded or citations broke
+
+7. Stop condition
+
+When done:
+
+* do not push
+* report branch name
+* local commit hash if committed
+* files changed
+* commands run
+* report path
+* verdict
+* what Codex should verify after the current audit completes

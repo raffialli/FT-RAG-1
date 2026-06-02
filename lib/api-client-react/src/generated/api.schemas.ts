@@ -75,6 +75,51 @@ export interface QueryInput {
   includeDebug?: boolean;
 }
 
+/**
+ * Coarse evidence quality verdict derived from retrieved chunk count,
+source diversity, section quality, and hedging detection.
+- sufficient: ≥3 direct-score chunks from ≥2 sources, no severe hedging
+- partial: ≥2 direct-score chunks OR single source with HQ sections
+- weak: ≥1 direct-score chunk or partial-score chunks present
+- insufficient: no evidence or LLM indicated corpus lacks the information
+
+ */
+export type EvidenceSufficiency = typeof EvidenceSufficiency[keyof typeof EvidenceSufficiency];
+
+
+export const EvidenceSufficiency = {
+  sufficient: 'sufficient',
+  partial: 'partial',
+  weak: 'weak',
+  insufficient: 'insufficient',
+} as const;
+
+export interface CitationValidation {
+  /** All citation numbers [N] found in the answer text */
+  citedNumbers: number[];
+  /** Citation numbers that reference existing, low-noise chunks */
+  validCitations: number[];
+  /** Citation numbers that reference non-existent sources */
+  invalidCitations: number[];
+  /** 1-based indices of retrieved chunks not cited in the answer */
+  uncitedChunkIndices: number[];
+  /** Citation numbers whose chunks have noiseScore ≥ 0.5 */
+  noisyCitedChunks: number[];
+  /** True if all cited numbers are valid, non-empty, and non-noisy */
+  allValid: boolean;
+  warnings: string[];
+}
+
+export type QueryResultConfidence = typeof QueryResultConfidence[keyof typeof QueryResultConfidence];
+
+
+export const QueryResultConfidence = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  insufficient: 'insufficient',
+} as const;
+
 export type QueryResultDebugTrace = { [key: string]: unknown } | null;
 
 export interface AnswerSource {
@@ -107,8 +152,10 @@ export interface RetrievedChunk {
 
 export interface QueryResult {
   answer: string;
-  confidence: string;
+  confidence: QueryResultConfidence;
   confidenceReason: string;
+  evidenceSufficiency: EvidenceSufficiency;
+  citationValidation: CitationValidation;
   sources: AnswerSource[];
   retrievedChunks: RetrievedChunk[];
   warnings: string[];

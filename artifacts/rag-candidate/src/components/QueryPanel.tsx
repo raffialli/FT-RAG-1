@@ -6,10 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRagQuery, useGetRagStatus } from "@workspace/api-client-react";
-import type { QueryResult, AnswerSource, RetrievedChunk } from "@workspace/api-client-react";
+import type { QueryResult, AnswerSource, RetrievedChunk, CitationValidation } from "@workspace/api-client-react";
 import {
   Search, Loader2, AlertCircle, ChevronDown, ChevronUp,
-  FileText, BookOpen, BarChart3, Zap
+  FileText, BookOpen, BarChart3, Zap, ShieldCheck, ShieldAlert
 } from "lucide-react";
 
 const SAMPLE_QUERIES = [
@@ -123,6 +123,7 @@ export default function QueryPanel() {
                   <BookOpen className="w-4 h-4 text-emerald-400" /> Answer
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
+                  <EvidenceSufficiencyBadge level={result.evidenceSufficiency} />
                   <ConfidenceBadge level={result.confidence} />
                   <span className="text-xs text-slate-500">{result.durationMs}ms</span>
                 </div>
@@ -135,6 +136,11 @@ export default function QueryPanel() {
               <div className="bg-slate-800/50 rounded p-4 text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
                 {result.answer}
               </div>
+
+              {/* Citation validation summary */}
+              {result.citationValidation && (
+                <CitationValidationRow cv={result.citationValidation} totalChunks={result.sources?.length ?? 0} />
+              )}
 
               {result.warnings && result.warnings.length > 0 && (
                 <div className="mt-3 space-y-1">
@@ -235,6 +241,67 @@ function ConfidenceBadge({ level }: { level: string }) {
   };
   const { cls, label } = cfg[level] ?? cfg.low;
   return <Badge className={`text-xs border ${cls}`}>{label}</Badge>;
+}
+
+function EvidenceSufficiencyBadge({ level }: { level?: string }) {
+  if (!level) return null;
+  const cfg: Record<string, { cls: string; label: string }> = {
+    sufficient: { cls: "bg-emerald-950/60 text-emerald-400 border-emerald-800/60", label: "Evidence: sufficient" },
+    partial:    { cls: "bg-blue-950/60 text-blue-400 border-blue-800/60",           label: "Evidence: partial" },
+    weak:       { cls: "bg-amber-950/60 text-amber-400 border-amber-800/60",        label: "Evidence: weak" },
+    insufficient: { cls: "bg-red-950/60 text-red-400 border-red-800/60",            label: "Evidence: insufficient" },
+  };
+  const { cls, label } = cfg[level] ?? cfg.weak;
+  return <Badge className={`text-xs border ${cls}`}>{label}</Badge>;
+}
+
+function CitationValidationRow({ cv, totalChunks }: { cv: CitationValidation; totalChunks: number }) {
+  const hasIssues =
+    !cv.allValid ||
+    cv.invalidCitations.length > 0 ||
+    cv.noisyCitedChunks.length > 0 ||
+    cv.citedNumbers.length === 0;
+
+  const uncitedCount = cv.uncitedChunkIndices.length;
+
+  if (!hasIssues && uncitedCount === 0) {
+    return (
+      <div className="mt-3 flex items-center gap-2 text-xs text-emerald-500">
+        <ShieldCheck className="w-3 h-3 shrink-0" />
+        Citations valid — {cv.validCitations.length}/{totalChunks} sources cited
+        {uncitedCount > 0 && <span className="text-slate-500">({uncitedCount} unused)</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 space-y-1">
+      {cv.citedNumbers.length > 0 ? (
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <ShieldCheck className="w-3 h-3 shrink-0 text-emerald-600" />
+          {cv.validCitations.length} valid citation{cv.validCitations.length !== 1 ? "s" : ""}
+          {uncitedCount > 0 && `, ${uncitedCount} of ${totalChunks} sources uncited`}
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-xs text-red-400">
+          <ShieldAlert className="w-3 h-3 shrink-0" />
+          No source citations found in answer
+        </div>
+      )}
+      {cv.invalidCitations.length > 0 && (
+        <div className="flex items-center gap-2 text-xs text-red-400">
+          <ShieldAlert className="w-3 h-3 shrink-0" />
+          Invalid citation{cv.invalidCitations.length !== 1 ? "s" : ""}: [{cv.invalidCitations.join(", ")}]
+        </div>
+      )}
+      {cv.noisyCitedChunks.length > 0 && (
+        <div className="flex items-center gap-2 text-xs text-amber-400">
+          <AlertCircle className="w-3 h-3 shrink-0" />
+          Noisy source{cv.noisyCitedChunks.length !== 1 ? "s" : ""} cited: [{cv.noisyCitedChunks.join(", ")}]
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SourceCard({ index, source }: { index: number; source: AnswerSource }) {

@@ -1,0 +1,183 @@
+We need to pause feature work and produce a RAG Candidate Verification Report.
+
+Goal:
+Tell me whether this Replit candidate RAG app is actually better than the original FalconTrust RAG approach for the nine provided documents.
+
+Use this verdict format:
+
+- YES — materially better, with proof
+- PARTIAL — better in some areas, not proven in others
+- NO — not better yet
+- UNKNOWN — not enough evidence
+
+Do not give a vague answer. Pick one verdict and prove it.
+
+Please produce a markdown report at:
+
+docs/rag-experiments/replit-rag-candidate/09-verification-report.md
+
+The report must answer these sections:
+
+1. Overall verdict
+
+Answer this directly:
+
+Is this candidate RAG app better than the original FalconTrust RAG approach for the nine provided documents, based on:
+- answer quality
+- source/citation quality
+- OCR cleanup
+- retrieval quality
+- evidence visibility
+- confidence handling
+
+Use YES / PARTIAL / NO / UNKNOWN.
+
+2. Technique inventory
+
+For each requested technique, mark:
+
+- IMPLEMENTED
+- PARTIAL
+- NOT IMPLEMENTED
+- NOT PROVEN
+
+Requested techniques:
+- PDF ingestion
+- OCR/layout cleanup before embedding
+- frontmatter/index/ad/reference/noise removal
+- page/section metadata preservation
+- semantic/section-aware chunking
+- embeddings with nomic-embed-text:latest
+- local vector storage
+- Chroma/ChromaDB usage
+- hybrid retrieval
+- reranking
+- evidence quality filtering
+- answer synthesis with qwen3.5:122b
+- citation validation
+- confidence validation
+- regression/comparison evaluation
+- clickable UI for testing
+- upload and re-ingest new PDFs
+
+For every item, include exact file paths and function/component names where it is implemented.
+
+3. Code proof
+
+List the exact code files that implement the main RAG pipeline.
+
+Include:
+- ingestion entry point
+- PDF extraction
+- OCR/layout cleanup
+- chunking
+- embedding call
+- vector storage
+- retrieval
+- reranking
+- evidence filtering
+- answer generation
+- citation/source display
+- confidence scoring
+- UI upload path
+- UI question-answer path
+
+For each file, explain what it does in one sentence.
+
+4. Artifact proof
+
+Show proof that OCR cleanup happens before embedding.
+
+Include at least 3 examples from the provided PDFs:
+
+For each example:
+- source PDF name
+- page number if available
+- raw extracted text sample
+- cleaned text sample
+- final chunk text that was embedded
+- chunk ID
+- vector/index metadata for that chunk
+
+If raw-vs-clean text is not currently saved, add code to save it and rerun ingestion.
+
+5. Retrieval proof
+
+Run at least 10 test questions against the candidate app.
+
+For each question, save:
+- question
+- answer
+- confidence
+- top retrieved chunks
+- retrieval/rerank scores if available
+- source file/page/section
+- why the cited source supports the answer
+- whether retrieval was good, partial, or bad
+
+Include the exact output files or screenshots where results are saved.
+
+6. “Is it better?” proof
+
+For each test question, classify the candidate result:
+
+- clearly better
+- slightly better
+- same/unknown
+- worse
+
+If you cannot compare to the original app directly because AWS/S3/existing vectors are not available, say that plainly.
+
+In that case, compare against:
+- expected answer concepts
+- source relevance
+- citation quality
+- OCR cleanliness
+- whether the answer is grounded in visible evidence
+
+Do not claim global improvement unless the evidence supports it.
+
+7. Failure and gap analysis
+
+List:
+- what is still not implemented
+- what is implemented but not proven
+- where retrieval still fails
+- where OCR cleanup still fails
+- where citations/confidence are weak
+- what would need to be added before Codex should consider porting this back into FalconTrust
+
+8. Reproduction steps for Codex
+
+Give exact steps for Codex or a human reviewer to reproduce your claims:
+
+- install/run commands
+- required env vars, without secret values
+- how to ingest the PDFs
+- how to run the test questions
+- where generated artifacts are stored
+- where reports are stored
+- how to inspect Chroma/vector data
+- how to verify raw-vs-clean-vs-chunk flow
+
+9. Final recommendation
+
+Choose one:
+
+- Codex should review for port-back
+- Continue improving candidate first
+- Port only ingestion cleanup
+- Port only retrieval/reranking
+- Port only UI/source display ideas
+- Do not port yet
+
+Important boundaries:
+- Do not use AWS.
+- Do not request AWS access.
+- Do not use S3.
+- Do not claim comparison against production vectors.
+- Do not commit secrets.
+- Do not hide weak results.
+- Proof matters more than confidence.
+
+After writing the report, summarize the verdict and point me to the exact report path.

@@ -1,0 +1,108 @@
+We now have the GitHub repo connected.
+
+First priority: preserve and publish the completed OCR cleanup lane.
+
+Do this before starting any new work.
+
+1. Verify current branch and working tree
+
+Run and report:
+
+git branch --show-current
+git status --short
+git log --oneline -n 5
+
+2. Make sure the OCR cleanup lane is committed
+
+Expected lane/report:
+
+docs/rag-experiments/replit-rag-candidate/10-ocr-cleanup-improvement-report.md
+
+Expected key code changes include:
+
+- artifacts/api-server/src/lib/rag/ocr-cleaner.ts
+- artifacts/api-server/src/lib/rag/ocr-detector.ts
+- artifacts/api-server/src/lib/rag/ingester.ts
+
+If anything is uncommitted, commit it.
+
+Use branch:
+
+experiment/replit-ocr-cleanup-lane
+
+Commit message:
+
+Improve OCR cleanup before embedding
+
+3. Push to GitHub
+
+Push the branch to GitHub.
+
+Do not push to main.
+Do not modify production branches.
+Do not commit secrets.
+Do not include API keys.
+
+After pushing, report:
+
+- branch name
+- latest commit hash
+- GitHub branch URL if available
+- clean/dirty git status
+- exact files committed
+- report path
+
+4. Then continue to the next lane: Section Detection + Chunk Quality
+
+Only after the OCR lane is safely pushed, begin the next focused lane.
+
+Goal:
+Improve section detection and chunk quality so more chunks have useful sectionPath metadata, cleaner boundaries, fewer reference/noise chunks, and better retrieval evidence.
+
+Focus only on:
+
+- mixed-case heading detection, such as:
+  - Abstract
+  - Introduction
+  - Literature Review
+  - Methods
+  - Results
+  - Discussion
+  - Limitations
+  - Conclusion
+  - References
+- sectionPath metadata coverage
+- chunk boundaries
+- suppressing reference-only chunks
+- suppressing editorial/frontmatter chunks
+- reducing chunks with sectionPath=null where a real section exists
+- proving retrieval/source quality improves or is not harmed
+
+Do not move on to model changes, Chroma migration, confidence scoring, or broad UI work yet.
+
+Create a new report:
+
+docs/rag-experiments/replit-rag-candidate/11-section-detection-chunk-quality-report.md
+
+The report must include:
+
+- baseline sectionPath coverage before changes
+- after-change sectionPath coverage
+- number of chunks before/after
+- examples of heading detection before/after
+- examples of cleaner chunks
+- examples of suppressed reference/noise chunks
+- retrieval impact on the same 10 test questions
+- exact files/functions changed
+- remaining gaps
+- final verdict:
+  - IMPROVED
+  - PARTIAL
+  - NO CHANGE
+  - REGRESSION
+
+When the section/chunk lane is complete, commit and push it to a new branch:
+
+experiment/replit-section-chunk-quality-lane
+
+Stop after pushing that lane and report the branch, commit hash, status, report path, and what Codex should verify.

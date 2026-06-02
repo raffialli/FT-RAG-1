@@ -8,7 +8,7 @@
  * 6. Evidence quality filtering
  */
 
-import { embedText } from "./embeddings.js";
+import { embedQuery } from "./embeddings.js";
 import { loadVectorIndex, vectorSearch } from "./vector-store.js";
 import { bm25Search, exactPhraseSearch, tokenize } from "./bm25.js";
 import type { RetrievedChunk, VectorRecord } from "./types.js";
@@ -38,7 +38,7 @@ export async function hybridRetrieve(
   }
 
   // 1. Dense vector search
-  const queryEmbedding = await embedText(query);
+  const queryEmbedding = await embedQuery(query);
   const vectorResults = vectorSearch(queryEmbedding, 25);
 
   // 2. BM25 lexical search

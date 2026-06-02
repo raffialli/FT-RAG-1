@@ -40,6 +40,7 @@ onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - msw
+  - onnxruntime-node
   - unrs-resolver
 
 overrides:

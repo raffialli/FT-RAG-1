@@ -1,3 +1,5 @@
 - [pdf-parse Node.js compat](pdf-parse-nodejs.md) — Always use pdf-parse@1.1.1 in Node.js; v2 crashes with DOMMatrix/browser deps.
 - [Orval TanStack Query v5 options](orval-tanstack-v5.md) — Generated hooks require queryKey in the query options when using TanStack Query v5.
-- [RAG pipeline architecture](rag-pipeline-arch.md) — Flat JSON vector store (cosine sim) chosen over ChromaDB to avoid server deps; RRF fusion for hybrid retrieval.
+- [RAG pipeline architecture](rag-pipeline-arch.md) — Flat JSON vector store (cosine sim) chosen over ChromaDB; RRF fusion for hybrid retrieval; embeddings run locally via transformers.js.
+- [Ollama Cloud limitations](ollama-cloud-limits.md) — /api/embed is NOT available on Ollama Cloud; only /api/chat and /api/generate work; no embedding models in the 40-model catalog.
+- [HuggingFace transformers esbuild](hf-transformers-esbuild.md) — Must mark @huggingface/transformers external in esbuild; add onnxruntime-node to onlyBuiltDependencies in pnpm-workspace.yaml.

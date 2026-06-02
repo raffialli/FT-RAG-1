@@ -52,6 +52,8 @@ Experimental RAG pipeline for FalconTrust — hybrid dense+BM25 retrieval, reran
 - **RRF (Reciprocal Rank Fusion)** for hybrid score fusion: more robust than weighted sum since it normalizes ranks from different scoring systems.
 - **Heuristic reranking** (token overlap + length + OCR penalty) before sending to LLM: avoids expensive per-chunk LLM scoring while still improving result order.
 - **All Orval `query` options require `queryKey`** in TanStack Query v5: always pass `queryKey: get*QueryKey()` when providing `query` options to generated hooks.
+- **Embeddings run locally via `@huggingface/transformers`** (nomic-embed-text-v1.5, ONNX q8, ~135MB). The `@huggingface/transformers` package must be marked `external` in `build.mjs` — bundling it causes optional deps (sharp, onnxruntime-node) to become fatal static ESM imports. `onnxruntime-node` must be in `onlyBuiltDependencies` in `pnpm-workspace.yaml` to build its native binaries.
+- **Generation uses `/api/chat`** (not `/api/generate`) on Ollama Cloud with `qwen3.5:397b`. The `/api/embed` endpoint is not available on Ollama Cloud at all — only generation/chat models are accessible.
 
 ## Product
 
@@ -69,9 +71,9 @@ _Populate as you build — explicit user instructions worth remembering across s
 ## Gotchas
 
 - **pdf-parse v2 crashes on startup**: uses pdfjs-dist with browser Canvas APIs. Always use `pdf-parse@1.1.1`.
-- **Ollama Cloud base URL**: set to `https://ollama.com`; API calls go to `{base}/api/embed` and `{base}/api/generate`. If embeddings fail, try `https://api.ollama.com`.
+- **Ollama Cloud base URL**: set to `https://ollama.com`; generation uses `{base}/api/chat`. **`/api/embed` is NOT available on Ollama Cloud** — only text generation models are accessible remotely. Available models include `qwen3.5:397b`, `gpt-oss:120b`, `deepseek-v4-flash`, etc. (40 total). Check with `curl https://ollama.com/api/tags -H "Authorization: Bearer $OLLAMA_API_KEY"`.
 - **TanStack Query v5 + Orval**: generated hooks' `query` parameter takes full `UseQueryOptions` which requires `queryKey`. Always include `queryKey: get*QueryKey()` when passing custom query options.
-- **Ingestion is slow for large PDFs**: embeddings are batched in groups of 8 with sequential Ollama calls. For 9 PDFs ~200+ chunks, expect 5–15 minutes if Ollama is remote.
+- **Ingestion is CPU-bound for embeddings**: nomic-embed-text-v1.5 runs locally via ONNX Runtime on CPU. First ingest downloads the model (~135MB, cached to `.hf-cache/`). Expect ~1–3 seconds per chunk on CPU; for 695 chunks across 9 PDFs, allow ~15–30 min total.
 
 ## Pointers
 

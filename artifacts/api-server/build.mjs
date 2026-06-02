@@ -29,6 +29,13 @@ async function buildAll() {
     // - use path traversal to read files (e.g. @google-cloud/secret-manager loads sibling .proto files)
     external: [
       "*.node",
+      // HuggingFace / ONNX — must stay external: these packages use optional
+      // native deps (sharp, onnxruntime-node) that esbuild would turn into
+      // static ESM imports, causing ERR_MODULE_NOT_FOUND at startup.
+      "@huggingface/transformers",
+      "@huggingface/env",
+      "onnxruntime-node",
+      "onnxruntime-web",
       "sharp",
       "better-sqlite3",
       "sqlite3",

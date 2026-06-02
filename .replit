@@ -35,5 +35,5 @@ externalPort = 3000
 
 [userenv.shared]
 OLLAMA_BASE_URL = "https://ollama.com"
-EMBEDDING_MODEL = "nomic-embed-text:latest"
-GENERATION_MODEL = "qwen3.5:122b"
+EMBEDDING_MODEL = "nomic-ai/nomic-embed-text-v1.5"
+GENERATION_MODEL = "qwen3.5:397b"

@@ -1,0 +1,97 @@
+[
+  {
+    "id": "Flood_Risk_Management-OCR_1780399724237_pdf",
+    "filename": "Flood_Risk_Management-OCR_1780399724237.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/Flood_Risk_Management-OCR_1780399724237.pdf",
+    "pageCount": 226,
+    "chunkCount": 324,
+    "ingestedAt": "2026-06-02T12:58:36.551Z",
+    "status": "ingested",
+    "cleaningFlags": [
+      "removed-frontmatter"
+    ]
+  },
+  {
+    "id": "JEM_2024_Special_Issue_1780399724235_pdf",
+    "filename": "JEM_2024_Special_Issue_1780399724235.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/JEM_2024_Special_Issue_1780399724235.pdf",
+    "pageCount": 126,
+    "chunkCount": 216,
+    "ingestedAt": "2026-06-02T12:58:37.399Z",
+    "status": "ingested",
+    "cleaningFlags": [
+      "removed-frontmatter",
+      "removed-ads"
+    ]
+  },
+  {
+    "id": "bdevito67_JEM-12-1-04-Kohn_1780399724237_pdf",
+    "filename": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
+    "pageCount": 19,
+    "chunkCount": 38,
+    "ingestedAt": "2026-06-02T12:58:37.442Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEM_20-8-08-Wood-Practical_flood_risk_1780399724236_pdf",
+    "filename": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+    "pageCount": 14,
+    "chunkCount": 40,
+    "ingestedAt": "2026-06-02T12:58:37.533Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEM_21-1-04-Huang_1780399724236_pdf",
+    "filename": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
+    "pageCount": 13,
+    "chunkCount": 22,
+    "ingestedAt": "2026-06-02T12:58:37.650Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEM_V3N2_3_1780399724236_pdf",
+    "filename": "bdevito67,+JEM_V3N2_3_1780399724236.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V3N2_3_1780399724236.pdf",
+    "pageCount": 6,
+    "chunkCount": 11,
+    "ingestedAt": "2026-06-02T12:58:37.668Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEM_V3N3_3_1780399724236_pdf",
+    "filename": "bdevito67,+JEM_V3N3_3_1780399724236.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V3N3_3_1780399724236.pdf",
+    "pageCount": 3,
+    "chunkCount": 5,
+    "ingestedAt": "2026-06-02T12:58:37.679Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEM_V6N5_9_1780399724235_pdf",
+    "filename": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+    "pageCount": 10,
+    "chunkCount": 22,
+    "ingestedAt": "2026-06-02T12:58:37.704Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  },
+  {
+    "id": "bdevito67_JEMv9n1_7_1780399724237_pdf",
+    "filename": "bdevito67,+JEMv9n1_7_1780399724237.pdf",
+    "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEMv9n1_7_1780399724237.pdf",
+    "pageCount": 9,
+    "chunkCount": 17,
+    "ingestedAt": "2026-06-02T12:58:37.728Z",
+    "status": "ingested",
+    "cleaningFlags": []
+  }
+]

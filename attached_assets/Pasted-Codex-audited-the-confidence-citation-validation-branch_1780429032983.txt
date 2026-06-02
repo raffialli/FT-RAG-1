@@ -1,0 +1,122 @@
+Codex audited the confidence/citation validation branch.
+
+Audit verdict:
+PASS WITH FIXES
+
+Audited branch/commit:
+experiment/replit-confidence-citation-validation-lane
+4bcae4eab45e9808ca8af98b371b73bdf7ccb40a
+
+Codex verified:
+- build/typecheck passes
+- frontend build passes
+- confidence behavior improved from 10/10 high to 6 high / 4 low
+- citation validation mostly works
+- Q9 being low is justified
+
+Do not start a new broad lane.
+Do not merge to main.
+Do not create the integration branch yet.
+
+Create a focused fix branch:
+
+experiment/replit-confidence-citation-validation-fixes
+
+Goal:
+Fix the specific Codex audit findings before integration.
+
+Required fixes:
+
+1. Fix comma citation parsing
+
+Current bug:
+Citations like `[1,2]` are not parsed correctly.
+
+Update citation validation to support:
+- `[1]`
+- `[1,2]`
+- `[1, 2]`
+- `[1,2,3]`
+- multiple separate citations like `[1] [2]`
+- repeated citations without double-counting
+
+Add/verify tests or audit examples for:
+- valid comma citations
+- out-of-range comma citations
+- mixed valid/invalid citations
+- no-citation answer
+- noisy cited chunk
+
+2. Decide and implement rule for high confidence with partial evidence
+
+Codex flagged this as needing a policy decision.
+
+Use this rule unless you have a strong reason to propose a better one:
+
+- `confidence=high` requires `evidenceSufficiency=sufficient`.
+- If `evidenceSufficiency=partial`, max confidence is `medium`.
+- If `evidenceSufficiency=weak`, max confidence is `low`.
+- If `evidenceSufficiency=insufficient`, confidence must be `insufficient` or `low`, depending on whether a useful partial answer exists.
+- If the answer text says evidence is limited, indirect, not explicitly covered, or not directly supported, confidence cannot be high.
+
+Document the exact rule in the report.
+
+3. Add deterministic regression tests/checks for Q3/Q6/Q7/Q9/Q10
+
+Create a lightweight deterministic check that does not depend only on LLM wording.
+
+For these benchmark queries, verify expected confidence/evidence direction:
+
+- Q3 South Sudan strategies: should not be high if answer says corpus lacks sufficient strategy evidence.
+- Q6 EWS fatalities: should not be high if quantitative fatality data is absent.
+- Q7 climate change FRM policy: should not be high if policy mechanism evidence is indirect/missing.
+- Q9 resilience methods: should be low/medium unless direct method-assessment evidence is actually present.
+- Q10 social risk: should be medium/low if evidence is single-source or hedged.
+
+Prefer testing the scoring/validation functions directly with controlled answer text and mock chunks, in addition to any live benchmark run.
+
+4. Update report
+
+Create or update:
+
+docs/rag-experiments/replit-rag-candidate/14-confidence-citation-fixes-report.md
+
+Include:
+- Codex findings addressed
+- files/functions changed
+- citation parser examples before/after
+- confidence/evidence sufficiency policy
+- deterministic regression test results
+- 10-question benchmark result after fixes
+- remaining gaps
+- final verdict:
+  - FIXED
+  - PARTIAL
+  - NOT FIXED
+  - REGRESSION
+
+5. Run checks
+
+Run:
+- pnpm --filter @workspace/api-server run typecheck
+- pnpm --filter @workspace/api-server run build
+- frontend build/typecheck if available
+- any new deterministic tests/checks you add
+
+6. Push branch for Codex audit
+
+Push to:
+
+experiment/replit-confidence-citation-validation-fixes
+
+Do not push to main.
+Do not commit secrets.
+
+Final response:
+- branch name
+- commit hash
+- files changed
+- commands run
+- report path
+- verdict
+- what Codex should verify next

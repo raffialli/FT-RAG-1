@@ -170,6 +170,67 @@ export function cleanOcrText(rawText: string, filename: string): CleanResult {
   text = text.replace(/^\s*www\.[^\s]{5,}\s*$/gm, "");
   if (text.length !== urlLineBefore) flags.push("removed-bare-url-lines");
 
+  // 15a. Split inline headings off from body text.
+  //
+  //  PDF extraction often produces long lines where a section heading keyword
+  //  runs directly into the body text with no newline:
+  //    "ABSTRACT Objectives: To measure..."
+  //    "CONCLUSIONS The ultimate goal..."
+  //    "ACkNOWLEDGMENTS The authors..."
+  //    "AbstrAct This study uses FEMA..."
+  //
+  //  Inject a newline between the heading keyword and the body so that
+  //  detectSectionHeading() in the chunker can isolate and label the heading.
+  //
+  //  Pattern: line starts with a known section keyword (case-insensitive),
+  //  optionally followed by punctuation, then an uppercase word beginning body text.
+  //  Guard: body text must be ≥15 chars (avoids splitting "METHODS:" alone).
+  //
+  const INLINE_HEADING_RE =
+    /^\s*((?:ABSTRACT|INTRODUCTION|BACKGROUND|METHODS?|METHODOLOGY|RESULTS?|DISCUSSION|LIMITATIONS?|CONCLUSIONS?|REFERENCES?|ACKNOWLEDGEMENTS?|ACKNOWLEDGMENTS?|OBJECTIVES?|FINDINGS?|IMPLICATIONS?|RECOMMENDATIONS?|SUMMARY|OVERVIEW|PURPOSE|SIGNIFICANCE|HYPOTHESIS|SAMPLE|FRAMEWORK|APPROACH|EVALUATION|ANALYSIS|LITERATURE REVIEW|STUDY DESIGN|CASE STUDY|DATA COLLECTION|DATA ANALYSIS|KEY WORDS?|KEYWORDS?|STUDY LIMITATIONS?|FUTURE WORK))(\s*[:.]\s*|\s{1,4})([A-Z0-9].{14,})/gim;
+  const before15a = text;
+  text = text.replace(INLINE_HEADING_RE, (_, heading, _sep, body) => {
+    return heading.trim() + "\n" + body;
+  });
+  if (text !== before15a) flags.push("split-inline-headings");
+
+  // 15b. Split mid-line headings preceded by sentence-end punctuation.
+  //
+  //  After step 15a, some headings are still embedded deeply mid-line because
+  //  they follow body text ending in [.!?] rather than appearing at line start.
+  //  Pattern (all docs like Huang, JEM-2024, Wood):
+  //    "...management. MATERIALS AND METHODS This study employed..."
+  //    "...experience. DISCUSSION The findings suggest..."
+  //
+  //  Insert a newline before the heading keyword when preceded by [.!?] + space.
+  //  Guard: body text after the heading must be ≥20 chars to avoid false positives
+  //  on things like "...results. Methods: A survey..." that are already correctly
+  //  inline. Also catch author-credential-block + ABSTRACT patterns:
+  //    "...John Smith, PhD ABSTRACT An effective..."
+  //
+  const MIDLINE_HEADING_KEYWORDS =
+    "(?:ABSTRACT|INTRODUCTION|BACKGROUND|MATERIALS AND METHODS|METHODS?|METHODOLOGY|RESULTS?|DISCUSSION|LIMITATIONS?|CONCLUSIONS?|REFERENCES?|ACKNOWLEDGEMENTS?|ACKNOWLEDGMENTS?|OBJECTIVES?|FINDINGS?|IMPLICATIONS?|RECOMMENDATIONS?|SUMMARY|OVERVIEW|PURPOSE|SIGNIFICANCE|HYPOTHESIS|SAMPLE|FRAMEWORK|APPROACH|EVALUATION|ANALYSIS|LITERATURE REVIEW|STUDY DESIGN|CASE STUDY|DATA COLLECTION|DATA ANALYSIS|KEY WORDS?|KEYWORDS?|STUDY LIMITATIONS?|FUTURE WORK)";
+  // Pattern 1: sentence-end + space + heading keyword + space + capital letter
+  const MIDLINE_SENTENCE_RE = new RegExp(
+    `([.!?])\\s{1,3}(${MIDLINE_HEADING_KEYWORDS})(\\s*[:\\.]?\\s{1,4})([A-Z0-9].{19,})`,
+    "gim"
+  );
+  // Pattern 2: credential suffix (PhD, MS, etc.) + space + ABSTRACT / heading
+  const MIDLINE_AUTHOR_RE = new RegExp(
+    `(?:,?\\s*(?:PhD|MS|MD|DrPH|MPH|MA|BA|BS|RN|MBA|JD|LLM|MT|MPA|MEM|MSEM|PE|CPM|MPM)[.,]*)\\s+(${MIDLINE_HEADING_KEYWORDS})(\\s{1,4})([A-Z0-9].{19,})`,
+    "gi"
+  );
+  const before15b = text;
+  text = text.replace(MIDLINE_SENTENCE_RE, (_, punct, heading, _sep, body) => {
+    return punct + "\n" + heading.trim() + "\n" + body;
+  });
+  text = text.replace(MIDLINE_AUTHOR_RE, (fullMatch, heading, _sep, body) => {
+    // Keep the credential suffix, inject newline before heading
+    const credentialEnd = fullMatch.indexOf(heading);
+    return fullMatch.slice(0, credentialEnd).trimEnd() + "\n" + heading.trim() + "\n" + body;
+  });
+  if (text !== before15b) flags.push("split-midline-headings");
+
   // 15. Normalize whitespace
   text = text.replace(/\n{3,}/g, "\n\n"); // max 2 blank lines
   text = text.replace(/[ \t]{2,}/g, " ");  // multiple spaces → single
@@ -344,18 +405,50 @@ function fixColumnArtifacts(text: string, flags: string[]): string {
 
 // ── Section heading detection (used by chunker) ──────────────────────────────
 
+// Known section heading keywords (used by both detector and cleaner step 15a)
+const SECTION_KEYWORDS = [
+  "abstract", "introduction", "background", "method", "methods", "methodology",
+  "result", "results", "discussion", "limitation", "limitations", "conclusion",
+  "conclusions", "reference", "references", "bibliography", "acknowledgement",
+  "acknowledgements", "acknowledgment", "acknowledgments", "objective", "objectives",
+  "finding", "findings", "implication", "implications", "recommendation",
+  "recommendations", "summary", "overview", "purpose", "significance", "hypothesis",
+  "sample", "framework", "approach", "evaluation", "analysis", "literature review",
+  "study design", "case study", "data collection", "data analysis", "key words",
+  "keywords", "study limitations", "future work", "procedure", "procedures",
+  "measure", "measures", "instrument", "instruments",
+];
+
 export function detectSectionHeading(line: string): string | null {
   const trimmed = line.trim();
   if (!trimmed || trimmed.length < 3 || trimmed.length > 120) return null;
 
-  // ALL CAPS heading
-  if (/^[A-Z][A-Z\s\-:]{4,}$/.test(trimmed)) return trimmed;
+  const lower = trimmed.toLowerCase();
 
-  // Numbered heading like "1. Introduction" or "1.2 Methods"
+  // 1. Exact match against known keywords (case-insensitive, handles mixed-case
+  //    OCR artifacts like "AbstrAct", "IntroductIon", "ACkNOWLEDGMENTS")
+  for (const kw of SECTION_KEYWORDS) {
+    if (lower === kw || lower === kw + ":" || lower === kw + "s") {
+      // Normalise to Title Case for consistent sectionPath values
+      return kw
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+  }
+
+  // 2. ALL CAPS heading (existing rule — catches "DISCUSSION", "RESULTS", etc.)
+  if (/^[A-Z][A-Z\s\-:]{4,}$/.test(trimmed)) {
+    return trimmed
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  // 3. Numbered heading like "1. Introduction" or "1.2 Methods"
   if (/^\d+(\.\d+)?\s+[A-Z][a-zA-Z\s]{3,}$/.test(trimmed)) return trimmed;
 
-  // Title case heading (mixed-case, ≤8 words, no trailing period)
-  // Extended to catch JEM article headers like "Literature Review", "Study Limitations"
+  // 4. Title case heading (mixed-case, ≤8 words, no trailing period)
+  //    Extended to catch JEM article headers like "Literature Review"
   if (
     /^[A-Z][a-zA-Z\s\-:,]{4,}$/.test(trimmed) &&
     !trimmed.endsWith(".") &&

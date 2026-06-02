@@ -221,14 +221,39 @@ function isUsableChunk(text: string): boolean {
   const trimmed = text.trim();
   if (trimmed.length < MIN_CHUNK_CHARS) return false;
 
-  // Reject chunks that are mostly references / bibliography
-  const referenceLineRatio =
-    (trimmed.match(/^\s*\d+\.\s+[A-Z]/gm) || []).length / (trimmed.split("\n").length || 1);
-  if (referenceLineRatio > 0.5) return false;
-
-  // Reject chunks that are mostly page numbers and headers
+  const lines = trimmed.split("\n").filter((l) => l.trim().length > 0);
   const wordCount = trimmed.split(/\s+/).length;
+
+  // Reject very short chunks
   if (wordCount < 20) return false;
+
+  // ── Reference / bibliography chunks ──────────────────────────────────────
+  // Pattern 1: numbered reference list  "1. Author, Title..."
+  const numberedRefLines = (trimmed.match(/^\s*\d{1,3}[\.\)]\s+[A-Z]/gm) || []).length;
+  if (numberedRefLines / (lines.length || 1) > 0.4) return false;
+
+  // Pattern 2: bibliography-style lines  "Author, A. (YYYY)..." or "Author A:"
+  const bibLines = (trimmed.match(/^\s*[A-Z][a-z]+,?\s+[A-Z][\w.]*[,.]?\s+\(\d{4}\)/gm) || []).length;
+  if (bibLines / (lines.length || 1) > 0.35) return false;
+
+  // Pattern 3: chunk is ALL references (high ratio of year citations)
+  const yearCitations = (trimmed.match(/\(\d{4}[a-z]?\)/g) || []).length;
+  if (yearCitations > 6 && yearCitations / wordCount > 0.06) return false;
+
+  // ── Table of contents / dot-leader chunks ────────────────────────────────
+  // TOC lines have a title followed by dots and a page number
+  const tocLines = (trimmed.match(/[.]{3,}\s*\d+\s*$/gm) || []).length;
+  if (tocLines / (lines.length || 1) > 0.3) return false;
+
+  // ── Contributor / editorial list chunks ──────────────────────────────────
+  // Lines with only a name + affiliation and no substantive sentence
+  const affiliationLines = (trimmed.match(/\b(University|College|Institute|Department|Professor|Director)\b/gm) || []).length;
+  if (affiliationLines > 4 && affiliationLines / (lines.length || 1) > 0.5) return false;
+
+  // ── Table-of-contents number-only density ────────────────────────────────
+  // E.g. "3 14\n 4 18\n 5 22" — lines that are almost entirely numbers
+  const numberOnlyLines = lines.filter((l) => /^\s*[\dxivXIV\s.]+\s*$/.test(l)).length;
+  if (numberOnlyLines / (lines.length || 1) > 0.5) return false;
 
   return true;
 }

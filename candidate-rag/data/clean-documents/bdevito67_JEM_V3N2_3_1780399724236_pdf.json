@@ -3,6 +3,8 @@
   "filename": "bdevito67,+JEM_V3N2_3_1780399724236.pdf",
   "cleaningFlags": [
     "fixed-hyphenation",
-    "removed-journal-headers"
+    "removed-journal-headers",
+    "split-inline-headings",
+    "split-midline-headings"
   ]
 }

@@ -4,13 +4,14 @@
     "filename": "Flood_Risk_Management-OCR_1780399724237.pdf",
     "filePath": "/home/runner/workspace/attached_assets/Flood_Risk_Management-OCR_1780399724237.pdf",
     "pageCount": 226,
-    "chunkCount": 323,
-    "ingestedAt": "2026-06-02T16:09:45.718Z",
+    "chunkCount": 319,
+    "ingestedAt": "2026-06-02T17:17:51.340Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
       "repaired-ocr-substitutions",
-      "removed-frontmatter"
+      "removed-frontmatter",
+      "split-midline-headings"
     ]
   },
   {
@@ -18,8 +19,8 @@
     "filename": "JEM_2024_Special_Issue_1780399724235.pdf",
     "filePath": "/home/runner/workspace/attached_assets/JEM_2024_Special_Issue_1780399724235.pdf",
     "pageCount": 126,
-    "chunkCount": 232,
-    "ingestedAt": "2026-06-02T16:09:46.601Z",
+    "chunkCount": 227,
+    "ingestedAt": "2026-06-02T17:17:52.216Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
@@ -27,7 +28,8 @@
       "removed-logo-artifacts",
       "removed-journal-headers",
       "removed-frontmatter",
-      "removed-ads"
+      "removed-ads",
+      "split-midline-headings"
     ]
   },
   {
@@ -35,12 +37,14 @@
     "filename": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
     "pageCount": 19,
-    "chunkCount": 37,
-    "ingestedAt": "2026-06-02T16:09:46.646Z",
+    "chunkCount": 35,
+    "ingestedAt": "2026-06-02T17:17:52.259Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   },
   {
@@ -48,12 +52,14 @@
     "filename": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
     "pageCount": 14,
-    "chunkCount": 41,
-    "ingestedAt": "2026-06-02T16:09:46.739Z",
+    "chunkCount": 38,
+    "ingestedAt": "2026-06-02T17:17:52.344Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   },
   {
@@ -62,11 +68,12 @@
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
     "pageCount": 13,
     "chunkCount": 24,
-    "ingestedAt": "2026-06-02T16:09:46.854Z",
+    "ingestedAt": "2026-06-02T17:17:52.455Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-midline-headings"
     ]
   },
   {
@@ -74,12 +81,14 @@
     "filename": "bdevito67,+JEM_V3N2_3_1780399724236.pdf",
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V3N2_3_1780399724236.pdf",
     "pageCount": 6,
-    "chunkCount": 11,
-    "ingestedAt": "2026-06-02T16:09:46.872Z",
+    "chunkCount": 9,
+    "ingestedAt": "2026-06-02T17:17:52.473Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   },
   {
@@ -87,12 +96,14 @@
     "filename": "bdevito67,+JEM_V3N3_3_1780399724236.pdf",
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V3N3_3_1780399724236.pdf",
     "pageCount": 3,
-    "chunkCount": 5,
-    "ingestedAt": "2026-06-02T16:09:46.884Z",
+    "chunkCount": 6,
+    "ingestedAt": "2026-06-02T17:17:52.485Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   },
   {
@@ -100,12 +111,14 @@
     "filename": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEM_V6N5_9_1780399724235.pdf",
     "pageCount": 10,
-    "chunkCount": 21,
-    "ingestedAt": "2026-06-02T16:09:46.913Z",
+    "chunkCount": 19,
+    "ingestedAt": "2026-06-02T17:17:52.512Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   },
   {
@@ -114,11 +127,13 @@
     "filePath": "/home/runner/workspace/attached_assets/bdevito67,+JEMv9n1_7_1780399724237.pdf",
     "pageCount": 9,
     "chunkCount": 16,
-    "ingestedAt": "2026-06-02T16:09:46.936Z",
+    "ingestedAt": "2026-06-02T17:17:52.535Z",
     "status": "ingested",
     "cleaningFlags": [
       "fixed-hyphenation",
-      "removed-journal-headers"
+      "removed-journal-headers",
+      "split-inline-headings",
+      "split-midline-headings"
     ]
   }
 ]

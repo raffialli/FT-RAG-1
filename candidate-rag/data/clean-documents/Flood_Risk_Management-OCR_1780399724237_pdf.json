@@ -4,6 +4,7 @@
   "cleaningFlags": [
     "fixed-hyphenation",
     "repaired-ocr-substitutions",
-    "removed-frontmatter"
+    "removed-frontmatter",
+    "split-midline-headings"
   ]
 }

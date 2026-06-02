@@ -3,6 +3,7 @@
   "filename": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
   "cleaningFlags": [
     "fixed-hyphenation",
-    "removed-journal-headers"
+    "removed-journal-headers",
+    "split-midline-headings"
   ]
 }

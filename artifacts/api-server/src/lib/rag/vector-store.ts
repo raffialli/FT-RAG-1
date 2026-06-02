@@ -8,7 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import type { RagChunk, VectorIndex, VectorRecord } from "./types.js";
 
-const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(process.cwd(), "candidate-rag", "data");
+const WORKSPACE_ROOT = path.resolve(process.cwd(), "..", "..");
+const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(WORKSPACE_ROOT, "candidate-rag", "data");
 const VECTOR_INDEX_PATH = path.join(DATA_DIR, "vectors", "index.json");
 const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "nomic-embed-text:latest";
 

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ComparisonReport } from "./types.js";
 
-const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(process.cwd(), "candidate-rag", "data");
+const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
 const REPORTS_PATH = path.join(DATA_DIR, "reports", "comparison-reports.json");
 
 export function loadReports(): ComparisonReport[] {

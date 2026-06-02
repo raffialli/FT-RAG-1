@@ -29,12 +29,14 @@ import {
 } from "./vector-store.js";
 import type { RagChunk, RagDocument } from "./types.js";
 
-const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(process.cwd(), "candidate-rag", "data");
+// api-server cwd = artifacts/api-server — go up two levels to workspace root
+const WORKSPACE_ROOT = path.resolve(process.cwd(), "..", "..");
+const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(WORKSPACE_ROOT, "candidate-rag", "data");
 const DOCS_MANIFEST_PATH = path.join(DATA_DIR, "manifests", "documents.json");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 const CLEAN_DOCS_DIR = path.join(DATA_DIR, "clean-documents");
 const CHUNKS_DIR = path.join(DATA_DIR, "chunks");
-const SOURCE_PDFS_DIR = path.join(process.cwd(), "attached_assets");
+const SOURCE_PDFS_DIR = process.env.SOURCE_PDFS_DIR ?? path.join(WORKSPACE_ROOT, "attached_assets");
 
 export interface IngestResult {
   success: boolean;

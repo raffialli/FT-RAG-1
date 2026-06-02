@@ -15,7 +15,7 @@ import { loadVectorIndex, resetVectorIndex } from "../lib/rag/vector-store.js";
 import { testConnectivity } from "../lib/rag/embeddings.js";
 import { loadReports, saveReport } from "../lib/rag/reports.js";
 
-const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(process.cwd(), "candidate-rag", "data");
+const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });

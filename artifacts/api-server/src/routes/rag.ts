@@ -58,7 +58,7 @@ router.get("/rag/status", async (req, res) => {
       chunkCount,
       vectorCount: index.records.length,
       ready: index.records.length > 0,
-      embeddingModel: process.env.EMBEDDING_MODEL ?? "nomic-ai/nomic-embed-text-v1.5",
+      embeddingModel: process.env.EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2",
       generationModel: process.env.GENERATION_MODEL ?? "qwen3.5:397b",
       ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? "https://ollama.com",
       lastIngestedAt: lastIngestedDoc?.ingestedAt ?? null,

@@ -29,5 +29,6 @@ onlyBuiltDependencies:
 **Usage pattern in embeddings.ts:**
 - Use dynamic `await import("@huggingface/transformers")` inside a lazy getter
 - Set `env.cacheDir` to a persistent path inside the workspace (`.hf-cache/`)
-- nomic-embed-text-v1.5 task prefixes: `search_document:` for chunks, `search_query:` for queries
-- Use `dtype: "q8"` (int8 quantized ~135MB) for CPU inference
+- Use `dtype: "q8"` for CPU inference
+- Use `Xenova/all-MiniLM-L6-v2` (~23MB q8, 384-dim) — nomic-embed-text-v1.5 (~135MB) OOMs Replit's container
+- **CRITICAL: batch serially (one at a time)** — parallel ONNX sessions multiply memory and OOM. Never use Promise.all on embedText calls.

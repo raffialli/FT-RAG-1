@@ -262,7 +262,7 @@ export async function ingestAllDocuments(rebuild = false): Promise<IngestResult>
   if (allNewChunks.length > 0) {
     try {
       const texts = allNewChunks.map((c) => c.text);
-      const embeddings = await embedBatch(texts, 8);
+      const embeddings = await embedBatch(texts);
       addOrUpdateRecords(allNewChunks, embeddings);
       totalVectors = allNewChunks.length;
     } catch (e) {
@@ -293,7 +293,7 @@ export async function ingestUploadedFile(filePath: string): Promise<IngestResult
   if (result.chunks.length > 0) {
     try {
       const texts = result.chunks.map((c) => c.text);
-      const embeddings = await embedBatch(texts, 8);
+      const embeddings = await embedBatch(texts);
       addOrUpdateRecords(result.chunks, embeddings);
       vectorsCreated = result.chunks.length;
     } catch (e) {

@@ -45,6 +45,8 @@ export interface RetrievedChunk extends RagChunk {
   vectorScore: number;
   bm25Score: number;
   rerankScore: number;
+  noiseScore: number;
+  noiseCategory: string;
   retrievalMethod: string;
 }
 

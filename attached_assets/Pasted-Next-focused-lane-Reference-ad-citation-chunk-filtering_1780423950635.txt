@@ -1,0 +1,95 @@
+Next focused lane: Reference / ad / citation chunk filtering.
+
+Pause broad feature work. Do not move to model changes, Chroma, confidence scoring, or UI expansion yet.
+
+Context:
+Codex audited the OCR and section/chunk lanes. The improvements are real, but retrieval still has a serious issue: Reference/ad/citation chunks can rank highly and pollute answers, especially Q7 and Q9.
+
+Goal:
+Improve retrieval quality by preventing reference-list, ad/subscription, citation-only, editorial/frontmatter, and bibliography chunks from dominating top retrieval results.
+
+Primary requirements:
+
+1. Identify noisy chunks
+
+Detect and classify chunks as:
+
+* reference-list chunk
+* citation-heavy chunk
+* bibliography chunk
+* ad/subscription chunk
+* editorial/frontmatter chunk
+* TOC chunk
+* contributor/affiliation chunk
+* useful content chunk
+
+Pay special attention to chunks with:
+
+* sectionPath = Reference
+* lots of URLs
+* many years/citations
+* many author-name lists
+* subscription or pricing language
+* journal issue metadata
+* editorial board material
+* low semantic answer value
+
+2. Filtering behavior
+
+Do not blindly delete all Reference chunks from the corpus unless safe.
+
+Preferred behavior:
+
+* mark noisy chunks with metadata/noiseScore
+* exclude strong noise chunks from top-K answer evidence
+* strongly penalize Reference/ad/citation chunks during reranking
+* allow reference chunks only when the user explicitly asks for references/bibliography/source list
+
+3. Fix known retrieval failures
+
+Rerun the 10 benchmark questions from the prior reports.
+
+Hard gates:
+
+* Q7 must not have Reference chunks at rank 1 or rank 5.
+* Q9 must not have Reference chunks dominating ranks 1–4.
+* Q4/Q6 should not surface subscription/ad-like chunks in top evidence.
+* Top 5 chunks should be mostly useful content for answer generation.
+
+4. Produce proof report
+
+Create:
+
+docs/rag-experiments/replit-rag-candidate/12-reference-noise-filtering-report.md
+
+Report must include:
+
+* baseline noisy top-K count before this lane
+* after noisy top-K count
+* exact rules/heuristics added
+* exact files/functions changed
+* examples of chunks correctly suppressed
+* examples of useful content preserved
+* Q1–Q10 retrieval before/after table
+* whether answer quality improved, stayed same, or regressed
+* remaining failure cases
+
+5. Verdict
+
+Use one:
+
+* IMPROVED — noisy reference/ad chunks reduced and retrieval not harmed
+* PARTIAL — noise reduced but some failures remain
+* NO CHANGE — filtering did not materially improve retrieval
+* REGRESSION — useful content was suppressed or retrieval got worse
+
+6. GitHub handoff
+
+When complete:
+
+* commit changes
+* push to a new branch:
+  experiment/replit-reference-noise-filtering-lane
+* do not push to main
+* do not commit secrets
+* report branch, commit hash, files changed, commands run, report path, and what Codex should verify next.

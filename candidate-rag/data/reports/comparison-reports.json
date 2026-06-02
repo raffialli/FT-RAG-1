@@ -1,5 +1,860 @@
 [
   {
+    "question": "How is social risk constructed in flood risk management?",
+    "candidateAnswer": "Based on the provided evidence, social risk in flood risk management is constructed through the following mechanisms:\n\n*   **Social Norms and Politics:** Risk knowledge is not pure or objective; it is shaped by social norms, moralities, and political motivations, which influence how \"expert\" and \"lay\" epistemologies are treated [1].\n*   **Power Relations:** Social relations and risk are constructed through power dynamics, specifically how actors include or exclude others and exercise coercive or hegemonic power [3].\n*   **Policy and Infrastructure Effects:** Policy regimes and structural mitigation measures (like levees) can create gaps between actual and perceived risk. These measures may increase perceived safety, leading to the \"escalator effect\" where development increases in hazardous areas, thereby amplifying social risk [2].\n*   **Social Context vs. Individual Cognition:** Unlike frameworks that confine risk to individual cognitive processes (heuristics and biases), the constructivist perspective argues that individuals do not perceive risk in a vacuum and that risk cannot be determined with complete objectivity [4].\n*   **Trust and Historical Experience:** Risk is historically and scientifically contingent, constructed through a relationship with trust and accountability that relies on individual behaviors and societal historical-cultural experiences of flood events [5].\n\nThe evidence provides a theoretical overview of these construction mechanisms but offers limited specific detail on the operational application of \"social risk\" as a distinct metric beyond these conceptual frameworks.",
+    "candidateConfidence": "medium",
+    "candidateSources": [
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 18,
+        "pageEnd": 18,
+        "sectionPath": null,
+        "snippet": "In this volume, the impact of broken or ineffective communication systems is explored in both chapters 10 and 11, wherein the devastating impacts of poor warning systems are outlined and technical flood risk information is demonstrated to be difficult to reconcile with diverse, non-expert knowledge …",
+        "supportLevel": "direct",
+        "score": 0.29343137254901963
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 11,
+        "pageEnd": 12,
+        "sectionPath": "Conclusion",
+        "snippet": "In these cases, 'expert' actors play a significant role in shaping prospective residents' risk perceptions. Parker's (1995) and Pardoe et al.'s (2011) descriptions of the 'escalator effect' helps to explain why we see increased development in the floodplain after structural mitigation measures are i…",
+        "supportLevel": "direct",
+        "score": 0.29327651515151515
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 13,
+        "pageEnd": 14,
+        "sectionPath": null,
+        "snippet": "Theoretical conceptualisations of power are multiple and diverse, however all consider the relations between different actors (see Weber (1964); Foucault (1979); Allen (2009); Ailon (2006); and Lukes (2004)). One application of models of power to the field of FRM is provided by Self and Penning-Rows…",
+        "supportLevel": "direct",
+        "score": 0.29289373814041747
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": "Conclusion",
+        "snippet": "The affect heuristic suggests that individuals tend to make judgments about risk based on emotional connections to the hazard (Slovic, 2000). In the psychometric paradigm, as this school of thought has been labelled, emphasis is placed on predicting behavioural outcomes (Birkholz, 2014). Heuristics,…",
+        "supportLevel": "direct",
+        "score": 0.2901377217553688
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 19,
+        "pageEnd": 19,
+        "sectionPath": null,
+        "snippet": "Chapter 16 demonstrates the efficacy with which information spreads between public communities during flood events via social media and how platforms such as Twitter are increasingly used as a bridge between official and public communities. The examples show how social media platforms as a component…",
+        "supportLevel": "direct",
+        "score": 0.28476645849596666
+      }
+    ],
+    "evidenceQuality": "partial",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433869789",
+    "createdAt": "2026-06-02T20:57:49.789Z"
+  },
+  {
+    "question": "What methods are used to assess community resilience to floods?",
+    "candidateAnswer": "The provided evidence does not explicitly list specific methods used to assess community resilience to floods. However, it mentions related concepts and tools:\n\n*   **Vulnerability Indices:** The text notes that \"vulnerability indices have evolved... to better quantify the subjective nature of social vulnerability\" and that community leaders employ popular social vulnerability indices, such as **SVI** or **SoVI**, to meet federal disaster funding requirements and distribute resources [2].\n*   **Resilience Strategies as Means:** One source describes resilience strategies (such as accepting help, taking decisive action, and maintaining a realistic perspective) as \"methods by which communities can restore damaged resources and protect against future loss,\" though these are framed as actions for recovery rather than assessment tools [1].\n*   **Composite Indicators:** A reference is made to a \"Handbook on Constructing Composite Indicators,\" suggesting the use of composite indicators in methodology, but the text does not detail how they are applied to flood resilience assessment [4].\n\nThe corpus does not contain sufficient information to provide a comprehensive list of methods specifically for *assessing* community resilience to floods, as the available text focuses more on the definition of resilience, the use of vulnerability indices for funding, and general recovery strategies.",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Discussion",
+        "snippet": "They need to respect how hard it is to ask for help. They also need to provide real help. If you are going to help, bring real resources and a willingness to take action yourself. An outsider’s expertise will be respected if it is demonstrated rather than flaunted. Fourth, the strategies of resilien…",
+        "supportLevel": "direct",
+        "score": 0.2820028011204482
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "community resilience, corporate social responsibility, disasters, emergency management; DOI: 10.5055/jem.0808 INTRODUCTION Vulnerability indices have evolved over the last several decades in an attempt to better quantify the subjective nature of social vulnerability. Community leaders, particularly …",
+        "supportLevel": "direct",
+        "score": 0.2710152913624466
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 4,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "There even appears to be a disconnect between those shared value concepts and practical core business functions. 9 “CSR seems to be lacking specific research with regards to how to address the core SA-Weston-JEM#230028.indd 27 22-03-2024 14:41:26\n\n rough CSR and seems to point out a reason why CSR c…",
+        "supportLevel": "direct",
+        "score": 0.25861344537815123
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 6,
+        "pageEnd": 7,
+        "sectionPath": "Discussion",
+        "snippet": "J Occup Environ Med . 2012; 54(11): 1421-1429. 45. Bardoel EA, Pettit TM, De Cieri H, et al.: Employee resilience: An emerging challenge for HRM. Asia Pacific J Hum Resour . 2014; 52(3): 279-297. 46. Ali M, Ghani MU, Raza B: Linking human resource practice with work happiness through employee resili…",
+        "supportLevel": "direct",
+        "score": 0.25760619316219635
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Discussion",
+        "snippet": "Acad Manag Discov . 2019; 5(1): 97-101. 19. Kim S, Karlesky MJ, Myers CG, et  al.: Why companies are becoming B corporations. Harvard Bus Rev . 2016; 17: 1-5. 20. Creswell JW, Creswell JD: Research Design: Qualitative, Quantitative, and Mixed Methods Approaches . 5th ed. Thousand Oaks, CA: Sage Publ…",
+        "supportLevel": "direct",
+        "score": 0.25581232492997197
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433865342",
+    "createdAt": "2026-06-02T20:57:45.342Z"
+  },
+  {
+    "question": "How is flood risk communicated to the public?",
+    "candidateAnswer": "The provided evidence offers limited and fragmented information on how flood risk is communicated to the public, primarily highlighting specific tools, failures in communication, and legal constraints on engagement rather than a comprehensive communication strategy.\n\n*   **Communication Tools:** Flood warnings are communicated globally, satellites are used to map flood extents, and global flood models are used to predict risk [2]. Additionally, probabilistic and deterministic models are used to produce flood maps of floodplain areas to illustrate potential future impacts [1].\n*   **Failures in Communication:** Evidence indicates that communication can fail; for example, heavy rain and flooding were not communicated to 6,393 families living around a dam by the relevant authorities, leaving villages caught unawares [3].\n*   **Public Engagement Constraints:** In Germany, there is no legal requirement for the public to be engaged in the creation of flood risk maps; public consultation is restricted to the post-flood risk mapping stage, which limits the time available for effective dissemination and collection of materials [5].\n\nThe corpus does not contain sufficient information to answer this question comprehensively, as it lacks details on standard public communication channels (e.g., media, alerts), specific messaging strategies, or how risk information is generally disseminated to households outside of the specific examples of mapping and the cited failure in Zimbabwe.",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 17,
+        "pageEnd": 18,
+        "sectionPath": null,
+        "snippet": "Penning-Rowsell and Matilda Becker management, normativity (probabilistic modelling) is predominantly used to model flood risk, scale, recurrence and hence likely economic impacts. Deterministic statements (based on positive knowledge) underpin several of the models which might be used to produce di…",
+        "supportLevel": "direct",
+        "score": 0.2802823315118397
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": null,
+        "snippet": "Before taking on her current role she worked for the Foreign and Commonwealth Office as a Sustainable Urbanisation Policy Officer at BCG. Wenhui is an animal lover and environmental enthusiast. Having lived in China, the USA, the UK and Australia, she likes to explore cultural differences and enjoys…",
+        "supportLevel": "direct",
+        "score": 0.2784313725490196
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 12,
+        "pageEnd": 13,
+        "sectionPath": "Conclusion",
+        "snippet": "The valley behind the dam had been expected to fill gradually over four years, with that plan to relocate people in phases, but it did so over a matter of weeks (Gum.indoga et al., 2014) resulting is sudden inundation (UNOSAT, 2014). The 12 villages within the basin were caught unawares. As a result…",
+        "supportLevel": "direct",
+        "score": 0.2571493212669683
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 12,
+        "pageEnd": 13,
+        "sectionPath": "Introduction",
+        "snippet": "Private property can be made public property or have development restrictions placed upon it in areas where a demonstrable impact on public safety from floods is present. It is therefore a geographically selective and risk-proportional interference into individuals' rights. Universal flood insurance…",
+        "supportLevel": "partial",
+        "score": 0.1422664584959667
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 15,
+        "pageEnd": 16,
+        "sectionPath": "Introduction",
+        "snippet": "However, any review of public engagement projects demonstrates that they \n\nLegal geography and FRM in Germany 25 are inherently time-intensive, with one month providing limited time for the dissemination and collection of materials to and from the public in an effective manner that does not just sim…",
+        "supportLevel": "partial",
+        "score": 0.14021353930031802
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433861636",
+    "createdAt": "2026-06-02T20:57:41.636Z"
+  },
+  {
+    "question": "How do climate change policies affect flood risk management mechanisms?",
+    "candidateAnswer": "The provided evidence indicates that climate change policies affect flood risk management (FRM) mechanisms primarily by driving policy evolution towards \"adaptation,\" defined as reducing vulnerabilities to climate change, and by integrating resiliency requirements into existing planning and funding processes [1]. Specifically, these policies have led to:\n\n*   **Integration of Resiliency into Planning:** Agencies like the EPA have incorporated resilience requirements into existing processes, such as requiring applicants for brownfield grants to evaluate remedial options against foreseeable climate conditions like sea-level rise and increased flooding [2].\n*   **Development of New Funding Mechanisms:** Policy evolution has resulted in new or modified funding mechanisms, such as the Energy Resilience Bank, designed to support resilience [2].\n*   **Shifts in Actor Engagement:** Climate events and subsequent policies have increased the number of actors involved in adaptation, including community-based organizations that develop recovery agendas with community-led adaptation as a main goal [5]. Existing actors have also reframed their arguments around adaptation and resiliency [5].\n*   **Political Volatility:** The evolution of these policies is subject to political cycles, with federal administrations potentially reversing previously adopted climate change adaptation policies, affecting FRM at different levels [5].\n\nThe evidence also highlights that while policies aim to manage risk, legal approaches in some regions (e.g., Germany) remain fractured with inconsistent responsibilities, and there are ongoing social justice concerns regarding how vulnerability is reproduced through increasing exposure to flooding due to climate change [3], [4].",
+    "candidateConfidence": "medium",
+    "candidateSources": [
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Method",
+        "snippet": "and definitions To understand the impact of Sandy on the full range of public policies, it is important to be clear as to definitions and to contextualise our research within the commonly used academic frameworks of the policy process. Thus, first, in this chapter 'adaptation' is defined as reducing…",
+        "supportLevel": "direct",
+        "score": 0.28921952957947256
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": "Method",
+        "snippet": "In this vein, the EPA aimed to increase its resiliency planning, both internally and externally. This was streamlined by incorporating resilience requirements into existing planning processes. An example of this is found in brownfield grants aimed at the redevelopment of contaminated industrial wast…",
+        "supportLevel": "direct",
+        "score": 0.2867647058823529
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Conclusion",
+        "snippet": "Legal geographies in this German case study enables a focus on the legal approach to managing risk in space and begins to untangle a messy story of mixed responsibilities between government, private companies and citizens. Far from representing a unified and consistent approach to risk management, G…",
+        "supportLevel": "direct",
+        "score": 0.28572303921568626
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Conclusion",
+        "snippet": "The findings in Hull, nationally and in Scotland reinforce the need to develop a better understanding of flood risk in socially vulnerable communities if flood risk management efforts are to deliver fair outcomes. This situation raises questions about the production and reproduction of vulnerability…",
+        "supportLevel": "direct",
+        "score": 0.28548265460030164
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 11,
+        "pageEnd": 12,
+        "sectionPath": "Method",
+        "snippet": "However, as mentioned above, the current federal administration is actively working to reverse some of the climate change adaptation policies adopted during the Obama administration, an indication of how political cycles can affect policy evolution differently at different levels. One component of N…",
+        "supportLevel": "direct",
+        "score": 0.28524955436720145
+      }
+    ],
+    "evidenceQuality": "partial",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433856945",
+    "createdAt": "2026-06-02T20:57:36.945Z"
+  },
+  {
+    "question": "What quantitative evidence exists on early warning system fatality reduction rates?",
+    "candidateAnswer": "The provided evidence does not contain specific quantitative data or statistics on early warning system fatality reduction rates.\n\nWhile the documents discuss the design of early warning systems [1], progress in implementing them [2], barriers to their effectiveness such as communication challenges and lack of funding [3], and anecdotal accounts of warnings arriving too fast or being ignored [4], none of the excerpts provide numerical evidence regarding the rate at which these systems reduce fatalities.\n\nTherefore, the corpus does not contain sufficient information to answer this question.",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Conclusion",
+        "snippet": "Future bottlenecks in international river basins: Where transboundary institutions, population growth and hydrological variability intersect, Water International, 41(4), 400-424. \n\n128 Mahala Mclindin Basha, E. and Rus, D. (2007). Design of early warning flood detection systems for developing countr…",
+        "supportLevel": "partial",
+        "score": 0.1234313725490196
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 8,
+        "pageEnd": 9,
+        "sectionPath": "Conclusion",
+        "snippet": "Accessed at www.worldbank.org/ en/ news/feature/2016/ 11 / 10 / modernizing-m eteorologica1-services-to-bui1d-climate-resilience-across-africa WMO (World Meteorological Organisation) (2008). Capacity assessment of national meteorological and hydrological services in support of disaster risk reductio…",
+        "supportLevel": "weak",
+        "score": 0.1122664584959667
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": "Conclusion",
+        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
+        "supportLevel": "weak",
+        "score": 0.10943722943722944
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 7,
+        "pageEnd": 8,
+        "sectionPath": "Discussion",
+        "snippet": "The UNICEF representative also noted the same constraints, leading to a great loss of property, livestock and even human life in the flood disaster (see also Samukange (2014)). They also confirmed that the government, represented by the CPU, was reluctant to provide the relevant warning information …",
+        "supportLevel": "weak",
+        "score": 0.1069162210338681
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 7,
+        "pageEnd": 8,
+        "sectionPath": "Conclusion",
+        "snippet": "Flood risk awareness and preparedness: The role of trust in inforn1ation sources, 2012 IEEE International Conference on Systems, Man, and Cybernetics, Seoul, Korea. Schipper, E. (2010). Religion as an integral part of detem1ining and reducing climate change and disaster risk: An agenda for research.…",
+        "supportLevel": "weak",
+        "score": 0.1066900790166813
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "general",
+    "notes": null,
+    "id": "report_1780433851847",
+    "createdAt": "2026-06-02T20:57:31.847Z"
+  },
+  {
+    "question": "What factors determine flood vulnerability in urban areas?",
+    "candidateAnswer": "Based on the provided evidence, the factors determining flood vulnerability and rising flood costs in urban and populated areas include:\n\n*   **Geographical and Developmental Factors:** The specific geographical location of the population, the level of human development, and whether that development is planned or unplanned [2].\n*   **Resilience and Management Systems:** The status of the population's resilience and the effectiveness of disaster risk management systems at community, national, and international levels [2].\n*   **Physical and Environmental Drivers:** Subsidence, increased intensity of floods, and increased exposure of people and property to flood hazards [3].\n*   **Socio-Economic Attractors:** Economic activity, water-based amenities, and favorable weather conditions that attract people to coastal and riparian areas, thereby increasing exposure [3].\n*   **Population Characteristics:** The heterogeneous nature of residents in flood-prone areas, meaning there is no single \"prototypical\" occupant, which complicates vulnerability assessments [3].\n*   **Spatial and Cultural Interactions:** The interaction between spatial and cultural factors within spatiotemporal decision-making processes [4].\n\nThe evidence also notes that narrower geographical examinations often lack the detail necessary for effective planning, which can impact vulnerability assessments [2].",
+    "candidateConfidence": "medium",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Case Study",
+        "snippet": "Bangladesh . 2017. Available at bbc.co.uk . Accessed March 29, 2021. 67. Hossain MN, Paul SK: Vulnerability factors and effectiveness of disaster mitigation measures in the Bangladesh Coast. Earth Syst Environ . 2018; 2(1): 55-65. 68. World Bank: Bangladesh: Reducing poverty and sharing prosperity. …",
+        "supportLevel": "direct",
+        "score": 0.2700081243284325
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 4,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "In particular, the impacts can vary with the geographical location of the human population in question, 4 the level, and the planned nature of human development in an area. 5 Additional factors of influence will include the status of the resilience of the population and the disaster risk management …",
+        "supportLevel": "direct",
+        "score": 0.2449579831932773
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 8,
+        "pageEnd": 9,
+        "sectionPath": "Conclusion",
+        "snippet": "Protection measures are clearly not reducing the losses associated with flood events. Of the 16 weather and climate events that each caused over $1 billion in damage in the United States in 2017, two were flooding events, three were tropical cyclone events and eight were severe storm events with hea…",
+        "supportLevel": "partial",
+        "score": 0.13425058548009366
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "This group includes healthcare professionals, local police, firefighters, volunteer rescue organizations, and local government officials. 50,51 While rescue operators play a critical role in flood emergency response efforts, limited research identifies their critical information needs or what infor …",
+        "supportLevel": "partial",
+        "score": 0.13048764960529666
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Literature Review",
+        "snippet": "This calls for immediate and drastic mitigation strategies for managing seasonal flooding. 41 In 2019, the number of people affected by flooding was estimated between 600,000 and 800,000 people in more than seven counties across South Sudan. 40 Table 1 shows the types of climate change-related disas…",
+        "supportLevel": "partial",
+        "score": 0.12163561076604554
+      }
+    ],
+    "evidenceQuality": "partial",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433838874",
+    "createdAt": "2026-06-02T20:57:18.874Z"
+  },
+  {
+    "question": "How does community engagement improve emergency management outcomes?",
+    "candidateAnswer": "The provided evidence offers limited and indirect information regarding how community engagement improves emergency management outcomes, focusing primarily on communication networks and stakeholder participation in planning rather than broad engagement strategies.\n\nBased on the documents:\n*   **Enhancing Communication Networks:** Effective information communication through reliable networks is critical, particularly for vulnerable populations with minimal access to standard communication tools. Developing these networks using community structures, such as community groups, friends, and family, ensures that information reaches those who need it based on accessibility and specific group needs [1].\n*   **Improving Social Justice and Decision-Making:** While real-time stakeholder participation during emergency flood decision-making is often difficult, engaging stakeholders during advanced planning sessions can inform emergency decisions. This participation is cited as a critical mechanism for achieving procedural justice and improving the social justice of those decisions [4].\n*   **Facilitating Coordination:** Technology facilitates communication and information sharing, enabling stakeholders to coordinate response efforts effectively [3].\n\nThe evidence is partial; it specifically highlights the role of community networks in information dissemination and the value of pre-event stakeholder input for social justice, but it does not provide a comprehensive overview of other ways community engagement improves overall emergency management outcomes.",
+    "candidateConfidence": "high",
+    "candidateSources": [
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 4,
+        "pageEnd": 5,
+        "sectionPath": "Discussion",
+        "snippet": "As seen in previous research by Ali et al., 27 effective information communication through reliable networks is critical for disaster impacts, especially for vulnerable populations whose communication networks may already be minimal, eg, no access to phones. Therefore, communication networks must be…",
+        "supportLevel": "direct",
+        "score": 0.2812091503267974
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V3N2_3_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Introduction",
+        "snippet": "In January 2004, FEMA released HAZUS-MH (Multi-Hazard), a new emergency planning and re sponse software package. The HAZUS-MH mapping and modeling software utilizes the power of geographic information systems (GIS) and hazard modeling to estimate associat- ed social and economic losses as well as ch…",
+        "supportLevel": "direct",
+        "score": 0.2796218487394958
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 6,
+        "pageEnd": 6,
+        "sectionPath": null,
+        "snippet": "These technologies can be used to monitor changes in land use, vegetation cover, and DOI:10.5055/jem.0854 JEM Editorial Leveraging technology in emergency management: An opportunity to improve compounding and cascading hazards linked to climate change Attila J. Hertelendy, PhD, Special Issue Editor …",
+        "supportLevel": "direct",
+        "score": 0.2707207498383969
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 16,
+        "pageEnd": 16,
+        "sectionPath": "Result",
+        "snippet": "By disproportionately impacting Canada's First Nations, the longer-term impacts and perpetuation of historical social inequalities is detrimental to the overall project of reconciliation between Federal government and Aboriginal peoples (TRC, 2015). Public engagement is often cited as an effective m…",
+        "supportLevel": "direct",
+        "score": 0.2677797434763379
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Abstract",
+        "snippet": "Flooding events are the most common natural hazard globally, resulting in vast destruction and loss of life. An effective flood emergency response is necessary to lessen the negative impacts of flood disasters. However, disaster management and response efforts face a complex scenario. Simultaneously…",
+        "supportLevel": "direct",
+        "score": 0.26696752775184146
+      }
+    ],
+    "evidenceQuality": "strong",
+    "classification": "emergency-management",
+    "notes": null,
+    "id": "report_1780433832175",
+    "createdAt": "2026-06-02T20:57:12.175Z"
+  },
+  {
+    "question": "What flood adaptation strategies are used in South Sudan?",
+    "candidateAnswer": "The provided evidence does not contain sufficient information to explicitly list the specific flood adaptation strategies currently used in South Sudan.\n\nWhile the documents identify high-risk areas in South Sudan (Jonglei, Unity, Upper Nile, etc.) and note that recurring flooding overwhelms the government's ability to deploy mitigation strategies due to conflict and lack of resources [2][3], they do not detail specific implemented adaptations. The text mentions that \"robust project planning decisions and mitigation strategies\" are required and hints that a viable solution involves the \"implementation of struct[ures]\" [3], but the sentence is cut off.\n\nOther sections of the evidence discuss flood strategies used in different countries—such as disaster education and school shelters in Bangladesh [1], or gabion walls in Afghanistan and Somalia [5]—but these are not attributed to South Sudan. One source frames its research around the question of what strategies *can* be deployed, rather than listing those already in use [2].",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 5,
+        "pageEnd": 5,
+        "sectionPath": "Literature Review",
+        "snippet": "Disaster education and alternative livelihoods support training provided to more than 6,000 households in 200 communities across the country. 64,67 The World Bank and the International Development Agency have financed an estimated $1.5 billion for projects to reduce disaster vulnerability opposite c…",
+        "supportLevel": "direct",
+        "score": 0.30518018018018017
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "Given the distressed economic history of South Sudan, ongoing conflict, and lack of resources, this study is developed around two main queries including: n n Why does the recurring flooding in South Sudan overwhelm the government’s ability to deploy mitigation strategies to reduce flood risk and haz…",
+        "supportLevel": "direct",
+        "score": 0.29366616989567806
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Literature Review",
+        "snippet": "This calls for immediate and drastic mitigation strategies for managing seasonal flooding. 41 In 2019, the number of people affected by flooding was estimated between 600,000 and 800,000 people in more than seven counties across South Sudan. 40 Table 1 shows the types of climate change-related disas…",
+        "supportLevel": "direct",
+        "score": 0.2863671274961598
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 10,
+        "sectionPath": "Conclusion",
+        "snippet": "Attention to the mobility of people and technologies further directs attention to how policies are transferred in hierarchical and uneven ways (McCann, 2011); indeed, the observation that the Dutch water sector has the resources to transport its people around the world, attend conferences, subscribe…",
+        "supportLevel": "direct",
+        "score": 0.2778361344537815
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Result",
+        "snippet": "However, they are essentially gravity structures that are subject to the lateral force of water. 87 Including some engineering principles like interlocking the cages instead of stacking them can produce longer term, more effective results. 85 One such project in Kabul, Afghanistan (Figure 5) protect…",
+        "supportLevel": "direct",
+        "score": 0.27738432722486583
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433805697",
+    "createdAt": "2026-06-02T20:56:45.697Z"
+  },
+  {
+    "question": "How did Japan flood warning systems perform during recent flood events?",
+    "candidateAnswer": "The provided evidence does not contain sufficient information to answer how Japan's flood warning systems performed during recent flood events.\n\nWhile one source introduces a study intended to evaluate the \"current flood warning system in Japan and its effectiveness in mobilizing evacuation\" based on case studies, it only presents the abstract and introduction of the article without providing the actual findings, performance data, or conclusions regarding recent events [3]. The other provided documents discuss flood risks and warning system barriers in the United States and developing countries like Zimbabwe and South Africa, but do not offer specific performance details for Japan [1], [2], [4], [5].",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "spatial decision support systems, community knowledge base, disaster response, disaster rescue operators; DOI:10.5055/jem.0741 INTRODUCTION Flooding events are the most common natural hazard globally and result in vast destruction and loss of life. 1,2 Recent studies have found that flood risk withi…",
+        "supportLevel": "direct",
+        "score": 0.27763772175536877
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": "Conclusion",
+        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
+        "supportLevel": "direct",
+        "score": 0.26856767097082734
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": null,
+        "snippet": "Current flood warning system in Japan and its effectiveness in mobilizing evacuation: Lessons from case studies Guangwei Huang, PhD Juan Fan ABSTRACT An effective flood warning system is crucial for successful flood management. Flood warning systems have been developed in many countries across the w…",
+        "supportLevel": "direct",
+        "score": 0.25639344262295083
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "This group includes healthcare professionals, local police, firefighters, volunteer rescue organizations, and local government officials. 50,51 While rescue operators play a critical role in flood emergency response efforts, limited research identifies their critical information needs or what infor …",
+        "supportLevel": "direct",
+        "score": 0.2485294117647059
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 6,
+        "pageEnd": 6,
+        "sectionPath": "Method",
+        "snippet": "For example, one respondent wanted to know about the “[e]vacuation routes and congestion on those routes.” Finally, respondents raised concerns about a lack of information on safety during previous flooding events, specifically regarding electrical power during a flood event. While not as common, a …",
+        "supportLevel": "partial",
+        "score": 0.12546333601933923
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433802201",
+    "createdAt": "2026-06-02T20:56:42.201Z"
+  },
+  {
+    "question": "What strategies do small towns use to build flood resilience?",
+    "candidateAnswer": "Based on the provided evidence, small towns utilize the following strategies to build flood resilience, as identified through interviews with community leaders:\n\n*   **Taking action:** This involves a sense of urgency to \"get in gear\" and includes practical measures such as constructing temporary dikes and engaging in frantic efforts to protect the town [1][4].\n*   **Accepting help from others:** This includes accepting emotional support and recognizing that basic practical and physical needs must be met first to foster recovery [2][4].\n*   **Engaging in self-discovery:** Respondents highlighted this as a key component of the resilience process [2].\n*   **Maintaining a realistic long-term perspective:** Leaders advised keeping a grounded view of the recovery timeline [2].\n*   **Fostering hope and optimism:** Cultivating a positive outlook was repeatedly mentioned as a strategy for recovery [2].\n*   **Replacing lost resources:** Recovery depends on the extent to which lost resources (financial, personnel, services) can be replaced and remaining resources applied to rebuilding [5].\n*   **Planning and funding mitigation projects:** Community leaders are charged with planning, funding, and carrying out rebuilding and mitigation projects during the prolonged recovery process [4].\n\nThe evidence is partial as it primarily reflects advice given by community leaders 7 to 8 years after a specific flood event in two small towns, rather than a comprehensive list of all possible strategies used by small towns globally [2].",
+    "candidateConfidence": "medium",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 3,
+        "sectionPath": "Method",
+        "snippet": "The general strategies serve as the organizational framework for our presentation of the results later. We have included from seven to 17 illustrative quotes for each general strategy for a total of 53 transcript excerpts. The selected quotes come from 73 percent of\n\nour respondents, with each gener…",
+        "supportLevel": "direct",
+        "score": 0.29378314850530374
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Abstract",
+        "snippet": "ABSTRACT\nResilience refers to the capacity to withstand, overcome, or recover from serious threat, such as a natural disaster. In small towns, community leaders are intimately involved with their towns’ response and recovery from a disaster and can see resilience processes, or their absence, virtual…",
+        "supportLevel": "direct",
+        "score": 0.28854166666666664
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Discussion",
+        "snippet": "Research on long-term disaster effects supports the notion that replacing lost resources is important to recovery. Hobfoll et al. 10 suggest that, in the wake of disaster, basic practical and physical needs must first be met to foster community \n\nrecovery and protect against long-term psychological …",
+        "supportLevel": "direct",
+        "score": 0.28511002886002884
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Discussion",
+        "snippet": "One possibility is that, for small towns facing a major flood, the demands of the crisis were too great to allow community leaders to take time for rest and relaxation. Community leaders were under pressure to work long and hard to protect the town against the flood threat and to aid citizens in the…",
+        "supportLevel": "direct",
+        "score": 0.2791666666666667
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Key Words",
+        "snippet": "resilience, recovery, leaders, rural INTRODUCTION Natural disasters such as floods stress communities in a number of ways. They may cause damage to private and public property and disrupt basic and necessary community services (eg, emergency services and electric power). How well a community recover…",
+        "supportLevel": "direct",
+        "score": 0.27476873814041747
+      }
+    ],
+    "evidenceQuality": "partial",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433799840",
+    "createdAt": "2026-06-02T20:56:39.840Z"
+  },
+  {
+    "question": "What factors determine flood vulnerability in urban areas?",
+    "candidateAnswer": "Based on the provided evidence, the factors determining flood vulnerability and rising flood costs in urban and populated areas include:\n\n*   **Geographical and Development Factors:** The specific geographical location of the population, the level of human development, and whether that development is planned or unplanned [2].\n*   **Resilience and Management Systems:** The status of resilience within the population and the effectiveness of disaster risk management systems at community, national, and international levels [2].\n*   **Physical and Exposure Factors:** Land subsidence, the increased intensity of floods, and the increased exposure of people and property to flood hazards [3].\n*   **Socio-Economic Drivers:** Economic activity, the presence of water-based amenities, and favorable weather conditions that attract populations to coastal and riparian areas, thereby increasing the number of people living in flood-prone zones [3].\n*   **Population Characteristics:** The heterogeneous nature of residents in floodplains, meaning there is no single \"prototypical\" occupant, which complicates vulnerability assessments [3].\n*   **Spatial and Cultural Interactions:** The interaction between spatial and cultural factors, which influences decision-making processes regarding flood risk [4].\n\nThe evidence also notes that while protection measures exist, they are not currently reducing losses associated with flood events [3].",
+    "candidateConfidence": "high",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Case Study",
+        "snippet": "Bangladesh . 2017. Available at bbc.co.uk . Accessed March 29, 2021. 67. Hossain MN, Paul SK: Vulnerability factors and effectiveness of disaster mitigation measures in the Bangladesh Coast. Earth Syst Environ . 2018; 2(1): 55-65. 68. World Bank: Bangladesh: Reducing poverty and sharing prosperity. …",
+        "supportLevel": "direct",
+        "score": 0.2700081243284325
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 4,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "In particular, the impacts can vary with the geographical location of the human population in question, 4 the level, and the planned nature of human development in an area. 5 Additional factors of influence will include the status of the resilience of the population and the disaster risk management …",
+        "supportLevel": "direct",
+        "score": 0.2449579831932773
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 8,
+        "pageEnd": 9,
+        "sectionPath": "Conclusion",
+        "snippet": "Protection measures are clearly not reducing the losses associated with flood events. Of the 16 weather and climate events that each caused over $1 billion in damage in the United States in 2017, two were flooding events, three were tropical cyclone events and eight were severe storm events with hea…",
+        "supportLevel": "partial",
+        "score": 0.13425058548009366
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "This group includes healthcare professionals, local police, firefighters, volunteer rescue organizations, and local government officials. 50,51 While rescue operators play a critical role in flood emergency response efforts, limited research identifies their critical information needs or what infor …",
+        "supportLevel": "partial",
+        "score": 0.13048764960529666
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Literature Review",
+        "snippet": "This calls for immediate and drastic mitigation strategies for managing seasonal flooding. 41 In 2019, the number of people affected by flooding was estimated between 600,000 and 800,000 people in more than seven counties across South Sudan. 40 Table 1 shows the types of climate change-related disas…",
+        "supportLevel": "partial",
+        "score": 0.12163561076604554
+      }
+    ],
+    "evidenceQuality": "strong",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433745867",
+    "createdAt": "2026-06-02T20:55:45.867Z"
+  },
+  {
+    "question": "How does community engagement improve emergency management outcomes?",
+    "candidateAnswer": "Based on the provided evidence, community engagement improves emergency management outcomes primarily by facilitating consensus on risk management decisions and enhancing social justice through stakeholder participation.\n\n*   **Achieving Consensus and Social Justice:** Public engagement is cited as an effective mechanism for reaching consensus on risk management decisions. While real-time participation during an emergency is often impossible, involving stakeholders during advanced planning sessions allows them to inform emergency decisions, thereby improving the \"social justice\" and \"procedural justice\" of those decisions [4].\n*   **Leveraging Community Networks for Communication:** Effective information communication relies on developing networks that include community groups, friends, and family. This is particularly critical for vulnerable populations who may have minimal access to other communication channels (e.g., no phones) [1].\n*   **Tailoring Information to Needs:** Engagement helps address the specific, differing information needs of various groups. For instance, while both rescue operators and citizens need accurate evacuation information, citizens specifically require details on destinations and resources, whereas operators need data on evacuees and rescue operations [1][5].\n\nThe evidence regarding the direct impact of community engagement is partial; while it highlights the importance of stakeholder participation in planning and the use of community networks for communication, it does not provide specific metrics or case studies quantifying the improvement in overall emergency management outcomes resulting from these engagements.",
+    "candidateConfidence": "high",
+    "candidateSources": [
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 4,
+        "pageEnd": 5,
+        "sectionPath": "Discussion",
+        "snippet": "As seen in previous research by Ali et al., 27 effective information communication through reliable networks is critical for disaster impacts, especially for vulnerable populations whose communication networks may already be minimal, eg, no access to phones. Therefore, communication networks must be…",
+        "supportLevel": "direct",
+        "score": 0.2812091503267974
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V3N2_3_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Introduction",
+        "snippet": "In January 2004, FEMA released HAZUS-MH (Multi-Hazard), a new emergency planning and re sponse software package. The HAZUS-MH mapping and modeling software utilizes the power of geographic information systems (GIS) and hazard modeling to estimate associat- ed social and economic losses as well as ch…",
+        "supportLevel": "direct",
+        "score": 0.2796218487394958
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 6,
+        "pageEnd": 6,
+        "sectionPath": null,
+        "snippet": "These technologies can be used to monitor changes in land use, vegetation cover, and DOI:10.5055/jem.0854 JEM Editorial Leveraging technology in emergency management: An opportunity to improve compounding and cascading hazards linked to climate change Attila J. Hertelendy, PhD, Special Issue Editor …",
+        "supportLevel": "direct",
+        "score": 0.2707207498383969
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 16,
+        "pageEnd": 16,
+        "sectionPath": "Result",
+        "snippet": "By disproportionately impacting Canada's First Nations, the longer-term impacts and perpetuation of historical social inequalities is detrimental to the overall project of reconciliation between Federal government and Aboriginal peoples (TRC, 2015). Public engagement is often cited as an effective m…",
+        "supportLevel": "direct",
+        "score": 0.2677797434763379
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Abstract",
+        "snippet": "Flooding events are the most common natural hazard globally, resulting in vast destruction and loss of life. An effective flood emergency response is necessary to lessen the negative impacts of flood disasters. However, disaster management and response efforts face a complex scenario. Simultaneously…",
+        "supportLevel": "direct",
+        "score": 0.26696752775184146
+      }
+    ],
+    "evidenceQuality": "strong",
+    "classification": "emergency-management",
+    "notes": null,
+    "id": "report_1780433742155",
+    "createdAt": "2026-06-02T20:55:42.155Z"
+  },
+  {
+    "question": "What flood adaptation strategies are used in South Sudan?",
+    "candidateAnswer": "The provided evidence does not contain sufficient information to answer what specific flood adaptation strategies are currently used in South Sudan.\n\nWhile the documents identify the urgent need for \"immediate and drastic mitigation strategies\" and \"robust project planning decisions\" due to high flood threat levels in several states [3], they do not list specific strategies that have been implemented in South Sudan. Instead, the text poses research questions about what strategies the government *can* reasonably deploy given the country's distressed economic history and ongoing conflict [2].\n\nThe evidence mentions specific adaptation strategies such as building schools as shelters, disaster education, alternative livelihoods, and gabion walls, but these examples are explicitly attributed to other countries:\n*   **Bangladesh:** Building schools used as shelters, disaster education, and alternative livelihoods training [1].\n*   **Afghanistan and Somalia:** The use of gabion systems (wire cages filled with rocks) to block and channel floodwater [5].\n\nAlthough the text mentions that a viable solution for South Sudan is the \"implementation of struct...\" (likely structural measures), the sentence is cut off, and no further details on implemented structural strategies in South Sudan are provided in the retrieved excerpts [3].",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 5,
+        "pageEnd": 5,
+        "sectionPath": "Literature Review",
+        "snippet": "Disaster education and alternative livelihoods support training provided to more than 6,000 households in 200 communities across the country. 64,67 The World Bank and the International Development Agency have financed an estimated $1.5 billion for projects to reduce disaster vulnerability opposite c…",
+        "supportLevel": "direct",
+        "score": 0.30518018018018017
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "Given the distressed economic history of South Sudan, ongoing conflict, and lack of resources, this study is developed around two main queries including: n n Why does the recurring flooding in South Sudan overwhelm the government’s ability to deploy mitigation strategies to reduce flood risk and haz…",
+        "supportLevel": "direct",
+        "score": 0.29366616989567806
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 2,
+        "sectionPath": "Literature Review",
+        "snippet": "This calls for immediate and drastic mitigation strategies for managing seasonal flooding. 41 In 2019, the number of people affected by flooding was estimated between 600,000 and 800,000 people in more than seven counties across South Sudan. 40 Table 1 shows the types of climate change-related disas…",
+        "supportLevel": "direct",
+        "score": 0.2863671274961598
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 10,
+        "sectionPath": "Conclusion",
+        "snippet": "Attention to the mobility of people and technologies further directs attention to how policies are transferred in hierarchical and uneven ways (McCann, 2011); indeed, the observation that the Dutch water sector has the resources to transport its people around the world, attend conferences, subscribe…",
+        "supportLevel": "direct",
+        "score": 0.2778361344537815
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Result",
+        "snippet": "However, they are essentially gravity structures that are subject to the lateral force of water. 87 Including some engineering principles like interlocking the cages instead of stacking them can produce longer term, more effective results. 85 One such project in Kabul, Afghanistan (Figure 5) protect…",
+        "supportLevel": "direct",
+        "score": 0.27738432722486583
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433707168",
+    "createdAt": "2026-06-02T20:55:07.168Z"
+  },
+  {
+    "question": "How did Japan flood warning systems perform during recent flood events?",
+    "candidateAnswer": "The provided evidence does not contain sufficient information to answer how Japan's flood warning systems performed during recent flood events.\n\nWhile one source identifies an article titled \"Current flood warning system in Japan and its effectiveness in mobilizing evacuation: Lessons from case studies,\" the provided text only includes the abstract and introduction, which state the article's *intent* to present a picture of the system and evaluate its practices [3]. The actual findings, performance data, or specific lessons from recent events are not included in the retrieved excerpts.\n\nOther provided sources discuss flood risks and warning system barriers in the United States [1], [4], [5] and developing countries like Zimbabwe and South Africa [2], but do not offer performance details for Japan.",
+    "candidateConfidence": "low",
+    "candidateSources": [
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 4,
+        "sectionPath": "Key Words",
+        "snippet": "spatial decision support systems, community knowledge base, disaster response, disaster rescue operators; DOI:10.5055/jem.0741 INTRODUCTION Flooding events are the most common natural hazard globally and result in vast destruction and loss of life. 1,2 Recent studies have found that flood risk withi…",
+        "supportLevel": "direct",
+        "score": 0.27763772175536877
+      },
+      {
+        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
+        "pageStart": 10,
+        "pageEnd": 11,
+        "sectionPath": "Conclusion",
+        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
+        "supportLevel": "direct",
+        "score": 0.26856767097082734
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": null,
+        "snippet": "Current flood warning system in Japan and its effectiveness in mobilizing evacuation: Lessons from case studies Guangwei Huang, PhD Juan Fan ABSTRACT An effective flood warning system is crucial for successful flood management. Flood warning systems have been developed in many countries across the w…",
+        "supportLevel": "direct",
+        "score": 0.25639344262295083
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 5,
+        "pageEnd": 6,
+        "sectionPath": "Literature Review",
+        "snippet": "This group includes healthcare professionals, local police, firefighters, volunteer rescue organizations, and local government officials. 50,51 While rescue operators play a critical role in flood emergency response efforts, limited research identifies their critical information needs or what infor …",
+        "supportLevel": "direct",
+        "score": 0.2485294117647059
+      },
+      {
+        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
+        "pageStart": 6,
+        "pageEnd": 6,
+        "sectionPath": "Method",
+        "snippet": "For example, one respondent wanted to know about the “[e]vacuation routes and congestion on those routes.” Finally, respondents raised concerns about a lack of information on safety during previous flooding events, specifically regarding electrical power during a flood event. While not as common, a …",
+        "supportLevel": "partial",
+        "score": 0.12546333601933923
+      }
+    ],
+    "evidenceQuality": "weak",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433701286",
+    "createdAt": "2026-06-02T20:55:01.286Z"
+  },
+  {
+    "question": "What strategies do small towns use to build flood resilience?",
+    "candidateAnswer": "Based on the provided evidence, small towns utilize the following strategies to build flood resilience:\n\n*   **Taking Action:** Respondents emphasized the need to \"get in gear\" with a sense of urgency to address the crisis [1]. This includes frantic efforts to construct temporary defenses, such as dikes, to protect the town [4].\n*   **Accepting Help:** Community members are advised to accept help from others, including emotional support, though leaders often neglect self-care due to the high demands of the crisis [2], [4].\n*   **Engaging in Self-Discovery:** This was identified as a recurring suggestion from community leaders based on their recovery experiences [2].\n*   **Maintaining a Realistic Long-Term Perspective:** Leaders advised keeping a realistic view of the long-term recovery process [2].\n*   **Fostering Hope and Optimism:** Cultivating hope and optimism was repeatedly mentioned as a key strategy for recovery [2].\n*   **Replacing Lost Resources:** Recovery depends on replacing lost resources and applying remaining ones to rebuilding efforts [5].\n*   **Meeting Basic Needs:** Addressing basic practical and physical needs first is essential to foster recovery and protect against long-term psychological distress [3].\n*   **Securing Support Systems:** Ensuring social support, financial assistance, and the restoration of community services helps mitigate negative emotional reactions and family dysfunction [3].\n\nThe evidence is derived from interviews with 30 community leaders in two specific small towns along the Red River of the North, focusing on psychological and community-level responses rather than technical engineering strategies [2].",
+    "candidateConfidence": "high",
+    "candidateSources": [
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 3,
+        "sectionPath": "Method",
+        "snippet": "The general strategies serve as the organizational framework for our presentation of the results later. We have included from seven to 17 illustrative quotes for each general strategy for a total of 53 transcript excerpts. The selected quotes come from 73 percent of\n\nour respondents, with each gener…",
+        "supportLevel": "direct",
+        "score": 0.29378314850530374
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Abstract",
+        "snippet": "ABSTRACT\nResilience refers to the capacity to withstand, overcome, or recover from serious threat, such as a natural disaster. In small towns, community leaders are intimately involved with their towns’ response and recovery from a disaster and can see resilience processes, or their absence, virtual…",
+        "supportLevel": "direct",
+        "score": 0.28854166666666664
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Discussion",
+        "snippet": "Research on long-term disaster effects supports the notion that replacing lost resources is important to recovery. Hobfoll et al. 10 suggest that, in the wake of disaster, basic practical and physical needs must first be met to foster community \n\nrecovery and protect against long-term psychological …",
+        "supportLevel": "direct",
+        "score": 0.28511002886002884
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 2,
+        "pageEnd": 2,
+        "sectionPath": "Discussion",
+        "snippet": "One possibility is that, for small towns facing a major flood, the demands of the crisis were too great to allow community leaders to take time for rest and relaxation. Community leaders were under pressure to work long and hard to protect the town against the flood threat and to aid citizens in the…",
+        "supportLevel": "direct",
+        "score": 0.2791666666666667
+      },
+      {
+        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
+        "pageStart": 1,
+        "pageEnd": 1,
+        "sectionPath": "Key Words",
+        "snippet": "resilience, recovery, leaders, rural INTRODUCTION Natural disasters such as floods stress communities in a number of ways. They may cause damage to private and public property and disrupt basic and necessary community services (eg, emergency services and electric power). How well a community recover…",
+        "supportLevel": "direct",
+        "score": 0.27476873814041747
+      }
+    ],
+    "evidenceQuality": "strong",
+    "classification": "flood-hazard",
+    "notes": null,
+    "id": "report_1780433698654",
+    "createdAt": "2026-06-02T20:54:58.654Z"
+  },
+  {
     "question": "How did South Sudan communities adapt flood management strategies?",
     "candidateAnswer": "Answer generation failed: Error: Ollama returned empty generation",
     "candidateConfidence": "insufficient",
@@ -4613,860 +5468,5 @@
     "notes": null,
     "id": "report_1780416653280",
     "createdAt": "2026-06-02T16:10:53.280Z"
-  },
-  {
-    "question": "What are the main findings on flood insurance and economic recovery after disasters?",
-    "candidateAnswer": "Based on the provided documents, there are no direct findings on the specific impact of flood insurance on economic recovery outcomes. The evidence is partial and focuses primarily on the availability of insurance, barriers to implementation, and public perception rather than post-disaster economic recovery metrics.\n\nThe main relevant findings include:\n\n*   **Shift in Financial Responsibility:** Historically, some regions like Canada relied solely on government aid for cost recovery after floods, but there is a recent shift toward private flood insurance (introduced in 2015 and 2017) to distribute risk sharing to homeowners [3].\n*   **Barriers to Viability:** For flood insurance to be economically viable, insurers must be able to accurately price flood probabilities and losses, set affordable premiums that cover costs, and address issues like adverse selection where only high-risk homeowners purchase coverage [4].\n*   **Public Awareness and Confusion:** There is a low level of flood risk awareness in high-risk zones, and many residents are uncertain whether their home insurance policies cover overland flooding [5]. While over 80% of respondents in one survey felt they should share some responsibility for protecting their property, they also believe insurance companies and the government should remain actively involved in financing and management [5].\n*   **Resilience Strategies:** In the absence of specific insurance data, community leaders in small towns emphasized psychological and social resilience strategies for recovery, such as taking action, accepting help, and maintaining hope, rather than financial mechanisms [1].\n*   **Systemic Barriers:** Effective risk management is hindered by difficulties in translating scientific forecasting into simple formats and a lack of capacity and funding, particularly in developing countries [2].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "ABSTRACT Resilience refers to the capacity to withstand, overcome, or recover from serious threat, such as a natural disaster. In small towns, community leaders are intimately involved with their towns’ response and recovery from a disaster and can see resilience processes, or their absence, virtual…",
-        "supportLevel": "direct",
-        "score": 0.1184313725490196
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 121,
-        "pageEnd": 122,
-        "sectionPath": null,
-        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
-        "supportLevel": "direct",
-        "score": 0.11815814850530376
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 37,
-        "pageEnd": 38,
-        "sectionPath": null,
-        "snippet": "Until very recently, the cost recovery scheme following a major flood event in Canada has solely relied on government financial aid to compensate flood victims. Trends towards increasing numbers of flooding events and floods of greater destruction have raised questions as to whether government aid a…",
-        "supportLevel": "direct",
-        "score": 0.105625
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 40,
-        "pageEnd": 41,
-        "sectionPath": null,
-        "snippet": "Flood damages inherently do not meet many of these basic conditions. Flooding events often affect large geographical areas and many properties (Amell, 2000). They are not random and are prone to occur in floodplain areas and high-risk zones, so condition three of unpredictability is not met (IBC, 20…",
-        "supportLevel": "direct",
-        "score": 0.10511139134089954
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 42,
-        "pageEnd": 44,
-        "sectionPath": null,
-        "snippet": "This demonstrates the worryingly low level of flood risk awareness by Canadians living in such high-risk flood zones. Concerning responsibility for flood risk management and financing, the survey showed that Canadians are open to sharing responsibility, and consider that insurance companies should f…",
-        "supportLevel": "direct",
-        "score": 0.10237373737373737
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780416648861",
-    "createdAt": "2026-06-02T16:10:48.861Z"
-  },
-  {
-    "question": "What role does land use planning play in flood risk reduction?",
-    "candidateAnswer": "Based on the provided evidence, land use planning plays a role in flood risk reduction through the enforcement of laws governing zoning, land use mapping, and building codes [1]. These powers are often part of a broader land use planning system designed to zone areas for specific uses and make decisions on development applications, frequently circumscribed by geographical delineations of at-risk areas such as flood plains [2]. Additionally, flood insurance rate maps (FIRMs) support this process by defining Special Flood Hazard Areas (100-year floodplains) and establishing base flood elevations, which determine minimum height requirements for properties to be considered flood-proofed [5].\n\nThe evidence regarding the specific mechanisms of land use planning is partial; while Source [1] lists \"land use mapping\" and \"zoning\" as examples of nonstructural mitigation measures, the sentence describing their enforcement is cut off. Similarly, Source [2] mentions the zoning system but does not provide detailed examples of how specific zoning decisions directly reduce risk beyond the general context of managing development in at-risk areas.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 9,
-        "pageEnd": 9,
-        "sectionPath": null,
-        "snippet": "The gabion wall shown from the project in Nairobi (Figure 6) will likely not outlast the engineered product from Kabul shown in Figure 5, and this may provide insight into why these walls have yielded varying results. 91 In South Sudan, there is a component of urgency where the value of a locally de…",
-        "supportLevel": "direct",
-        "score": 0.2759710550887021
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 15,
-        "pageEnd": 16,
-        "sectionPath": null,
-        "snippet": "These powers may be circumscribed in most countries by some geographical delineation of the at-risk areas (i.e. the flood plain), but such powers are often a small part of an overall land use planning system designed to zone all areas for particular uses and make decisions on specific development ap…",
-        "supportLevel": "direct",
-        "score": 0.27572303921568625
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 41,
-        "pageEnd": 41,
-        "sectionPath": null,
-        "snippet": "The report also announced the intention of the federal government to consult with the insurance industry concerning its role in providing private flood insurance to homeowners (Government of Canada, 2014). This attitude has become stronger, with a key objective of the 2015 National Disaster Mitigati…",
-        "supportLevel": "direct",
-        "score": 0.27502341235001465
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 13,
-        "pageEnd": 15,
-        "sectionPath": null,
-        "snippet": "Power in flood risk management Within FRM, the power to raise and spend money is important because, in general, much risk reduction is a capital-intensive activity where large sums are needed to implement significant flood warning systems and for protecting local communities and regional economies (…",
-        "supportLevel": "direct",
-        "score": 0.27181818181818185
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 161,
-        "pageEnd": 162,
-        "sectionPath": null,
-        "snippet": "Managed by the Federal Emergency Management Agency (FEMA), the NFIP provides government administered subsidised flood insurance to US citize~s ~ ~ •. tb.e &,oal~ .. Of fedu:c1t1g: Hood~rblated damag~ and less~riing the amouiit ofgovernmen·t funding needed for post-disaster recovery (King, 2013)\\ Flo…",
-        "supportLevel": "direct",
-        "score": 0.2710096153846154
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780416634366",
-    "createdAt": "2026-06-02T16:10:34.366Z"
-  },
-  {
-    "question": "What are the main causes of flooding in South Sudan?",
-    "candidateAnswer": "Based on the provided evidence, the main causes and contributing factors to flooding in South Sudan include:\n\n*   **Heavy Rainfall:** Thirty counties across various states were inundated by heavy rainfall, leading to severe flooding [3].\n*   **Seasonal and Intensifying Cycles:** Flooding is described as a recurrent disaster occurring each rainy season, with a cycle that is becoming more intensifying [3], [5].\n*   **Climate Patterns:** Specific climate patterns, such as less early rain, result in crops that are physically vulnerable when flooding begins, exacerbating the impact of the floods [5].\n\nThe documents also note that while heavy rainfall is the direct cause, the government's ability to mitigate these risks is overwhelmed by the country's distressed economic history, ongoing conflict, and lack of resources [2]. Additionally, poor roads and insecurity compound the effects of flooding on livelihoods, though these are cited as factors hindering recovery and market integration rather than direct causes of the water levels themselves [5].\n\n*Note: The provided evidence focuses heavily on the impacts (displacement, malnutrition, economic damage) and the context of vulnerability (conflict, poverty) rather than providing a detailed hydrological analysis of all root causes (e.g., river overflow mechanics or topography).*",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 6,
-        "pageEnd": 7,
-        "sectionPath": null,
-        "snippet": "Disaster education and alternative livelihoods sup- port training provided to more than 6,000 households in 200 communities across the country. 64,67 The World Bank and the International Development Agency have financed an estimated $1.5 billion for pro- jects to reduce disaster vulnerability opposi…",
-        "supportLevel": "direct",
-        "score": 0.13166666666666665
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 7,
-        "pageEnd": 7,
-        "sectionPath": null,
-        "snippet": "Given the distressed economic history of South Sudan, ongoing conflict, and lack of resources, this study is developed around two main queries including: n n Why does the recurring flooding in South Sudan overwhelm the government’s abil- ity to deploy mitigation strategies to reduce flood risk and h…",
-        "supportLevel": "direct",
-        "score": 0.13108856457417034
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 2,
-        "pageEnd": 3,
-        "sectionPath": null,
-        "snippet": "LITERATURE REVIEW Flooding hazard in South Sudan The floods in South Sudan have become a recur - rent disaster theme, affecting individuals, families, and communities each rainy season for many decades in the past. 34 In July 2019, severe flooding devastated many counties and villages across the nat…",
-        "supportLevel": "direct",
-        "score": 0.12125
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 78,
-        "pageEnd": 79,
-        "sectionPath": null,
-        "snippet": "The model was developed in the context of health and aviation policies in the United States in the 1980s, but it has been used widely in different geographical and policy domains, such as in Argentine education policy (Jelena, 2008) and Canadian municipal emergency management policy (Henstra, 2010).…",
-        "supportLevel": "direct",
-        "score": 0.1144229337304542
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 3,
-        "pageEnd": 4,
-        "sectionPath": null,
-        "snippet": "This situation has made the recovery process difficult for hundreds of thousands of people during the period of civil war that put the entire country on the brink of collapse and ultimately pro- duced failed state. 38 The floods have devastated com- munities, displaced families, destroyed homes, far…",
-        "supportLevel": "direct",
-        "score": 0.11002247488101534
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414760681",
-    "createdAt": "2026-06-02T15:39:20.681Z"
-  },
-  {
-    "question": "What are the key components of flood risk governance?",
-    "candidateAnswer": "Based on the provided evidence, the key components of flood risk governance include:\n\n*   **Effective Flood Early Warning Systems (FEWS):** These require adequate lead times, mechanisms to ensure warnings reach at-risk communities, and strategies to address deficient response behaviors [1]. Success depends on aligning those who possess the necessary knowledge with those who control the system [1].\n*   **Cooperation and Stakeholder Engagement:** Effective governance requires cooperation between the government, relief agencies, and communities to create, maintain, and use warning systems properly [3]. Social and political factors are defined as critical to the success of these systems [3].\n*   **Knowledge Bases Incorporating Local Input:** A successful Spatial Decision Support System (SDSS) relies on a knowledge base that integrates community input, citizen science, and local knowledge to ensure solutions are appropriate for local evacuation and rescue operations [2].\n*   **Cyberinfrastructure and Decision Support Tools:** Governance utilizes cyberinfrastructure platforms that integrate decision models, data, geospatial visualization tools, high-performance computing, and advanced data storage to support seamless decision-making [2][4]. This includes Spatial Decision Support Systems (SDSSs) and CyberGIS to analyze and synthesize field information [4].\n*   **Risk Modeling and Mapping:** Governance involves using probabilistic (normative) and deterministic models to assess flood risk, scale, recurrence, and economic impacts [5]. This includes prioritizing real-time monitoring, flood modeling, and mapping facilities [3].\n\n**Limitations:** The provided evidence focuses heavily on early warning systems, decision support technologies, and modeling. It offers limited detail on other potential governance components such as legal frameworks, long-term land-use planning policies, or specific funding mechanisms.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 109,
-        "pageEnd": 109,
-        "sectionPath": null,
-        "snippet": "Where FEWS do exist, research frequently demonstrates that lead times are inadequate, warnings fail to reach at- risk communities and response behaviour is deficient. Achieving an effective FEWS is therefore universally challenging. Even countries like Australia and the UK continue to face well-rese…",
-        "supportLevel": "direct",
-        "score": 0.26873912163529645
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 60,
-        "pageEnd": 61,
-        "sectionPath": null,
-        "snippet": "Various components that are related to decision models, data and knowledge relevant to a decision, and geospatial visualization tools can be shared over a cyberinfra- structure platform in a way that they can be seam- lessly integrated and used by various decision-makers. Incorporating community inp…",
-        "supportLevel": "direct",
-        "score": 0.26789373814041745
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 126,
-        "pageEnd": 127,
-        "sectionPath": null,
-        "snippet": "The rapid nature of the flood disaster - and a clearly deficient warning and infonnation dis- semination system - prevented the orderly and planned resettlement of the people displaced by the dam project and affected by the flood. A key workshop conclu- sion - among many was therefore that enhanced …",
-        "supportLevel": "direct",
-        "score": 0.2676377217553688
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 60,
-        "pageEnd": 60,
-        "sectionPath": null,
-        "snippet": "Spatial decision support systems (SDSSs) help automate or guide decision- making by analyzing and synthesizing available information from the field. 54 SDSSs come in vari- ous shapes and sizes, including privately developed applications, open-source software, and commercial systems designed for part…",
-        "supportLevel": "direct",
-        "score": 0.26565359477124184
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 17,
-        "pageEnd": 18,
-        "sectionPath": null,
-        "snippet": "Penning-Rowsell and Matilda Becker management, normativity (probabilistic modelling) is predominantly used to model flood risk, scale, recurrence and hence likely economic impacts. Deterministic statements (based on positive knowledge) underpin several of the models which might be used to produce di…",
-        "supportLevel": "direct",
-        "score": 0.2544162210338681
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414752437",
-    "createdAt": "2026-06-02T15:39:12.437Z"
-  },
-  {
-    "question": "How do socioeconomic factors influence flood vulnerability in communities?",
-    "candidateAnswer": "Socioeconomic factors influence flood vulnerability by constraining residents' ability to make voluntary decisions about where to live, often forcing them into flood-prone areas despite an awareness of the risks. Key influences include:\n\n*   **Economic Constraints:** Factors such as low income levels, the affordability of housing in safer areas, and proximity to work can compel individuals to reside in floodplains [3]. Residents with less financial flexibility regarding these considerations are less able to make voluntary choices to avoid flood risks [5].\n*   **Compounding Deprivation:** Vulnerability is not caused by single indicators but by the \"compounding and dynamic effect\" of multiple socioeconomic factors in flood-prone areas. For example, communities with higher unemployment, greater reliance on welfare benefits, lower educational qualifications, and higher rates of social renting exhibit increased vulnerability [4].\n*   **Policy and Development:** External policies that encourage development in floodplains or discourage relocation can alter risk perceptions and lead to involuntary occupation of hazardous areas [3][5].\n*   **Heterogeneity of Residents:** Floodplain residents are a diverse group attracted by various factors including economic activity and amenities, meaning there is no single \"prototypical occupant,\" yet socioeconomic situations strongly dictate how these groups prioritize flood risk [2][3].\n\nThe evidence notes that while rising federal expenditure on flood control has occurred, it has not succeeded in reducing flood losses, suggesting that protection measures alone do not address the underlying socioeconomic drivers of vulnerability [2].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 159,
-        "pageEnd": 159,
-        "sectionPath": null,
-        "snippet": "In that example it appears that socioeconomic considerations primarily drive the voluntariness of the decision. In order to strengthen these conclusions, future research should consider surveying residents further to confirm that their decision-making process conforms with the concept of voluntarine…",
-        "supportLevel": "direct",
-        "score": 0.2639115482495357
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 151,
-        "pageEnd": 151,
-        "sectionPath": null,
-        "snippet": "Unfortunately, rising federal flood control expenditure in the United States has not succeeded in reducing flood losses (Parker and Penning-Rowsell, 1983). Post Hurricane Katrina, federal flood expenditure has risen dramatically and is not pro- jected to decrease in the coming decades (Cummins et 20…",
-        "supportLevel": "direct",
-        "score": 0.26252747252747255
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 153,
-        "pageEnd": 154,
-        "sectionPath": null,
-        "snippet": "Even if prospective or current residents possess an accurate understanding of flood risk, external factors may con- strain their ability to make decisions based on that perception. They may not necessarily reside in a flood-prone area by choice. Bollens et al. (1988), for example, concluded that occ…",
-        "supportLevel": "direct",
-        "score": 0.2625108225108225
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 133,
-        "pageEnd": 134,
-        "sectionPath": null,
-        "snippet": "The rains exceeded the capacity of the drainage system: on 25 June, over 110 mm fell (Whittle et al., 2010), affecting 8,657 households (over 20,000 people) and forcing 31.5 per cent into temporary accommodation (Coulthard et al., 2007a). This is a deprived part of the UK. Hull in 2007 was the eight…",
-        "supportLevel": "direct",
-        "score": 0.26240848021693575
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 155,
-        "pageEnd": 156,
-        "sectionPath": null,
-        "snippet": "The rationalist perspective on risk perception, for example, might argue that if prospective residents are well informed and understand the biases that ori- ginate from heuristics, they could make a more voluntary choice. The con- structivist perspective, on the other hand, might argue that the soci…",
-        "supportLevel": "direct",
-        "score": 0.2602468487394958
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414751581",
-    "createdAt": "2026-06-02T15:39:11.581Z"
-  },
-  {
-    "question": "What personal preparedness activities should public health workers know about?",
-    "candidateAnswer": "Based on the provided documents, public health workers should know about the three core personal preparedness activities promoted by the Federal Emergency Management Agency's (FEMA) Ready campaign: \"get a kit, make a plan and be informed\" [3], [4].\n\nSpecific knowledge gaps identified in the evidence suggest workers need to be aware of the importance of having a **family emergency kit**, as surveys indicated that while many responders have family members dependent on them, only a small percentage reported possessing such a kit [2]. Additionally, preparedness involves having sufficient **food, water, and medicine** to remain at home for up to two weeks if ill [4]. The evidence also highlights the need for workers to understand **tools for conducting personal preparedness activities** and how to apply frameworks like the Extended Parallel Process Model (EPPM) to improve preparedness levels [1], [5].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
-        "pageStart": 3,
-        "pageEnd": 3,
-        "sectionPath": null,
-        "snippet": "The aims of the study were to measure three relevant outcomes of a per- sonal preparedness curriculum for public health workers: 1) the extent of change (increase) in knowl- edge about personal preparedness activities and knowledge about tools for conducting personal pre- paredness activities; 2) th…",
-        "supportLevel": "direct",
-        "score": 0.2813934426229508
-      },
-      {
-        "sourceFile": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
-        "pageStart": 2,
-        "pageEnd": 3,
-        "sectionPath": null,
-        "snippet": "Thirty-four local (six regional) West Virginia LHDs participated in the survey using the Johns Hopkins~ Public Health Infrastructure Response Survey Tool ( JH~PHIRST ). 11 The survey measured respondents’ perceptions including awareness, skills, and confi- dence in performing assigned tasks; WTR to …",
-        "supportLevel": "direct",
-        "score": 0.2813934426229508
-      },
-      {
-        "sourceFile": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
-        "pageStart": 1,
-        "pageEnd": 2,
-        "sectionPath": null,
-        "snippet": "Barnett, MD, MPH JEM \nthreats, government and response agencies have emphasized the need for personal emergency pre- paredness. For example, the Federal Emergency Management Agency (FEMA) launched its national Ready campaign in 2003. The campaign aims to increase public awareness and participation i…",
-        "supportLevel": "direct",
-        "score": 0.2803353814644137
-      },
-      {
-        "sourceFile": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
-        "pageStart": 2,
-        "pageEnd": 2,
-        "sectionPath": null,
-        "snippet": "Ready promotes three preparedness activities about different types of emergencies and their appropriate responses: “get a kit, make a plan and be informed.” 1 Despite government efforts, numerous studies and polls suggest low personal preparedness levels in the community. 2-7 A 2007 survey by the Na…",
-        "supportLevel": "direct",
-        "score": 0.2798313492063492
-      },
-      {
-        "sourceFile": "bdevito67,+JEM-12-1-04-Kohn_1780399724237.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "Journal of Emergency Management Vol. 12, No. 1, January/February 2014 55 ABSTRACT Objectives: To measure the following three rele- vant outcomes of a personal preparedness curriculum for public health workers: 1) the extent of change (increase) in knowledge about personal preparedness activities and…",
-        "supportLevel": "direct",
-        "score": 0.279613880742913
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "emergency-management",
-    "notes": null,
-    "id": "report_1780414750271",
-    "createdAt": "2026-06-02T15:39:10.271Z"
-  },
-  {
-    "question": "How should emergency managers communicate flood risk to the public?",
-    "candidateAnswer": "Based on the provided evidence, there is limited direct guidance on specific communication methods for flood risk; however, the documents highlight the following critical factors emergency managers should consider:\n\n*   **Methodology impacts outcomes:** The methodology used to warn the population strictly affects the velocity of warning dissemination, which in turn influences the number of injuries [1].\n*   **Engage specific communities:** Emergency managers must go beyond identifying locations to actively engage with households (specifically Manufactured Housing Communities) about the specific risks within their communities [4].\n*   **Avoid underestimation:** Managers should avoid relying solely on past experiences or easily anticipated scenarios, as this can lead to drastically underestimating damage and loss of life, resulting in \"policy surprises\" [3].\n*   **Use models for strategy comparison:** While simulation models are sensitive to parameters like alarm dissemination rates, they should be used to compare different emergency management strategies rather than as absolute estimates of life losses [1].\n\nThe provided evidence does not detail specific communication channels (e.g., sirens, social media) or messaging content, focusing instead on the importance of engagement, accurate risk assessment, and the impact of warning methodologies on safety outcomes.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEMv9n1_7_1780399724237.pdf",
-        "pageStart": 8,
-        "pageEnd": 9,
-        "sectionPath": null,
-        "snippet": "Therefore, the model requires a large amount of data for the simulation setup, which can be consequently very time consuming. Furthermore, the analysis reveals that the model is clearly sensitive in the choice of parame- ters, as to the rate of alarm disseminating, and to the distance in which the p…",
-        "supportLevel": "direct",
-        "score": 0.27200280112044817
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 139,
-        "pageEnd": 140,
-        "sectionPath": null,
-        "snippet": "The Poverty Site (2014). The poverty site: Key facts. Available from: www.poverty.org.uk/ summary/key facts.shtml. UK Government (2014). Shared ownership for council and housing association tenants. UK Government, London. Available from: www.gov.uk/shared-ownership-tenants. Whitehead, C. and Scanlon…",
-        "supportLevel": "direct",
-        "score": 0.2673843272248658
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 39,
-        "pageEnd": 40,
-        "sectionPath": null,
-        "snippet": "These tools are primarily designed to help state and federal agencies anticipate response capabilities and recov- ery needs; they estimate aggregate damage and loss, typically in economic terms, but do not identify specific impacts that local decision makers can act upon. 16,17 Without detailed stor…",
-        "supportLevel": "direct",
-        "score": 0.26000646412411116
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 74,
-        "pageEnd": 75,
-        "sectionPath": null,
-        "snippet": "Emergency managers should know where MHCs are located within their jurisdictions and identify risks relative to climate hazards To effectively engage , plan, and respond to climate-related emergencies affecting MHCs, emer - gency managers and planners need to know where they are located within their…",
-        "supportLevel": "direct",
-        "score": 0.2587063557817493
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 74,
-        "pageEnd": 74,
-        "sectionPath": null,
-        "snippet": "Some households have been challenged with remain- ing within a reasonable distance of employment or health services. Families with school-age children faced significant challenges in finding affordable tem- porary or permanent housing solutions that would enable them to remain in their community, cl…",
-        "supportLevel": "direct",
-        "score": 0.25696752775184145
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414748720",
-    "createdAt": "2026-06-02T15:39:08.720Z"
-  },
-  {
-    "question": "What is Reciprocal Rank Fusion and how is it used in information retrieval?",
-    "candidateAnswer": "Based on the provided evidence, there is no information available regarding \"Reciprocal Rank Fusion\" or its use in information retrieval.\n\nThe retrieved documents focus on flood risk management, social norms, data accuracy in disasters, critical infrastructure vulnerability, and Geographic Information Systems (GIS) [1]–[5]. While one document mentions that \"more data may not necessarily lead to [better insights]\" without a systematic approach to analyze information, it does not describe specific algorithms like Reciprocal Rank Fusion [3]. Therefore, the question cannot be answered using the supplied sources.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 18,
-        "pageEnd": 19,
-        "sectionPath": null,
-        "snippet": "The chapter demonstrates how biases towards certain knowledge histories and trajectories can provide a 'locked' approach to flood risk management, wherein the social norms of groups with power presides over others and require significant effort and disturbance to be altered. Meanwhile, chapter 15 de…",
-        "supportLevel": "direct",
-        "score": 0.1059313725490196
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 17,
-        "pageEnd": 17,
-        "sectionPath": null,
-        "snippet": "Significant differences may be found in the types and sources of information which inform people's knowledge and perception of this risk and which information they choose to trust. These differences produce both challenges and opportunities for enhancing the efficacy of FRM. Challenges arise where i…",
-        "supportLevel": "direct",
-        "score": 0.10539373814041746
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 63,
-        "pageEnd": 63,
-        "sectionPath": null,
-        "snippet": "Finally, respondents identified a need for accurate informa- tion in general. While not as specific as previous categories, one particular respondent recognized why this was of great concern: Can’t think of how we would have gotten more information. Sometimes there is too much information. Less info…",
-        "supportLevel": "direct",
-        "score": 0.10464932126696833
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 40,
-        "pageEnd": 40,
-        "sectionPath": null,
-        "snippet": "CI assets contribute to specific societal functions, so community impact often corre- lates with the extent to which functioning of the CI is impaired. 16,26 Other measures of vulnerability—eg, Social Vulnerability Index 27 —are useful for determin- ing comparative vulnerability but are not conduciv…",
-        "supportLevel": "direct",
-        "score": 0.10397058823529412
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 58,
-        "pageEnd": 59,
-        "sectionPath": null,
-        "snippet": "Geographic Information Systems (GIS) have been \n73 Journal of Emergency Management Vol. 22, No. 7 Special Issue on Climate Change and Sustainability in Emergency Management often used to support disaster response to identify risk areas and available resources. 28-33 Coordination refers to the alignm…",
-        "supportLevel": "direct",
-        "score": 0.10277821939586645
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "general",
-    "notes": null,
-    "id": "report_1780414746406",
-    "createdAt": "2026-06-02T15:39:06.406Z"
-  },
-  {
-    "question": "What are the main findings on flood insurance and economic recovery after disasters?",
-    "candidateAnswer": "Based on the provided documents, there are **no specific findings detailing the direct impact of flood insurance on economic recovery outcomes**. The evidence is partial and focuses on the *availability* of insurance and general *community resilience strategies* rather than empirical data linking insurance to recovery speed or success.\n\nThe available information indicates the following:\n\n*   **Limited Role of Insurance in Some Regions:** In Canada, flood insurance was historically unavailable to homeowners, leaving government financial aid as the sole cost recovery mechanism following major floods [4]. This reliance on government aid alone is being questioned due to increasing flood frequency and severity, leading to a shift toward distributing risk sharing across homeowners [4].\n*   **Barriers to Insurance Viability:** For overland flood insurance to be economically viable for insurers, specific conditions must be met, including the ability to accurately price flood probability and losses, and setting premiums that are both affordable for homeowners and sufficient to cover insurer costs [5]. Floods often fail standard insurance criteria because they affect large geographical areas, are not random (occurring in high-risk zones), and suffer from adverse selection where only the most exposed homeowners purchase coverage [5].\n*   **General Recovery Advice (Non-Insurance Specific):** Community leaders interviewed years after a flood emphasized resilience strategies such as taking action, accepting help, maintaining a realistic long-term perspective, and working together as a community [1][3]. While \"accepting help\" is noted, the excerpts do not specify whether this help refers to insurance payouts or other forms of aid [1][3].\n\n**Limitation of Evidence:** The provided text discusses the *conditions* necessary for flood insurance to exist and the *shift* toward including it in risk management, but it does not present findings on how having (or lacking) insurance specifically altered economic recovery trajectories compared to other methods.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "Journal of Emergency Management Vol. 6, No. 5, September/October 2008 71 ABSTRACT Resilience refers to the capacity to withstand, over- come, or recover from serious threat, such as a natural disaster. In small towns, community leaders are inti- mately involved with their towns’ response and recover…",
-        "supportLevel": "direct",
-        "score": 0.1184313725490196
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 121,
-        "pageEnd": 122,
-        "sectionPath": null,
-        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
-        "supportLevel": "direct",
-        "score": 0.1090563725490196
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
-        "pageStart": 5,
-        "pageEnd": 6,
-        "sectionPath": null,
-        "snippet": "After the flood is over, you [are] a little less likely to show up and help ....” “Stay united, work together.” Journal of Emergency Management Vol. 6, No. 5, September/October 2008 75\n\n“Stick together.” “Involve as many people in the community as you can. Let everybody have a voice.” “Well, work to…",
-        "supportLevel": "direct",
-        "score": 0.10694488606253312
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 37,
-        "pageEnd": 38,
-        "sectionPath": null,
-        "snippet": "With the likely increasing flood damage and associated expenses, it is necessary to examine critically the current state of Canadian flood management, including the cost recovery mechanisms, to detennine the best future options. Until very recently, the cost recovery scheme following a major flood e…",
-        "supportLevel": "direct",
-        "score": 0.10612903225806451
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 40,
-        "pageEnd": 41,
-        "sectionPath": null,
-        "snippet": "Flood damages inherently do not meet many of these basic conditions. Flooding events often affect large geographical areas and many properties (Amell, 2000). They are not random and are prone to occur in floodplain areas and high-risk zones, so condition three of unpredictability is not met (IBC, 20…",
-        "supportLevel": "direct",
-        "score": 0.10487829110779931
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414743289",
-    "createdAt": "2026-06-02T15:39:03.289Z"
-  },
-  {
-    "question": "What methods are used for flood forecasting and early warning systems?",
-    "candidateAnswer": "Based on the provided documents, the methods and components used for flood forecasting and early warning systems include:\n\n*   **Technical Detection and Modeling Methods:** Specific techniques employed include flood modelling using in-house software, stream gauge monitoring, upstream dam monitoring, and the use of GIS and remote sensing [4]. Additionally, satellite-based flood forecasting is used by international initiatives to provide technical assistance and integrate data into national systems [5].\n*   **System Functions and Actions:** While distinct from forecasting systems which assess risk, early warning systems are designed to issue warnings when a flood is approaching or imminent. These systems enable authorities to take specific actions such as issuing evacuation instructions and operating dams or retarding basins [2].\n*   **Collaborative and Community Approaches:** Methods include collaborative approaches between international agencies, governments, and communities. These often utilize formal international knowledge for the early technical stages of forecasting, followed by community-led approaches for later components of the warning chain [5]. Community-based systems are noted as potentially appropriate for evacuation-focused warnings in small river basins with small-scale floods [5].\n*   **Communication and Decision-Making:** Effective methods involve translating scientific forecasting information into simple formats for transmission to professionals and at-risk populations [1]. Furthermore, carefully demarcated decentralisation of decision-making is identified as a key component to avoid communication delays and ensure timely responses [3].\n\n**Limitations in Evidence:**\nThe provided evidence highlights significant barriers rather than a comprehensive list of global methods. It notes that technological challenges, outdated equipment (such as old radar), poor communication infrastructure, lack of funding, and insufficient trained staff can prevent these methods from being effective [1][4]. The evidence is partial regarding specific technical algorithms or detailed meteorological models beyond those explicitly listed for the Tokwe-Mukorsi case and the WMO initiative [4][5].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 121,
-        "pageEnd": 122,
-        "sectionPath": null,
-        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
-        "supportLevel": "direct",
-        "score": 0.27931010928961747
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "As the population living in flood-prone areas and the value of urban and rural assets exposed to flood risk are growing rapidly due to urbanization and climate change, a better and effective flood early warning system is in high demand. Having such a system enables authorities to take appropriate ac…",
-        "supportLevel": "direct",
-        "score": 0.27931010928961747
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 126,
-        "pageEnd": 127,
-        "sectionPath": null,
-        "snippet": "Learning from this example (cf Kundzewicz, 2013), we can conclude that carefully demarcated decentralisation of decision-making is a key component in helping to avoid delays in communicating the danger to the people at risk of flooding and allow for a timely response by everyone involved (the flood …",
-        "supportLevel": "direct",
-        "score": 0.27774801587301584
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 123,
-        "pageEnd": 124,
-        "sectionPath": null,
-        "snippet": "In the case of the Tokwe-Mukorsi flood disaster, ZINWA used the following techniques to detect the flood, as indicated by the representative of that authority who we interviewed: • Flood modelling using in-house software; • Stream gauge monitoring; • Upstream dam monitoring; • GIS and remote sensing…",
-        "supportLevel": "direct",
-        "score": 0.2752355072463768
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 117,
-        "pageEnd": 118,
-        "sectionPath": null,
-        "snippet": "Such community systems are perhaps only appropriate for evacuation-focused warnings in small river basins with small-scale floods (Basha and Rus, 2007); major flood catastrophes may be unaffected. Collaborative systems Collaborative approaches between international agencies, government and com- muni…",
-        "supportLevel": "direct",
-        "score": 0.2744551282051282
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414741790",
-    "createdAt": "2026-06-02T15:39:01.790Z"
-  },
-  {
-    "question": "What role does land use planning play in flood risk reduction?",
-    "candidateAnswer": "Based on the provided documents, land use planning plays a role in flood risk reduction by serving as a nonstructural mitigation measure that involves enforcing laws to govern building codes and land use mapping [1]. It functions as an overall system designed to zone all areas for particular uses and to make decisions on specific development applications, often circumscribed by geographical delineations of at-risk areas such as flood plains [2].\n\nThe evidence regarding the specific mechanisms of land use planning is partial; while Source [1] lists \"land use mapping\" as an example of effective nonstructural approaches, the sentence listing these examples is cut off in the provided text. Similarly, Source [2] describes the zoning powers but does not detail specific outcomes of those planning decisions beyond the general intent to manage development in at-risk areas.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_20-8-08-Wood-Practical+flood+risk_1780399724236.pdf",
-        "pageStart": 9,
-        "pageEnd": 9,
-        "sectionPath": null,
-        "snippet": "The gabion wall shown from the project in Nairobi (Figure 6) will likely not outlast the engineered product from Kabul shown in Figure 5, and this may provide insight into why these walls have yielded varying results. 91 In South Sudan, there is a component of urgency where the value of a locally de…",
-        "supportLevel": "direct",
-        "score": 0.2759710550887021
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 15,
-        "pageEnd": 16,
-        "sectionPath": null,
-        "snippet": "These powers may be circumscribed in most countries by some geo- graphical delineation of the at-risk areas (i.e. the flood plain), but such powers are often a small part of an overall land use planning system designed to zone all areas for particular uses and make decisions on specific development …",
-        "supportLevel": "direct",
-        "score": 0.27572303921568625
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 41,
-        "pageEnd": 41,
-        "sectionPath": null,
-        "snippet": "The report also announced the intention of the federal govern- ment to consult with the insurance industry concerning its role in providing private flood insurance to homeowners (Government of Canada, 2014). This attitude has become stronger, with a key objective of the 2015 National Disaster Mitiga…",
-        "supportLevel": "direct",
-        "score": 0.27480392156862743
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 13,
-        "pageEnd": 15,
-        "sectionPath": null,
-        "snippet": "Power in flood risk management Within FRM, the power to raise and spend money is important because, in gen- eral, much risk reduction is a capital-intensive activity where large sums are needed to implement significant flood warning systems and for protecting local commu- nities and regional economi…",
-        "supportLevel": "direct",
-        "score": 0.271592039800995
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 162,
-        "pageEnd": 162,
-        "sectionPath": null,
-        "snippet": "Managed by the Federal Emergency Management Agency (FEMA), the NFIP provides government administered subsidised flood insurance to US citize~s ~ ~ •. tb.e &,oal~ .. Of fedu:c1t1g: Hood~rblated damag~ and less~riing the amouiit ofgovernmen·t funding needed for post-disaster recovery (King, 2013)\\ Flo…",
-        "supportLevel": "direct",
-        "score": 0.27128054740957963
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414739539",
-    "createdAt": "2026-06-02T15:38:59.539Z"
-  },
-  {
-    "question": "How can resilience be measured in communities facing flood risk?",
-    "candidateAnswer": "Based on the provided evidence, there is no direct description of specific metrics or standardized methods to **measure** community resilience in the face of flood risk. The documents offer only partial insights into the *components* that influence resilience rather than a measurement framework:\n\n*   Resilience is conceptually defined as the ability to \"bounce back\" and produce positive outcomes despite stress, involving the replacement of lost resources and the application of remaining resources to recovery efforts [1].\n*   The capacity for recovery and resilience is influenced by the availability of financial and personnel resources, which is particularly critical for small rural communities [1].\n*   Long-term recovery prospects (a component of resilience) are constrained by factors such as the lack of available housing lots outside flood hazard areas and the high costs of land acquisition and infrastructure development [2].\n*   Responsiveness to warnings, which relates to resilience, is improved by previous flood experience and the incorporation of local knowledge and natural indicators into planning [3].\n\nThe evidence is weak regarding the actual *measurement* of resilience, as it focuses on defining the concept, identifying barriers to recovery, and discussing management responsibilities rather than providing quantitative or qualitative assessment tools [1], [2], [3], [4].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "bdevito67,+JEM_V6N5_9_1780399724235.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "How well a community recovers from a flood depends partially on the magnitude of disaster-related loss and the extent to which lost resources can be replaced and remaining resources applied to the work of recovery and rebuilding. 1 Recovery from a major disaster may be particularly stressful for sma…",
-        "supportLevel": "direct",
-        "score": 0.2770011737089202
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 74,
-        "pageEnd": 74,
-        "sectionPath": null,
-        "snippet": "Some households have been challenged with remain- ing within a reasonable distance of employment or health services. Families with school-age children faced significant challenges in finding affordable tem- porary or permanent housing solutions that would enable them to remain in their community, cl…",
-        "supportLevel": "direct",
-        "score": 0.2642647058823529
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 114,
-        "pageEnd": 115,
-        "sectionPath": null,
-        "snippet": "In contrast, the control of Bangladeshi flood response planning and activities has historically been managed by the national disaster agency without community involvement. The disparate char- acteristics and knowledge of sender and receiver here reduces the controlling authority's understanding of h…",
-        "supportLevel": "direct",
-        "score": 0.12825204813108038
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 28,
-        "pageEnd": 28,
-        "sectionPath": null,
-        "snippet": "Therefore, international European law has necessitated for hydrological management to be executed at the river basin level (EC, 2000/EC/ 60), whether or not the basin crosses internal or international political boundaries. Conversely, Butler and Pidgeon (2011), Doom and Oels (2006) have argued that …",
-        "supportLevel": "direct",
-        "score": 0.12250745950554134
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 69,
-        "pageEnd": 69,
-        "sectionPath": null,
-        "snippet": "METHODOLOGY We used an integrative literature review method of the scholarly literature related to the three dimen- sions of vulnerability of MHCs to synthesize recom- mendations for emergency managers regarding MHCs and their vulnerability to climate-related hazards. Such an approach is useful for …",
-        "supportLevel": "direct",
-        "score": 0.12152821939586644
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414738297",
-    "createdAt": "2026-06-02T15:38:58.297Z"
-  },
-  {
-    "question": "What methods are used for flood forecasting and early warning systems?",
-    "candidateAnswer": "Based on the provided documents, the methods and components used for flood forecasting and early warning systems include:\n\n*   **Technical Detection and Modeling Methods:** Specific techniques identified include flood modelling using in-house software, stream gauge monitoring, upstream dam monitoring, and the use of GIS and remote sensing [4]. Additionally, satellite-based flood forecasting is used by international initiatives to provide technical assistance and integrate data into national systems [5].\n*   **System Functions and Actions:** Effective systems enable authorities to take advance actions such as issuing evacuation instructions and operating dams or retarding basins [2]. The primary purpose of the warning component is to issue alerts when a flood is approaching, imminent, or becoming a disaster, distinct from forecasting systems which assess risk [2].\n*   **Organizational and Communication Approaches:** Methods include collaborative approaches between international agencies, governments, and communities, where international bodies handle early technical forecasting and communities manage later warning components [5]. Decentralised decision-making is also cited as a key method to avoid communication delays and ensure timely responses [3]. Furthermore, systems require translating scientific forecasting information into simple formats for easy transmission to professionals and at-risk populations [1].\n\n**Limitations in Evidence:**\nThe evidence provides specific examples of methods used in certain contexts (e.g., Zimbabwe/Nepal) and highlights barriers such as outdated radar equipment, poor telephone communication, and a lack of trained staff, which hinder the effectiveness of these methods [1][4]. The documents focus heavily on the challenges and organizational structures rather than providing a comprehensive global list of all available forecasting methodologies.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 121,
-        "pageEnd": 122,
-        "sectionPath": null,
-        "snippet": "Barriers to effective flood risk warning systems include, first, the difficulties in;~, translating scientific flood forecasting information into a simple format that can be transmitted easily to the relevant professionals and to the people at risk of flooding (Faulkner et al., 2007). Second, flood …",
-        "supportLevel": "direct",
-        "score": 0.27931010928961747
-      },
-      {
-        "sourceFile": "bdevito67,+JEM_21-1-04-Huang_1780399724236.pdf",
-        "pageStart": 1,
-        "pageEnd": 1,
-        "sectionPath": null,
-        "snippet": "As the population living in flood-prone areas and the value of urban and rural assets exposed to flood risk are growing rapidly due to urbanization and climate change, a better and effective flood early warning system is in high demand. Having such a system enables authorities to take appropriate ac…",
-        "supportLevel": "direct",
-        "score": 0.27931010928961747
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 126,
-        "pageEnd": 127,
-        "sectionPath": null,
-        "snippet": "Learning from this example (cf Kundzewicz, 2013), we can conclude that carefully demarcated decentralisation of decision-making is a key component in helping to avoid delays in communicating the danger to the people at risk of flooding and allow for a timely response by everyone involved (the flood …",
-        "supportLevel": "direct",
-        "score": 0.27774801587301584
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 123,
-        "pageEnd": 124,
-        "sectionPath": null,
-        "snippet": "In the case of the Tokwe-Mukorsi flood disaster, ZINWA used the following techniques to detect the flood, as indicated by the representative of that authority who we interviewed: • Flood modelling using in-house software; • Stream gauge monitoring; • Upstream dam monitoring; • GIS and remote sensing…",
-        "supportLevel": "direct",
-        "score": 0.2752355072463768
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 117,
-        "pageEnd": 118,
-        "sectionPath": null,
-        "snippet": "Such community systems are perhaps only appropriate for evacuation-focused warnings in small river basins with small-scale floods (Basha and Rus, 2007); major flood catastrophes may be unaffected. Collaborative systems Collaborative approaches between international agencies, government and com- muni…",
-        "supportLevel": "direct",
-        "score": 0.2744551282051282
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414712917",
-    "createdAt": "2026-06-02T15:38:32.917Z"
-  },
-  {
-    "question": "How do socioeconomic factors influence flood vulnerability in communities?",
-    "candidateAnswer": "Socioeconomic factors influence flood vulnerability by constraining residents' ability to make voluntary decisions about where to live, often forcing them into flood-prone areas despite an awareness of the risks. Key influences include:\n\n*   **Economic Constraints:** Factors such as low income levels and the affordability of housing in safer areas can prevent individuals from choosing where to reside, leading to involuntary occupation of floodplains [3]. Residents with less financial flexibility are less able to make voluntary choices compared to those with more resources [5].\n*   **Employment and Location:** Proximity to work is a significant external factor that may compel people to live in flood-prone zones regardless of the hazard [3].\n*   **Compounding Deprivation:** Vulnerability is not caused by single indicators but by the \"compounding and dynamic effect\" of multiple socioeconomic factors in flood-prone areas. For example, communities with higher unemployment, greater reliance on welfare benefits, lower educational qualifications, and higher rates of social renting exhibit increased vulnerability [4].\n*   **Policy and Development:** Policies that encourage development in floodplains or discourage relocation can alter risk perceptions and push individuals into accepting higher levels of risk involuntarily [3], [5].\n\nWhile socioeconomic considerations primarily drive the voluntariness of residence decisions, the provided evidence notes that further research is suggested to fully confirm how these decision-making processes conform to concepts of voluntariness [1].",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 159,
-        "pageEnd": 159,
-        "sectionPath": null,
-        "snippet": "In that example it appears that socioeconomic considerations primarily drive the voluntariness of the decision. In order to strengthen these conclusions, future research should consider surveying residents further to confirm that their decision-making process conforms with the concept of voluntarine…",
-        "supportLevel": "direct",
-        "score": 0.2639115482495357
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 151,
-        "pageEnd": 151,
-        "sectionPath": null,
-        "snippet": "Unfortunately, rising federal flood control expenditure in the United States has not succeeded in reducing flood losses (Parker and Penning-Rowsell, 1983). Post Hurricane Katrina, federal flood expenditure has risen dramatically and is not pro- jected to decrease in the coming decades (Cummins et 20…",
-        "supportLevel": "direct",
-        "score": 0.26252747252747255
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 153,
-        "pageEnd": 154,
-        "sectionPath": null,
-        "snippet": "Even if prospective or current residents possess an accurate understanding of flood risk, external factors may con- strain their ability to make decisions based on that perception. They may not necessarily reside in a flood-prone area by choice. Bollens et al. (1988), for example, concluded that occ…",
-        "supportLevel": "direct",
-        "score": 0.2625108225108225
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 133,
-        "pageEnd": 134,
-        "sectionPath": null,
-        "snippet": "The rains exceeded the capacity of the drainage system: on 25 June, over 110 mm fell (Whittle et al., 2010), affecting 8,657 households (over 20,000 people) and forcing 31.5 per cent into temporary accommodation (Coulthard et al., 2007a). This is a deprived part of the UK. Hull in 2007 was the eight…",
-        "supportLevel": "direct",
-        "score": 0.26240848021693575
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 155,
-        "pageEnd": 156,
-        "sectionPath": null,
-        "snippet": "The rationalist perspective on risk perception, for example, might argue that if prospective residents are well informed and understand the biases that ori- ginate from heuristics, they could make a more voluntary choice. The con- structivist perspective, on the other hand, might argue that the soci…",
-        "supportLevel": "direct",
-        "score": 0.2602468487394958
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414706409",
-    "createdAt": "2026-06-02T15:38:26.409Z"
-  },
-  {
-    "question": "What are the key components of flood risk governance?",
-    "candidateAnswer": "Based on the provided evidence, the key components of flood risk governance include:\n\n*   **Effective Flood Early Warning Systems (FEWS):** These require adequate lead times, mechanisms to ensure warnings reach at-risk communities, and strategies to address deficient response behaviors [1]. Success depends on aligning those who possess the necessary knowledge with those who control the system [1].\n*   **Cooperation and Stakeholder Engagement:** Effective governance requires cooperation between the government, relief agencies, and communities to create, maintain, and use warning systems properly [3]. Social and political factors are defined as critical to the success of these systems [3].\n*   **Knowledge Bases Incorporating Local Input:** Successful decision support systems must include a knowledge base that integrates local knowledge, citizen science, and community input to ensure solutions are appropriate for local evacuation and rescue operations [2].\n*   **Spatial Decision Support Systems (SDSS) and Cyberinfrastructure:** Governance utilizes SDSS to automate and guide decision-making by synthesizing field information [4]. These systems rely on cyberinfrastructure, which consists of computing systems, data storage, advanced instruments, data repositories, visualization environments, and people linked by high-speed networks [4].\n*   **Modelling and Mapping:** Priorities include enhanced flood monitoring, real-time dissemination facilities, flood modelling, and mapping [3]. This involves using both probabilistic (normative) and deterministic models to assess flood risk, scale, recurrence, and potential economic impacts, while accounting for uncertainties in variables like flood duration [5].\n\n**Note on Evidence Limitations:** The provided documents focus heavily on technical systems (FEWS, SDSS, modelling) and the social aspects of implementation (community input, cooperation). They do not provide a comprehensive framework of flood risk governance that might include other standard components such as legal frameworks, funding mechanisms, or land-use planning policies.",
-    "candidateConfidence": "high",
-    "candidateSources": [
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 109,
-        "pageEnd": 109,
-        "sectionPath": null,
-        "snippet": "Where FEWS do exist, research frequently demonstrates that lead times are inadequate, warnings fail to reach at- risk communities and response behaviour is deficient. Achieving an effective FEWS is therefore universally challenging. Even countries like Australia and the UK continue to face well-rese…",
-        "supportLevel": "direct",
-        "score": 0.26873912163529645
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 60,
-        "pageEnd": 61,
-        "sectionPath": null,
-        "snippet": "Various components that are related to decision models, data and knowledge relevant to a decision, and geospatial visualization tools can be shared over a cyberinfra- structure platform in a way that they can be seam- lessly integrated and used by various decision-makers. Incorporating community inp…",
-        "supportLevel": "direct",
-        "score": 0.26789373814041745
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 126,
-        "pageEnd": 127,
-        "sectionPath": null,
-        "snippet": "The rapid nature of the flood disaster - and a clearly deficient warning and infonnation dis- semination system - prevented the orderly and planned resettlement of the people displaced by the dam project and affected by the flood. A key workshop conclu- sion - among many was therefore that enhanced …",
-        "supportLevel": "direct",
-        "score": 0.2676377217553688
-      },
-      {
-        "sourceFile": "JEM_2024_Special_Issue_1780399724235.pdf",
-        "pageStart": 60,
-        "pageEnd": 60,
-        "sectionPath": null,
-        "snippet": "Spatial decision support systems (SDSSs) help automate or guide decision- making by analyzing and synthesizing available information from the field. 54 SDSSs come in vari- ous shapes and sizes, including privately developed applications, open-source software, and commercial systems designed for part…",
-        "supportLevel": "direct",
-        "score": 0.26565359477124184
-      },
-      {
-        "sourceFile": "Flood_Risk_Management-OCR_1780399724237.pdf",
-        "pageStart": 17,
-        "pageEnd": 18,
-        "sectionPath": null,
-        "snippet": "Penning-Rowsell and Matilda Becker management, normativity (probabilistic modelling) is predominantly used to model flood risk, scale, recurrence and hence likely economic impacts. Deterministic statements (based on positive knowledge) underpin several of the models which might be used to produce di…",
-        "supportLevel": "direct",
-        "score": 0.2544162210338681
-      }
-    ],
-    "evidenceQuality": "strong",
-    "classification": "flood-hazard",
-    "notes": null,
-    "id": "report_1780414700327",
-    "createdAt": "2026-06-02T15:38:20.327Z"
   }
 ]

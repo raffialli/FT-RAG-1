@@ -1,0 +1,161 @@
+Create the integrated FalconTrust RAG candidate branch.
+
+Context:
+Codex has audited the individual Replit lanes and found them meaningful enough to roll forward:
+
+- OCR cleanup lane
+- Section/chunk quality lane
+- Reference/noise filtering lane
+- Confidence/citation validation lane
+- Confidence/citation fixes lane
+
+Goal:
+Create one clean integrated branch that represents the best current standalone Replit RAG candidate app.
+
+Branch to create/push:
+
+experiment/replit-rag-candidate-integrated
+
+Important:
+- Do not push to main.
+- Do not overwrite the individual lane branches.
+- Do not remove the lane reports.
+- Do not commit secrets.
+- Do not use AWS/S3.
+- Preserve the individual lane history as separate branches.
+- This integrated branch should become the single branch Codex audits end-to-end and may become the branch we run on the VM for client testing.
+
+Integration requirements:
+
+1. Start from the latest verified candidate work
+
+Use the latest confidence/citation fixes branch as the base if it already includes the prior lane changes.
+
+Expected latest branch:
+
+experiment/replit-confidence-citation-validation-fixes
+
+2. Create the integration branch
+
+Create:
+
+experiment/replit-rag-candidate-integrated
+
+3. Confirm the integrated branch includes all verified improvements
+
+Verify these are present:
+
+OCR cleanup:
+- raw extracted text saved before cleanup
+- cleanup runs before chunking
+- chunks/embeddings use cleaned text
+- journal headers, layout artifacts, broken hyphenation, known OCR substitutions handled
+
+Section/chunk quality:
+- line-start and mid-line heading splitting
+- sectionPath metadata coverage
+- reference/noise chunk suppression from chunking where applicable
+
+Reference/noise filtering:
+- chunk-classifier.ts
+- noiseScore/noiseCategory
+- reference/ad/bibliography/editorial/citation-heavy classification
+- hard exclusion for noisy chunks on normal queries
+- reference-query bypass for explicit bibliography/reference questions
+
+Confidence/citation validation:
+- evidenceSufficiency
+- citationValidation
+- comma citation parsing like [1,2] and [1, 2]
+- confidence cannot be high unless evidenceSufficiency is sufficient
+- deterministic scoring tests
+
+pnpm reproducibility:
+- include pnpm-workspace.yaml allowBuilds only if needed for:
+  - esbuild
+  - onnxruntime-node
+  - protobufjs
+  - sharp
+- do not change dependency versions unless already part of the verified work
+
+4. Run checks
+
+Run:
+
+pnpm install --frozen-lockfile
+pnpm --filter @workspace/api-server run typecheck
+pnpm --filter @workspace/rag-candidate run typecheck
+pnpm --filter @workspace/api-server run test
+pnpm --filter @workspace/api-server run build
+
+If frontend build has a known required env, run it too, for example:
+
+PORT=4173 BASE_PATH=/ pnpm --filter @workspace/rag-candidate run build
+
+5. Run integrated 10-question benchmark
+
+Run the same 10 benchmark questions on the integrated branch.
+
+Report:
+- confidence
+- evidenceSufficiency
+- citationValidation status
+- top 5 chunks
+- noiseCategory/noiseScore
+- whether answer is grounded
+- whether any noisy chunks appear in top evidence
+
+Expected behavior:
+- no noisy/reference/ad chunks in normal top evidence
+- reference chunks allowed when user explicitly asks for references
+- no high confidence unless evidenceSufficiency=sufficient
+- citation parser handles [1,2] and [1, 2]
+- Q3/Q6/Q7/Q9/Q10 should not overstate confidence when evidence is limited or indirect
+
+6. Create integration report
+
+Create:
+
+docs/rag-experiments/replit-rag-candidate/15-integrated-candidate-report.md
+
+Include:
+- source branch/base commit
+- integrated branch name
+- exact files included
+- verification checklist for all lanes
+- commands run
+- build/typecheck/test results
+- 10-question benchmark results
+- known remaining gaps
+- whether this branch is ready for Codex end-to-end audit
+- whether it may be suitable for standalone VM/client-test deployment after Codex approval
+
+Verdict format:
+
+- READY_FOR_CODEX_AUDIT
+- PARTIAL_NEEDS_FIXES
+- NOT_READY
+- REGRESSION
+
+7. Commit and push
+
+Commit message:
+
+Integrated Replit RAG candidate
+
+Push to:
+
+experiment/replit-rag-candidate-integrated
+
+8. Final response
+
+Report:
+- branch name
+- commit hash
+- source/base branch used
+- files changed
+- commands run
+- all pass/fail results
+- report path
+- final verdict
+- what Codex should audit next

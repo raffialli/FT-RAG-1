@@ -251,6 +251,140 @@ What Codex should verify end-to-end:
 
 ---
 
+## Codex Integrated Audit Blocker Fixes
+
+**Date applied:** 2026-06-02  
+**Commit message:** `Fix integrated candidate reproducibility and embedding metadata`
+
+### Fix 1 — `allowBuilds` (pnpm-workspace.yaml)
+
+**Applied: YES**
+
+Codex found that `pnpm install` succeeds only when `protobufjs` and `sharp` are present in `onlyBuiltDependencies`. These were missing from the committed file.
+
+**Exact change to `pnpm-workspace.yaml`:**
+
+```yaml
+# Before
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - msw
+  - onnxruntime-node
+  - unrs-resolver
+
+# After
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - msw
+  - onnxruntime-node
+  - protobufjs
+  - sharp
+  - unrs-resolver
+```
+
+No dependency versions changed. Lockfile untouched (`pnpm install --frozen-lockfile` → PASS).
+
+### Fix 2 — Embedding metadata mismatch
+
+**Applied: YES**
+
+**Actual embedding model used: `Xenova/all-MiniLM-L6-v2`** (local ONNX, 384-dim, ~23 MB q8 via `@huggingface/transformers`)
+
+**Root cause:** `artifacts/api-server/src/lib/rag/vector-store.ts` line 14 had the wrong fallback default:
+
+```typescript
+// Before (wrong — leftover from early prototype)
+const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "nomic-embed-text:latest";
+
+// After (correct — matches embeddings.ts)
+const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2";
+```
+
+**Where embedding metadata is written:** `vector-store.ts` `addOrUpdateRecords()` writes `embeddingModel` to the top-level field of `candidate-rag/data/vectors/index.json` on every ingest run.
+
+**Where it is read:** `vector-store.ts` `loadVectorIndex()` reads `index.json` at startup. The `embeddingModel` field is informational metadata — it does not affect runtime search (cosine similarity is model-agnostic given correctly shaped vectors). Correctness matters for reproducibility documentation and Codex audit.
+
+**Stored index state:** `candidate-rag/data/vectors/index.json` → `"embeddingModel": "Xenova/all-MiniLM-L6-v2"` (confirmed correct after fix).
+
+**Nomic was never used in this candidate.** The codebase uses `@huggingface/transformers` for local ONNX inference only. An earlier `vector-store.ts` default was a stale prototype artifact predating the switch to local embeddings.
+
+### Fix 3 — Ollama env vars for live generation benchmark
+
+**Required environment variables:**
+
+| Variable | Value | Where set |
+|----------|-------|-----------|
+| `OLLAMA_API_KEY` | (secret — in Replit Secrets) | Replit Secrets panel |
+| `OLLAMA_BASE_URL` | `https://ollama.com` | Replit Secrets panel |
+| `GENERATION_MODEL` | `qwen3.5:397b` | Replit Secrets panel or shell export |
+| `EMBEDDING_MODEL` | *(optional — defaults to `Xenova/all-MiniLM-L6-v2`)* | Not required unless overriding |
+
+**To rerun the 10-query live generation benchmark:**
+
+```bash
+# 1. Start the API server (workflow handles env injection automatically)
+#    OR export vars manually for standalone runs:
+export OLLAMA_BASE_URL=https://ollama.com
+export OLLAMA_API_KEY=<from secrets>
+export GENERATION_MODEL=qwen3.5:397b
+
+# 2. Verify connectivity
+curl -s http://localhost:80/api/rag/models | python3 -m json.tool
+
+# 3. Run all 10 benchmark queries (topK=5)
+for q in \
+  "What strategies do small towns use to build flood resilience?" \
+  "How did Japan flood warning systems perform during recent flood events?" \
+  "What flood adaptation strategies are used in South Sudan?" \
+  "How does community engagement improve emergency management outcomes?" \
+  "What factors determine flood vulnerability in urban areas?" \
+  "What quantitative evidence exists on early warning system fatality reduction rates?" \
+  "How do climate change policies affect flood risk management mechanisms?" \
+  "How is flood risk communicated to the public?" \
+  "What methods are used to assess community resilience to floods?" \
+  "How is social risk constructed in flood risk management?" ; do
+  curl -s -X POST http://localhost:80/api/rag/query \
+    -H "Content-Type: application/json" \
+    -d "{\"query\":\"$q\",\"topK\":5}" | \
+    python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('confidence'), d.get('evidenceSufficiency'), d.get('citationValidation',{}).get('allValid'))"
+done
+```
+
+**Expected output** (integrated candidate baseline, Report 15):
+```
+medium partial True
+low insufficient True
+low insufficient True
+high sufficient True
+medium partial True
+low insufficient True
+medium partial True
+low insufficient True
+low insufficient True
+medium partial True
+```
+
+**Notes:**
+- Generation uses `/api/chat` (not `/api/embed` — Ollama Cloud does not expose `/api/embed`).
+- Embedding runs locally (ONNX, no Ollama call needed for embeddings).
+- If `GENERATION_MODEL` env var is unset, `embeddings.ts` defaults to `qwen3.5:397b`.
+- Timeout per query: 180 s (configurable via `generateAnswer(prompt, timeoutMs)`).
+
+### Verification commands run (post-fix)
+
+```bash
+pnpm install --frozen-lockfile                                   → PASS
+pnpm --filter @workspace/api-server run typecheck               → PASS (0 errors)
+pnpm --filter @workspace/rag-candidate run typecheck            → PASS (0 errors)
+pnpm --filter @workspace/api-server run test                    → PASS (65/65)
+pnpm --filter @workspace/api-server run build                   → PASS (dist/index.mjs ~1.9MB)
+PORT=4173 BASE_PATH=/ pnpm --filter @workspace/rag-candidate run build  → PASS (391KB JS)
+```
+
+---
+
 ## Verdict
 
 **READY_FOR_CODEX_AUDIT**

@@ -11,7 +11,7 @@ import type { RagChunk, VectorIndex, VectorRecord } from "./types.js";
 const WORKSPACE_ROOT = path.resolve(process.cwd(), "..", "..");
 const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(WORKSPACE_ROOT, "candidate-rag", "data");
 const VECTOR_INDEX_PATH = path.join(DATA_DIR, "vectors", "index.json");
-const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "nomic-embed-text:latest";
+const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2";
 
 let _cachedIndex: VectorIndex | null = null;
 

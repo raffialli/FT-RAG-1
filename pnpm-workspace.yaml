@@ -41,6 +41,8 @@ onlyBuiltDependencies:
   - esbuild
   - msw
   - onnxruntime-node
+  - protobufjs
+  - sharp
   - unrs-resolver
 
 overrides:

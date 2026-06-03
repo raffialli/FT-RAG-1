@@ -16,9 +16,14 @@ import { synthesizeAnswer } from "../lib/rag/answer-gen.js";
 import { loadVectorIndex, resetVectorIndex } from "../lib/rag/vector-store.js";
 import { testConnectivity } from "../lib/rag/embeddings.js";
 import { loadReports, saveReport } from "../lib/rag/reports.js";
+import { generateCorpusArtifactReport } from "../lib/rag/ocr-detector.js";
+import { getDisplayTitle } from "../lib/rag/source-titles.js";
+import type { CleanupQuality } from "../lib/rag/types.js";
 
 const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
+const RAW_DOCS_DIR = path.join(DATA_DIR, "raw-documents");
+const CLEAN_DOCS_DIR = path.join(DATA_DIR, "clean-documents");
 
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
@@ -75,7 +80,21 @@ router.get("/rag/status", async (req, res) => {
 // GET /api/rag/documents
 router.get("/rag/documents", (_req, res) => {
   const docs = loadDocumentsManifest();
-  res.json(docs);
+  const index = loadVectorIndex();
+  const vectorCounts = new Map<string, number>();
+  for (const record of index.records) {
+    vectorCounts.set(record.documentId, (vectorCounts.get(record.documentId) ?? 0) + 1);
+  }
+
+  const cleanupByDocument = loadCleanupQualityByDocument();
+  res.json(
+    docs.map((doc) => ({
+      ...doc,
+      displayTitle: getDisplayTitle(doc.filename),
+      vectorCount: vectorCounts.get(doc.id) ?? 0,
+      cleanupQuality: cleanupByDocument.get(doc.id) ?? null,
+    }))
+  );
 });
 
 // DELETE /api/rag/documents — remove one explicit document from the candidate index
@@ -251,6 +270,44 @@ router.get("/rag/test-model", async (req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+function loadCleanupQualityByDocument(): Map<string, CleanupQuality> {
+  const byDocument = new Map<string, CleanupQuality>();
+  try {
+    const report = generateCorpusArtifactReport(RAW_DOCS_DIR, CLEAN_DOCS_DIR);
+    for (const doc of report.documents) {
+      const categoriesTracked = Array.from(
+        new Set([
+          ...Object.keys(doc.rawArtifacts.counts),
+          ...Object.keys(doc.cleanArtifacts.counts),
+        ])
+      ).sort();
+      const byType: CleanupQuality["byType"] = {};
+      for (const category of categoriesTracked) {
+        const raw = doc.rawArtifacts.counts[category] ?? 0;
+        const clean = doc.cleanArtifacts.counts[category] ?? 0;
+        byType[category] = { raw, clean, removed: raw - clean };
+      }
+
+      const artifactsRemoved = doc.totalRawArtifacts - doc.totalCleanArtifacts;
+      byDocument.set(doc.documentId, {
+        tracked: true,
+        artifactsReducedPct:
+          doc.totalRawArtifacts > 0
+            ? Math.max(0, Math.min(100, Math.round((Math.max(0, artifactsRemoved) / doc.totalRawArtifacts) * 100)))
+            : null,
+        originalTrackedArtifacts: doc.totalRawArtifacts,
+        remainingTrackedArtifacts: doc.totalCleanArtifacts,
+        artifactsRemoved,
+        categoriesTracked,
+        byType,
+      });
+    }
+  } catch {
+    return byDocument;
+  }
+  return byDocument;
+}
 
 function classifyQuestion(query: string): string {
   const q = query.toLowerCase();

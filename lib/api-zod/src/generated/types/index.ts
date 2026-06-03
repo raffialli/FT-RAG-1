@@ -8,6 +8,8 @@
 
 export * from './answerSource';
 export * from './citationValidation';
+export * from './cleanupQuality';
+export * from './cleanupQualityByType';
 export * from './comparisonReport';
 export * from './comparisonReportCandidateSourcesItem';
 export * from './deleteDocumentBeforeCounts';

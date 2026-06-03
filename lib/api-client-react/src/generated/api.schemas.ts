@@ -22,14 +22,37 @@ export interface RagStatus {
   notes?: string[];
 }
 
+export type CleanupQualityByType = {[key: string]: {
+  raw: number;
+  clean: number;
+  removed: number;
+}};
+
+export interface CleanupQuality {
+  tracked: boolean;
+  /**
+     * Percentage of tracked artifacts removed from raw text to cleaned text. Null when no tracked raw artifacts exist.
+     * @nullable
+     */
+  artifactsReducedPct: number | null;
+  originalTrackedArtifacts: number;
+  remainingTrackedArtifacts: number;
+  artifactsRemoved: number;
+  categoriesTracked: string[];
+  byType: CleanupQualityByType;
+}
+
 export interface RagDocument {
   id: string;
   filename: string;
+  displayTitle?: string | null;
   pageCount: number;
   chunkCount: number;
+  vectorCount?: number | null;
   ingestedAt: string;
   status: string;
   cleaningFlags?: string[];
+  cleanupQuality?: CleanupQuality | null;
 }
 
 /**

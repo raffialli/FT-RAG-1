@@ -5,13 +5,17 @@
  * FalconTrust RAG Candidate API
  * OpenAPI spec version: 0.1.0
  */
+import type { CleanupQuality } from './cleanupQuality';
 
 export interface RagDocument {
   id: string;
   filename: string;
+  displayTitle?: string | null;
   pageCount: number;
   chunkCount: number;
+  vectorCount?: number | null;
   ingestedAt: string;
   status: string;
   cleaningFlags?: string[];
+  cleanupQuality?: CleanupQuality | null;
 }

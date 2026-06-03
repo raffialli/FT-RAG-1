@@ -21,6 +21,7 @@ export default function DocumentsPanel() {
   const [search, setSearch] = useState("");
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const [expandedFlags, setExpandedFlags] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const { data: docs = [], isLoading } = useListDocuments();
@@ -30,13 +31,17 @@ export default function DocumentsPanel() {
     { query: { queryKey: getListChunksQueryKey(chunkParams), enabled: !!selectedDoc } }
   );
 
-  const filtered = docs.filter((d: RagDocument) =>
-    d.filename.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = docs.filter((d: RagDocument) => {
+    const title = d.displayTitle ?? d.filename;
+    const haystack = `${title} ${d.filename}`.toLowerCase();
+    return haystack.includes(search.toLowerCase());
+  });
 
   const handleDelete = async (doc: RagDocument) => {
+    const title = doc.displayTitle ?? doc.filename;
+    const vectorCount = doc.vectorCount ?? doc.chunkCount;
     const confirmed = window.confirm(
-      `Remove "${doc.filename}" from this candidate index?\n\nThis removes its document entry, chunks, vectors, and generated text files. It does not delete other documents.`
+      `Remove "${title}" from this candidate index?\n\nRaw file: ${doc.filename}\nChunks: ${doc.chunkCount}\nVectors: ${vectorCount}\n\nThis removes the document entry, chunks, vectors, and generated text files for this local candidate test environment only.\n\nIt does not affect AWS, Demo, or production. Original source PDFs outside this candidate environment are preserved; uploaded candidate copies may be removed.`
     );
     if (!confirmed) return;
 
@@ -63,7 +68,7 @@ export default function DocumentsPanel() {
       ]);
       setMessage({
         type: "success",
-        text: `Removed ${doc.filename} from the index (${data.before?.targetChunkCount ?? doc.chunkCount} chunks, ${data.before?.targetVectorCount ?? 0} vectors).`,
+        text: `Removed ${title} from the index (${data.before?.targetChunkCount ?? doc.chunkCount} chunks, ${data.before?.targetVectorCount ?? vectorCount} vectors).`,
       });
     } catch (e) {
       setMessage({ type: "error", text: `Remove failed: ${e instanceof Error ? e.message : String(e)}` });
@@ -123,7 +128,11 @@ export default function DocumentsPanel() {
           ) : (
             <ScrollArea className="h-[500px]">
               <div className="divide-y divide-slate-800">
-                {filtered.map((doc: RagDocument) => (
+                {filtered.map((doc: RagDocument) => {
+                  const title = doc.displayTitle ?? doc.filename;
+                  const flagsExpanded = expandedFlags.has(doc.id);
+                  const visibleFlags = flagsExpanded ? doc.cleaningFlags : doc.cleaningFlags?.slice(0, 3);
+                  return (
                   <div
                     key={doc.id}
                     className={`p-3 transition-colors ${
@@ -138,9 +147,14 @@ export default function DocumentsPanel() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <FileText className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                          <span className="text-sm text-slate-200 truncate font-mono text-xs">
-                            {doc.filename}
-                          </span>
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-slate-100" title={title}>
+                              {title}
+                            </div>
+                            <div className="truncate text-[11px] font-mono text-slate-500" title={doc.filename}>
+                              {doc.filename}
+                            </div>
+                          </div>
                         </div>
                         <ChevronRight
                           className={`w-3.5 h-3.5 text-slate-500 shrink-0 transition-transform ${
@@ -155,7 +169,10 @@ export default function DocumentsPanel() {
                         <span className="text-slate-700">·</span>
                         <span className="text-xs text-slate-500">{doc.chunkCount} chunks</span>
                         <span className="text-slate-700">·</span>
+                        <span className="text-xs text-slate-500">{doc.vectorCount ?? doc.chunkCount} vectors</span>
+                        <span className="text-slate-700">·</span>
                         <StatusBadge status={doc.status} />
+                        <CleanupBadge doc={doc} />
                       </div>
                       <Button
                         type="button"
@@ -171,7 +188,7 @@ export default function DocumentsPanel() {
                     </div>
                     {doc.cleaningFlags && doc.cleaningFlags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1.5 pl-5">
-                        {doc.cleaningFlags.slice(0, 3).map((f, i) => (
+                        {visibleFlags?.map((f, i) => (
                           <Badge
                             key={i}
                             variant="outline"
@@ -181,14 +198,38 @@ export default function DocumentsPanel() {
                           </Badge>
                         ))}
                         {doc.cleaningFlags.length > 3 && (
-                          <span className="text-[10px] text-slate-600">
-                            +{doc.cleaningFlags.length - 3} more
-                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpandedFlags((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(doc.id)) next.delete(doc.id);
+                                else next.add(doc.id);
+                                return next;
+                              });
+                            }}
+                            className="h-4 rounded border border-slate-700 px-1 text-[10px] text-slate-400 hover:border-blue-500 hover:text-blue-300"
+                          >
+                            {flagsExpanded ? "show fewer" : `+${doc.cleaningFlags.length - 3} more`}
+                          </button>
                         )}
                       </div>
                     )}
+                    {flagsExpanded && doc.cleanupQuality && (
+                      <div className="mt-2 rounded border border-slate-800 bg-slate-950/50 p-2 text-[11px] text-slate-400">
+                        <div>
+                          Tracked artifacts: {doc.cleanupQuality.originalTrackedArtifacts} before,{" "}
+                          {doc.cleanupQuality.remainingTrackedArtifacts} after,{" "}
+                          {doc.cleanupQuality.artifactsRemoved} removed.
+                        </div>
+                        <div className="mt-1">
+                          Categories: {doc.cleanupQuality.categoriesTracked.join(", ")}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </ScrollArea>
           )}
@@ -200,7 +241,7 @@ export default function DocumentsPanel() {
         <CardHeader className="pb-3">
           <CardTitle className="text-white text-sm">
             {selectedDoc
-              ? `Chunks — ${docs.find((d: RagDocument) => d.id === selectedDoc)?.filename ?? selectedDoc}`
+              ? `Chunks — ${docs.find((d: RagDocument) => d.id === selectedDoc)?.displayTitle ?? docs.find((d: RagDocument) => d.id === selectedDoc)?.filename ?? selectedDoc}`
               : "Select a document to view chunks"}
           </CardTitle>
         </CardHeader>
@@ -251,5 +292,28 @@ function StatusBadge({ status }: { status: string }) {
     >
       {status}
     </Badge>
+  );
+}
+
+function CleanupBadge({ doc }: { doc: RagDocument }) {
+  const quality = doc.cleanupQuality;
+  if (!quality?.tracked || quality.artifactsReducedPct === null) {
+    return (
+      <span
+        className="text-xs text-slate-500"
+        title="No raw/clean artifact comparison is available for this document."
+      >
+        Cleanup: n/a
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="text-xs text-blue-300"
+      title={`Tracked cleanup only. Original tracked artifacts: ${quality.originalTrackedArtifacts}; remaining tracked artifacts: ${quality.remainingTrackedArtifacts}; categories: ${quality.categoriesTracked.join(", ")}`}
+    >
+      Tracked artifacts reduced: {quality.artifactsReducedPct}%
+    </span>
   );
 }

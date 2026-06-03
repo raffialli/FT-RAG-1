@@ -38,11 +38,26 @@ export const GetRagStatusResponse = zod.object({
 export const ListDocumentsResponseItem = zod.object({
   "id": zod.string(),
   "filename": zod.string(),
+  "displayTitle": zod.string().nullish(),
   "pageCount": zod.number(),
   "chunkCount": zod.number(),
+  "vectorCount": zod.number().nullish(),
   "ingestedAt": zod.string(),
   "status": zod.string(),
-  "cleaningFlags": zod.array(zod.string()).optional()
+  "cleaningFlags": zod.array(zod.string()).optional(),
+  "cleanupQuality": zod.object({
+  "tracked": zod.boolean(),
+  "artifactsReducedPct": zod.number().nullable().describe('Percentage of tracked artifacts removed from raw text to cleaned text. Null when no tracked raw artifacts exist.'),
+  "originalTrackedArtifacts": zod.number(),
+  "remainingTrackedArtifacts": zod.number(),
+  "artifactsRemoved": zod.number(),
+  "categoriesTracked": zod.array(zod.string()),
+  "byType": zod.record(zod.string(), zod.object({
+  "raw": zod.number(),
+  "clean": zod.number(),
+  "removed": zod.number()
+}))
+}).nullish()
 })
 export const ListDocumentsResponse = zod.array(ListDocumentsResponseItem)
 

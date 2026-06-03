@@ -77,6 +77,24 @@ export default function StatusPanel() {
     e.target.value = "";
   };
 
+  const handleRebuild = () => {
+    const confirmed = window.confirm(
+      "Rebuild the local candidate index?\n\nThis rebuilds chunks and vectors from the current source PDFs and uploaded PDFs in this test environment. It may take several minutes. It does not affect AWS, Demo, or production."
+    );
+    if (confirmed) ingest.mutate({ data: { rebuild: true } });
+  };
+
+  const handleReset = () => {
+    const confirmation = window.prompt(
+      "Reset the local candidate index?\n\nThis clears local manifest, chunks, and vectors for this candidate test environment only. It does not affect AWS, Demo, or production.\n\nType RESET to continue."
+    );
+    if (confirmation === "RESET") {
+      reset.mutate();
+    } else if (confirmation !== null) {
+      setLog((prev) => ["Reset cancelled: confirmation text did not match RESET.", ...prev].slice(0, 50));
+    }
+  };
+
   const busy = ingest.isPending || reset.isPending;
 
   return (
@@ -182,7 +200,7 @@ export default function StatusPanel() {
 
           <Button
             variant="outline"
-            onClick={() => ingest.mutate({ data: { rebuild: true } })}
+            onClick={handleRebuild}
             disabled={busy}
             className="w-full border-slate-700 text-slate-300 hover:bg-slate-800"
           >
@@ -209,7 +227,7 @@ export default function StatusPanel() {
 
           <Button
             variant="outline"
-            onClick={() => { if (confirm("Reset all index data?")) reset.mutate(); }}
+            onClick={handleReset}
             disabled={busy}
             className="w-full border-red-900 text-red-400 hover:bg-red-950"
           >

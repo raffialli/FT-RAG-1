@@ -25,6 +25,7 @@ export default function QueryPanel() {
   const [result, setResult] = useState<QueryResult | null>(null);
   const [showEvidence, setShowEvidence] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: status } = useGetRagStatus();
@@ -34,12 +35,14 @@ export default function QueryPanel() {
       onSuccess: (data) => {
         setResult(data);
         setShowEvidence(false);
+        setShowErrorDetails(false);
       },
     },
   });
 
   const handleSubmit = () => {
     if (!query.trim() || ragQuery.isPending) return;
+    setShowErrorDetails(false);
     ragQuery.mutate({ data: { query, topK: 5, includeEvidence: true, includeDebug: true } });
   };
 
@@ -107,9 +110,23 @@ export default function QueryPanel() {
 
       {/* Error */}
       {ragQuery.isError && (
-        <Alert className="bg-red-950 border-red-800">
+        <Alert className="bg-amber-950/50 border-amber-800">
           <AlertCircle className="h-4 w-4 text-red-400" />
-          <AlertDescription className="text-red-300 text-xs">{String(ragQuery.error)}</AlertDescription>
+          <AlertDescription className="space-y-2 text-xs text-amber-200">
+            <div>The model did not return an answer. Please try again.</div>
+            <button
+              type="button"
+              onClick={() => setShowErrorDetails(!showErrorDetails)}
+              className="text-amber-300 underline-offset-2 hover:underline"
+            >
+              {showErrorDetails ? "Hide details" : "Show details"}
+            </button>
+            {showErrorDetails && (
+              <pre className="max-h-32 overflow-auto rounded bg-slate-950 p-2 text-[11px] text-slate-400">
+                {String(ragQuery.error)}
+              </pre>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -135,7 +152,7 @@ export default function QueryPanel() {
             </CardHeader>
             <CardContent>
               <div className="bg-slate-800/50 rounded p-4 text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
-                {result.answer}
+                {result.answer?.trim() || "The model did not return an answer. Please try again."}
               </div>
 
               {/* Citation validation summary */}

@@ -14,11 +14,24 @@ export interface RagDocument {
   id: string;
   filename: string;
   filePath: string;
+  displayTitle?: string;
   pageCount: number;
   chunkCount: number;
+  vectorCount?: number;
   ingestedAt: string;
   status: "ingested" | "error" | "pending";
   cleaningFlags: string[];
+  cleanupQuality?: CleanupQuality;
+}
+
+export interface CleanupQuality {
+  tracked: boolean;
+  artifactsReducedPct: number | null;
+  originalTrackedArtifacts: number;
+  remainingTrackedArtifacts: number;
+  artifactsRemoved: number;
+  categoriesTracked: string[];
+  byType: Record<string, { raw: number; clean: number; removed: number }>;
 }
 
 export interface VectorRecord {

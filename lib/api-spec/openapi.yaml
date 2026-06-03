@@ -272,10 +272,16 @@ components:
           type: string
         filename:
           type: string
+        displayTitle:
+          type: string
+          nullable: true
         pageCount:
           type: integer
         chunkCount:
           type: integer
+        vectorCount:
+          type: integer
+          nullable: true
         ingestedAt:
           type: string
         status:
@@ -284,6 +290,48 @@ components:
           type: array
           items:
             type: string
+        cleanupQuality:
+          $ref: "#/components/schemas/CleanupQuality"
+          nullable: true
+
+    CleanupQuality:
+      type: object
+      required:
+        - tracked
+        - artifactsReducedPct
+        - originalTrackedArtifacts
+        - remainingTrackedArtifacts
+        - artifactsRemoved
+        - categoriesTracked
+        - byType
+      properties:
+        tracked:
+          type: boolean
+        artifactsReducedPct:
+          type: ["integer", "null"]
+          description: Percentage of tracked artifacts removed from raw text to cleaned text. Null when no tracked raw artifacts exist.
+        originalTrackedArtifacts:
+          type: integer
+        remainingTrackedArtifacts:
+          type: integer
+        artifactsRemoved:
+          type: integer
+        categoriesTracked:
+          type: array
+          items:
+            type: string
+        byType:
+          type: object
+          additionalProperties:
+            type: object
+            required: [raw, clean, removed]
+            properties:
+              raw:
+                type: integer
+              clean:
+                type: integer
+              removed:
+                type: integer
 
     DeleteDocumentInput:
       type: object

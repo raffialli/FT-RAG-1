@@ -13,11 +13,11 @@ import {
 } from "lucide-react";
 
 const SAMPLE_QUERIES = [
-  "What are the primary flood risk factors for coastal communities?",
-  "How does sea level rise affect flood inundation frequency?",
-  "What emergency management protocols are recommended for flood events?",
-  "How do building codes address flood vulnerability?",
-  "What is the relationship between precipitation intensity and urban flooding?",
+  "What methods are used for flood forecasting and early warning systems?",
+  "What role does community engagement play in flood resilience?",
+  "How does climate change affect flood risk management policy?",
+  "How do socioeconomic factors influence flood vulnerability?",
+  "Explain the three levels of vulnerability in manufactured housing communities: household, housing structure, and park community.",
 ];
 
 export default function QueryPanel() {
@@ -78,11 +78,12 @@ export default function QueryPanel() {
 
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-wrap gap-1.5">
-              {SAMPLE_QUERIES.slice(0, 3).map((q, i) => (
+              {SAMPLE_QUERIES.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => { setQuery(q); inputRef.current?.focus(); }}
-                  className="text-xs text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[200px]"
+                  title={q}
+                  className="text-xs text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[260px]"
                 >
                   {q.substring(0, 40)}…
                 </button>

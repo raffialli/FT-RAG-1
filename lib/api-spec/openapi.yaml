@@ -53,6 +53,62 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RagDocument"
+    delete:
+      operationId: deleteDocumentBySelector
+      tags: [rag]
+      summary: Remove one ingested document from the candidate index
+      parameters:
+        - in: query
+          name: documentId
+          schema:
+            type: string
+          description: Explicit document ID to remove
+        - in: query
+          name: sourceFile
+          schema:
+            type: string
+          description: Explicit source filename to remove
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteDocumentInput"
+      responses:
+        "200":
+          description: Document removal result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteDocumentResult"
+        "400":
+          description: Missing or unsafe selector
+        "404":
+          description: Document not found
+
+  /rag/documents/{documentId}:
+    delete:
+      operationId: deleteDocument
+      tags: [rag]
+      summary: Remove one ingested document from the candidate index by document ID
+      parameters:
+        - in: path
+          name: documentId
+          required: true
+          schema:
+            type: string
+          description: Explicit document ID to remove
+      responses:
+        "200":
+          description: Document removal result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteDocumentResult"
+        "400":
+          description: Unsafe selector
+        "404":
+          description: Document not found
 
   /rag/chunks:
     get:
@@ -228,6 +284,60 @@ components:
           type: array
           items:
             type: string
+
+    DeleteDocumentInput:
+      type: object
+      properties:
+        documentId:
+          type: string
+        sourceFile:
+          type: string
+      description: Provide exactly one explicit documentId or sourceFile.
+
+    DeleteDocumentCounts:
+      type: object
+      required: [documentCount, chunkCount, vectorCount]
+      properties:
+        documentCount:
+          type: integer
+        chunkCount:
+          type: integer
+        vectorCount:
+          type: integer
+
+    DeleteDocumentBeforeCounts:
+      allOf:
+        - $ref: "#/components/schemas/DeleteDocumentCounts"
+        - type: object
+          required: [targetChunkCount, targetVectorCount]
+          properties:
+            targetChunkCount:
+              type: integer
+            targetVectorCount:
+              type: integer
+
+    DeleteDocumentResult:
+      type: object
+      required: [success, documentId, sourceFile, removedFiles, warnings, before, after]
+      properties:
+        success:
+          type: boolean
+        documentId:
+          type: string
+        sourceFile:
+          type: string
+        removedFiles:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        before:
+          $ref: "#/components/schemas/DeleteDocumentBeforeCounts"
+        after:
+          $ref: "#/components/schemas/DeleteDocumentCounts"
 
     RagChunk:
       type: object

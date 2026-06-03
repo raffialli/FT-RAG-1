@@ -32,6 +32,35 @@ export interface RagDocument {
   cleaningFlags?: string[];
 }
 
+/**
+ * Provide exactly one explicit documentId or sourceFile.
+ */
+export interface DeleteDocumentInput {
+  documentId?: string;
+  sourceFile?: string;
+}
+
+export interface DeleteDocumentCounts {
+  documentCount: number;
+  chunkCount: number;
+  vectorCount: number;
+}
+
+export type DeleteDocumentBeforeCounts = DeleteDocumentCounts & {
+  targetChunkCount: number;
+  targetVectorCount: number;
+};
+
+export interface DeleteDocumentResult {
+  success: boolean;
+  documentId: string;
+  sourceFile: string;
+  removedFiles: string[];
+  warnings: string[];
+  before: DeleteDocumentBeforeCounts;
+  after: DeleteDocumentCounts;
+}
+
 export interface RagChunk {
   chunkId: string;
   documentId: string;
@@ -199,6 +228,17 @@ export interface ModelTestResult {
   /** @nullable */
   generationSample?: string | null;
 }
+
+export type DeleteDocumentBySelectorParams = {
+/**
+ * Explicit document ID to remove
+ */
+documentId?: string;
+/**
+ * Explicit source filename to remove
+ */
+sourceFile?: string;
+};
 
 export type ListChunksParams = {
 /**

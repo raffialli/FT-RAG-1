@@ -21,6 +21,9 @@ import type {
 
 import type {
   ComparisonReport,
+  DeleteDocumentBySelectorParams,
+  DeleteDocumentInput,
+  DeleteDocumentResult,
   HealthStatus,
   IngestInput,
   IngestResult,
@@ -277,6 +280,155 @@ export function useListDocuments<TData = Awaited<ReturnType<typeof listDocuments
 
 
 
+
+export const getDeleteDocumentBySelectorUrl = (params?: DeleteDocumentBySelectorParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/rag/documents?${stringifiedParams}` : `/api/rag/documents`
+}
+
+/**
+ * @summary Remove one ingested document from the candidate index
+ */
+export const deleteDocumentBySelector = async (deleteDocumentInput?: DeleteDocumentInput,
+    params?: DeleteDocumentBySelectorParams, options?: RequestInit): Promise<DeleteDocumentResult> => {
+
+  return customFetch<DeleteDocumentResult>(getDeleteDocumentBySelectorUrl(params),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      deleteDocumentInput,)
+  }
+);}
+
+
+
+
+export const getDeleteDocumentBySelectorMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentBySelector>>, TError,{data?: BodyType<DeleteDocumentInput>;params?: DeleteDocumentBySelectorParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentBySelector>>, TError,{data?: BodyType<DeleteDocumentInput>;params?: DeleteDocumentBySelectorParams}, TContext> => {
+
+const mutationKey = ['deleteDocumentBySelector'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocumentBySelector>>, {data?: BodyType<DeleteDocumentInput>;params?: DeleteDocumentBySelectorParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  deleteDocumentBySelector(data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentBySelectorMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocumentBySelector>>>
+    export type DeleteDocumentBySelectorMutationBody = BodyType<DeleteDocumentInput> | undefined
+    export type DeleteDocumentBySelectorMutationError = ErrorType<void>
+
+    /**
+ * @summary Remove one ingested document from the candidate index
+ */
+export const useDeleteDocumentBySelector = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentBySelector>>, TError,{data?: BodyType<DeleteDocumentInput>;params?: DeleteDocumentBySelectorParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocumentBySelector>>,
+        TError,
+        {data?: BodyType<DeleteDocumentInput>;params?: DeleteDocumentBySelectorParams},
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentBySelectorMutationOptions(options));
+    }
+
+export const getDeleteDocumentUrl = (documentId: string,) => {
+
+
+
+
+  return `/api/rag/documents/${documentId}`
+}
+
+/**
+ * @summary Remove one ingested document from the candidate index by document ID
+ */
+export const deleteDocument = async (documentId: string, options?: RequestInit): Promise<DeleteDocumentResult> => {
+
+  return customFetch<DeleteDocumentResult>(getDeleteDocumentUrl(documentId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteDocumentMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{documentId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{documentId: string}, TContext> => {
+
+const mutationKey = ['deleteDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocument>>, {documentId: string}> = (props) => {
+          const {documentId} = props ?? {};
+
+          return  deleteDocument(documentId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocument>>>
+
+    export type DeleteDocumentMutationError = ErrorType<void>
+
+    /**
+ * @summary Remove one ingested document from the candidate index by document ID
+ */
+export const useDeleteDocument = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{documentId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocument>>,
+        TError,
+        {documentId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentMutationOptions(options));
+    }
 
 export const getListChunksUrl = (params?: ListChunksParams,) => {
   const normalizedParams = new URLSearchParams();

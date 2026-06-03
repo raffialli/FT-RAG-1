@@ -48,6 +48,70 @@ export const ListDocumentsResponse = zod.array(ListDocumentsResponseItem)
 
 
 /**
+ * @summary Remove one ingested document from the candidate index
+ */
+export const DeleteDocumentBySelectorQueryParams = zod.object({
+  "documentId": zod.coerce.string().optional().describe('Explicit document ID to remove'),
+  "sourceFile": zod.coerce.string().optional().describe('Explicit source filename to remove')
+})
+
+export const DeleteDocumentBySelectorBody = zod.object({
+  "documentId": zod.string().optional(),
+  "sourceFile": zod.string().optional()
+}).describe('Provide exactly one explicit documentId or sourceFile.')
+
+export const DeleteDocumentBySelectorResponse = zod.object({
+  "success": zod.boolean(),
+  "documentId": zod.string(),
+  "sourceFile": zod.string(),
+  "removedFiles": zod.array(zod.string()),
+  "warnings": zod.array(zod.string()),
+  "before": zod.object({
+  "documentCount": zod.number(),
+  "chunkCount": zod.number(),
+  "vectorCount": zod.number()
+}).and(zod.object({
+  "targetChunkCount": zod.number(),
+  "targetVectorCount": zod.number()
+})),
+  "after": zod.object({
+  "documentCount": zod.number(),
+  "chunkCount": zod.number(),
+  "vectorCount": zod.number()
+})
+})
+
+
+/**
+ * @summary Remove one ingested document from the candidate index by document ID
+ */
+export const DeleteDocumentParams = zod.object({
+  "documentId": zod.coerce.string().describe('Explicit document ID to remove')
+})
+
+export const DeleteDocumentResponse = zod.object({
+  "success": zod.boolean(),
+  "documentId": zod.string(),
+  "sourceFile": zod.string(),
+  "removedFiles": zod.array(zod.string()),
+  "warnings": zod.array(zod.string()),
+  "before": zod.object({
+  "documentCount": zod.number(),
+  "chunkCount": zod.number(),
+  "vectorCount": zod.number()
+}).and(zod.object({
+  "targetChunkCount": zod.number(),
+  "targetVectorCount": zod.number()
+})),
+  "after": zod.object({
+  "documentCount": zod.number(),
+  "chunkCount": zod.number(),
+  "vectorCount": zod.number()
+})
+})
+
+
+/**
  * @summary List all chunks in the index
  */
 export const ListChunksQueryParams = zod.object({

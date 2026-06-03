@@ -3,6 +3,8 @@ import multer from "multer";
 import path from "node:path";
 import fs from "node:fs";
 import {
+  deleteDocumentFromIndex,
+  DocumentDeleteError,
   ingestAllDocuments,
   ingestUploadedFile,
   loadDocumentsManifest,
@@ -74,6 +76,37 @@ router.get("/rag/status", async (req, res) => {
 router.get("/rag/documents", (_req, res) => {
   const docs = loadDocumentsManifest();
   res.json(docs);
+});
+
+// DELETE /api/rag/documents — remove one explicit document from the candidate index
+router.delete("/rag/documents", (req, res) => {
+  try {
+    const body = req.body as { documentId?: string; sourceFile?: string } | undefined;
+    const query = req.query as { documentId?: string; sourceFile?: string };
+    const result = deleteDocumentFromIndex({
+      documentId: body?.documentId ?? query.documentId,
+      sourceFile: body?.sourceFile ?? query.sourceFile,
+    });
+    req.log.info({ documentId: result.documentId, sourceFile: result.sourceFile }, "Removed document from index");
+    res.json(result);
+  } catch (e) {
+    const statusCode = e instanceof DocumentDeleteError ? e.statusCode : 500;
+    req.log.error(e);
+    res.status(statusCode).json({ success: false, error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+// DELETE /api/rag/documents/:documentId — path-param form used by the Documents panel
+router.delete("/rag/documents/:documentId", (req, res) => {
+  try {
+    const result = deleteDocumentFromIndex({ documentId: req.params.documentId });
+    req.log.info({ documentId: result.documentId, sourceFile: result.sourceFile }, "Removed document from index");
+    res.json(result);
+  } catch (e) {
+    const statusCode = e instanceof DocumentDeleteError ? e.statusCode : 500;
+    req.log.error(e);
+    res.status(statusCode).json({ success: false, error: e instanceof Error ? e.message : String(e) });
+  }
 });
 
 // GET /api/rag/chunks

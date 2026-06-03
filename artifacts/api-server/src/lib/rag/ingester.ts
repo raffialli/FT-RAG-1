@@ -25,6 +25,7 @@ import { embedBatch } from "./embeddings.js";
 import {
   addOrUpdateRecords,
   loadVectorIndex,
+  removeDocumentRecords,
   resetVectorIndex,
 } from "./vector-store.js";
 import type { RagChunk, RagDocument } from "./types.js";
@@ -50,6 +51,34 @@ export interface IngestResult {
   cleanupReport: Record<string, unknown>;
 }
 
+interface DeleteCounts {
+  documentCount: number;
+  chunkCount: number;
+  vectorCount: number;
+}
+
+interface TargetDeleteCounts {
+  targetChunkCount: number;
+  targetVectorCount: number;
+}
+
+export interface DeleteDocumentResult {
+  success: boolean;
+  documentId: string;
+  sourceFile: string;
+  removedFiles: string[];
+  warnings: string[];
+  before: DeleteCounts & TargetDeleteCounts;
+  after: DeleteCounts;
+}
+
+export class DocumentDeleteError extends Error {
+  constructor(message: string, public readonly statusCode = 400) {
+    super(message);
+    this.name = "DocumentDeleteError";
+  }
+}
+
 export function loadDocumentsManifest(): RagDocument[] {
   if (!fs.existsSync(DOCS_MANIFEST_PATH)) return [];
   try {
@@ -57,6 +86,76 @@ export function loadDocumentsManifest(): RagDocument[] {
   } catch {
     return [];
   }
+}
+
+export function deleteDocumentFromIndex(input: {
+  documentId?: string;
+  sourceFile?: string;
+}): DeleteDocumentResult {
+  const documentId = normalizeDeleteSelector(input.documentId);
+  const sourceFile = normalizeDeleteSelector(input.sourceFile);
+
+  if (!documentId && !sourceFile) {
+    throw new DocumentDeleteError("documentId or sourceFile is required", 400);
+  }
+  if (documentId && sourceFile) {
+    throw new DocumentDeleteError("Provide either documentId or sourceFile, not both", 400);
+  }
+
+  const docs = loadDocumentsManifest();
+  const doc = documentId
+    ? docs.find((d) => d.id === documentId)
+    : docs.find((d) => d.filename === sourceFile);
+
+  if (!doc) {
+    throw new DocumentDeleteError("Document not found", 404);
+  }
+
+  const beforeIndex = loadVectorIndex();
+  const before = {
+    documentCount: docs.length,
+    chunkCount: docs.reduce((sum, d) => sum + d.chunkCount, 0),
+    vectorCount: beforeIndex.records.length,
+    targetChunkCount: doc.chunkCount,
+    targetVectorCount: beforeIndex.records.filter((r) => r.documentId === doc.id).length,
+  };
+
+  const removedFiles: string[] = [];
+  const warnings: string[] = [];
+  removeIfExists(path.join(RAW_DOCS_DIR, `${doc.id}.raw.txt`), removedFiles);
+  removeIfExists(path.join(RAW_DOCS_DIR, `${doc.id}.raw.json`), removedFiles);
+  removeIfExists(path.join(CLEAN_DOCS_DIR, `${doc.id}.txt`), removedFiles);
+  removeIfExists(path.join(CLEAN_DOCS_DIR, `${doc.id}.json`), removedFiles);
+  removeIfExists(path.join(CHUNKS_DIR, `${doc.id}.chunks.jsonl`), removedFiles);
+  removeUploadedPdfIfSafe(doc, removedFiles, warnings);
+
+  removeDocumentRecords(doc.id);
+  const remainingDocs = docs.filter((d) => d.id !== doc.id);
+  saveDocumentsManifest(remainingDocs);
+
+  const afterIndex = loadVectorIndex();
+  return {
+    success: true,
+    documentId: doc.id,
+    sourceFile: doc.filename,
+    removedFiles,
+    warnings,
+    before,
+    after: {
+      documentCount: remainingDocs.length,
+      chunkCount: remainingDocs.reduce((sum, d) => sum + d.chunkCount, 0),
+      vectorCount: afterIndex.records.length,
+    },
+  };
+}
+
+function normalizeDeleteSelector(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  if (/^(all|\*|\.)$/i.test(trimmed) || trimmed.includes("..") || trimmed.includes("*")) {
+    throw new DocumentDeleteError("Unsafe document selector rejected", 400);
+  }
+  return trimmed;
 }
 
 function saveDocumentsManifest(docs: RagDocument[]): void {
@@ -315,6 +414,31 @@ export async function ingestUploadedFile(filePath: string): Promise<IngestResult
     warnings,
     cleanupReport: { [result.doc.filename]: result.doc.cleaningFlags },
   };
+}
+
+function removeIfExists(filePath: string, removedFiles: string[]): void {
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    removedFiles.push(filePath);
+  }
+}
+
+function removeUploadedPdfIfSafe(
+  doc: RagDocument,
+  removedFiles: string[],
+  warnings: string[]
+): void {
+  const filePath = path.resolve(doc.filePath);
+  const uploadsDir = path.resolve(UPLOADS_DIR);
+  const relative = path.relative(uploadsDir, filePath);
+  const isUploadedFile = relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
+
+  if (isUploadedFile) {
+    removeIfExists(filePath, removedFiles);
+    return;
+  }
+
+  warnings.push("Source PDF was preserved because it is not an uploaded candidate-index copy.");
 }
 
 function saveRawDocument(

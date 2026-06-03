@@ -315,13 +315,15 @@ function SourceCard({ index, source }: { index: number; source: AnswerSource }) 
     ? `p. ${source.pageStart}`
     : `pp. ${source.pageStart}–${source.pageEnd}`;
 
+  const title = source.displayTitle ?? source.sourceFile;
+
   return (
     <div className="bg-slate-800/50 rounded p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-500">[{index}]</span>
-          <span className="text-xs font-medium text-slate-200 truncate max-w-[280px]">
-            {source.sourceFile}
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xs font-mono text-slate-500 shrink-0">[{index}]</span>
+          <span className="text-xs font-medium text-slate-200 truncate max-w-[280px]" title={source.sourceFile}>
+            {title}
           </span>
         </div>
         <div className="flex items-center gap-2 shrink-0">

@@ -59,11 +59,24 @@ export const NOISE_HARD_EXCLUSION_THRESHOLD = 0.72;
 
 /**
  * Detect whether a query explicitly requests a reference list, bibliography,
- * or citation list — in which case Reference-labeled chunks are allowed through.
+ * or citation list — in which case Reference-labeled chunks are allowed through
+ * and actively boosted in ranking.
+ *
+ * Patterns covered:
+ *   "references" / "bibliography" / "citations" (direct keyword)
+ *   "what references are cited in the FRM book?"
+ *   "list of sources" / "source list"
+ *   "what sources does X cite?"
+ *   "footnotes" in the document
  */
 export function isReferenceQuery(query: string): boolean {
   const lower = query.toLowerCase();
-  return /\b(references?|bibliography|bibliograph|citations?|cite|cited|works cited|source list|footnote)\b/.test(lower);
+  return (
+    /\b(references?|bibliography|bibliograph|citations?|cite|cited|works cited|source list|footnotes?)\b/.test(lower) ||
+    /\blist of (sources?|references?|citations?)\b/.test(lower) ||
+    /\bwhat (sources?|references?|citations?) (are )?(cited|used|included|referenced|in)\b/.test(lower) ||
+    /\b(sources?|references?) cited in\b/.test(lower)
+  );
 }
 
 /**

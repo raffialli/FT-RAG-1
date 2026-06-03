@@ -231,6 +231,15 @@ assert("'limited direct information'",          isMildlyHedged("There is limited
 assert("'not explicitly addressed'",            isMildlyHedged("This is not explicitly addressed in the sources."));
 assert("'partially supported'",                 isMildlyHedged("The claim is partially supported by evidence."));
 assert("non-hedged not mild",                  !isMildlyHedged("Flood risk factors include storm surge [1] and sea level [2]."));
+// New mild-hedge patterns (Client QA Fixes)
+assert("'only indirectly'",                     isMildlyHedged("The corpus only indirectly addresses this topic."));
+assert("'indirectly supported'",                isMildlyHedged("The conclusion is only indirectly supported by [1]."));
+assert("'does not fully answer'",               isMildlyHedged("The evidence does not fully answer this question."));
+assert("'not fully supported'",                 isMildlyHedged("This claim is not fully supported by the evidence."));
+assert("'not well supported'",                  isMildlyHedged("The assertion is not well supported by available sources."));
+assert("'cannot definitively'",                 isMildlyHedged("We cannot definitively answer based on these sources."));
+assert("'only partially addressed'",            isMildlyHedged("The query is only partially addressed by the corpus."));
+assert("'only partially covered'",              isMildlyHedged("This topic is only partially covered in the documents."));
 
 // ── 5. assessConfidence — sufficiency cap policy (Fix 2) ─────────────────────
 
@@ -359,6 +368,50 @@ section("Benchmark regressions — Q3/Q6/Q7/Q9/Q10 direction checks");
   assert("Q10 suf=partial (single source)", suf === "partial");
   assert("Q10 confidence≠high", conf.level !== "high");
   assert("Q10 is medium or low", conf.level === "medium" || conf.level === "low");
+}
+
+// ── 7. Client QA fix regressions (Q3 / Q4 / Q10) ─────────────────────────────
+
+section("Client QA Fixes — hedging-calibrated regression checks");
+
+// Q3 Communication: indirect support should cap confidence at medium (mild hedge)
+{
+  const ans = "Emergency managers can communicate flood risk using several approaches [1][2]. However, the evidence only indirectly addresses public messaging strategies and does not fully cover community outreach methods.";
+  const chunks = [directChunk("a.pdf"), directChunk("b.pdf"), partialChunk("c.pdf"), partialChunk("d.pdf"), weakChunk("e.pdf")];
+  const suf = assessEvidenceSufficiency(chunks, ans);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence("communicate flood risk to the public", chunks, ans, cv, suf);
+  assert("Q3 comm: 'only indirectly' → mild hedge detected", isMildlyHedged(ans));
+  assert("Q3 comm: confidence ≠ high (mild hedge caps to medium)", conf.level !== "high");
+  assert("Q3 comm: confidence is medium or low", conf.level === "medium" || conf.level === "low");
+}
+
+// Q4 Community engagement: partial single-source evidence → not high
+{
+  const ans = "Community engagement plays a significant role in flood resilience through local preparedness programs [1][2][3]. The evidence does not fully answer how engagement varies by context, and this is only partially covered in the sources.";
+  const chunks = [
+    directChunk("a.pdf"), directChunk("a.pdf"), directChunk("a.pdf"),
+    partialChunk("a.pdf"), weakChunk("a.pdf"),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, ans);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence("community engagement flood resilience", chunks, ans, cv, suf);
+  assert("Q4: 'does not fully answer' → mild hedge detected", isMildlyHedged(ans));
+  assert("Q4: suf ≤ partial (single source)", suf !== "sufficient");
+  assert("Q4: confidence ≠ high", conf.level !== "high");
+}
+
+// Q10 Reference query: 'only indirectly supported' → mild hedge
+{
+  const refAns = "The FRM book cites a range of references. However, the retrieved evidence only indirectly supports a complete list [1][2].";
+  assert("Q10 refQuery: 'only indirectly supported' → mild hedge", isMildlyHedged(refAns));
+}
+
+// Confirm new patterns don't fire for clean assertive answers
+{
+  const clean = "Flood risk is driven by storm surge intensity [1][2][3]. Early warning systems reduce mortality significantly [4][5].";
+  assert("clean answer: new patterns don't fire severe", !isSeverelyHedged(clean));
+  assert("clean answer: new patterns don't fire mild", !isMildlyHedged(clean));
 }
 
 // ── Summary ───────────────────────────────────────────────────────────────────

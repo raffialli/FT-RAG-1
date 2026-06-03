@@ -402,6 +402,9 @@ components:
       properties:
         sourceFile:
           type: string
+        displayTitle:
+          type: string
+          nullable: true
         pageStart:
           type: integer
         pageEnd:

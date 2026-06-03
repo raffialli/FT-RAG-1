@@ -1,0 +1,159 @@
+Start a focused Client QA Fixes lane.
+
+Branch rules:
+- Create a new branch from the latest integrated candidate:
+  experiment/replit-client-qa-fixes-lane
+- Do not push until I approve.
+- Do not merge to main.
+- Do not touch AWS/S3.
+- Do not do broad architecture work.
+- Focus only on client-visible answer/source quality issues from QA.
+
+Context:
+Necris compared the AWS/Demo app and the Candidate app.
+
+Verdict:
+Candidate is better overall, but not client-ready yet.
+
+Main QA failures to fix before client testing:
+
+1. Q3 — flood risk communication
+Candidate is too conservative and gives an insufficient-style answer.
+AWS was weak, but retrieved some communication examples.
+Goal: Candidate should produce a useful, grounded partial answer if the corpus has enough communication-related evidence.
+
+2. Q10 — FRM book references
+Candidate fails to retrieve/present the FRM bibliography/reference list when explicitly asked.
+Goal: explicit references/bibliography questions should retrieve and present actual FRM reference chunks cleanly.
+
+3. Confidence calibration
+Candidate still sometimes shows High/sufficient when the answer wording says evidence is partial, not explicit, or only indirectly supported.
+Goal: avoid High/sufficient unless the answer is clearly supported by direct evidence.
+
+4. Citation support labels
+“Direct” support sometimes means adjacent/relevant, not truly answer-supporting.
+Goal: tighten source support labels so direct/partial/weak are more honest.
+
+5. Client-facing source titles
+Raw filenames are too technical for client testing.
+Goal: show cleaner document/source titles while preserving raw filenames internally/debug.
+
+Scope:
+Fix only these client QA issues. Do not work on Chroma, embedding model changes, Cloudflare, deployment, UI redesign, or broad RAG rewrites.
+
+Required work:
+
+1. Add a client QA benchmark set
+
+Create or update a benchmark file/report using these target questions:
+
+- Q3: How should emergency managers communicate flood risk to the public?
+- Q10: What references are cited in the FRM book?
+- Q4: What are the key components of flood risk governance?
+- Q7: What role does land use planning play in flood risk reduction?
+- Q6: What methods are used for flood forecasting and early warning systems?
+
+For each question, define expected behavior:
+- Q3: useful grounded partial answer, not empty/over-conservative
+- Q10: actual FRM bibliography/reference chunks should surface
+- Q4/Q7: useful answer, but confidence must not be overstated if evidence is indirect
+- Q6: sources should be forecasting/early-warning relevant, not unrelated gabion/South Sudan evidence
+
+2. Fix Q3 retrieval/answer behavior
+
+Investigate why Q3 is too conservative.
+
+Improve one or more of:
+- retrieval query expansion for communication terms
+- section weighting for communication/warning/public-risk sections
+- reranking for communication-relevant chunks
+- answer synthesis instructions for partial-but-useful answers
+
+Do not hallucinate.
+If evidence is partial, answer with partial confidence and cite the best supporting chunks.
+
+3. Fix Q10 reference-query behavior
+
+Explicit reference queries must behave differently from normal answer queries.
+
+For “What references are cited in the FRM book?”:
+- referenceQuery should be true
+- bibliography/reference chunks should be allowed
+- actual FRM book reference chunks should rank near the top
+- answer should summarize or list representative cited references cleanly
+- do not mix unrelated South Sudan or other non-FRM snippets unless directly relevant
+
+4. Tighten confidence calibration
+
+Add rules:
+- If answer says “not explicitly,” “limited evidence,” “indirect,” “does not fully answer,” or similar, confidence cannot be high.
+- If evidence is single-source and answer is broad/general, confidence should usually cap at medium.
+- If cited chunks are only partially related, confidence should cap at medium or low.
+- High/sufficient requires direct answer support, not just topical relevance.
+
+5. Improve citation support labels
+
+Recalibrate supportLevel:
+- direct = snippet directly supports a specific answer claim
+- partial = snippet is relevant but does not fully answer the claim
+- weak = adjacent/background only
+
+If this cannot be done semantically without an LLM judge, add conservative heuristic labels and document limits.
+
+6. Clean source titles for client UI
+
+Add client-friendly display titles for known PDFs.
+
+Examples:
+- Flood Risk Management book
+- JEM 2024 Special Issue
+- Practical Flood Risk Reduction Strategies in South Sudan
+- Japan Flood Warning System / Huang JEM article
+- Personal Preparedness Curriculum for Public Health Workers
+- Community Resilience / JEM V6N5 article
+
+Preserve raw filename in debug/details, but show friendly title in normal source cards.
+
+7. Report
+
+Create:
+
+docs/rag-experiments/replit-rag-candidate/17-client-qa-fixes-report.md
+
+Include:
+- Necris QA findings addressed
+- exact files/functions changed
+- before/after for Q3
+- before/after for Q10
+- confidence changes for Q4/Q7
+- source relevance check for Q6
+- source-title cleanup examples
+- remaining client-facing gaps
+- final verdict:
+  - READY_FOR_CODEX_QA_AUDIT
+  - PARTIAL_NEEDS_MORE_FIXES
+  - NOT_READY
+  - REGRESSION
+
+8. Run checks
+
+Run:
+- pnpm install --frozen-lockfile
+- pnpm --filter @workspace/api-server run typecheck
+- pnpm --filter @workspace/rag-candidate run typecheck
+- pnpm --filter @workspace/api-server run test
+- pnpm --filter @workspace/api-server run build
+- PORT=4173 BASE_PATH=/ pnpm --filter @workspace/rag-candidate run build
+
+If live LLM benchmark is available in Replit, run the target client QA questions and include results.
+
+Stop condition:
+When done, do not push.
+Report:
+- branch name
+- local commit hash if committed
+- files changed
+- commands run
+- report path
+- verdict
+- what Codex should verify next

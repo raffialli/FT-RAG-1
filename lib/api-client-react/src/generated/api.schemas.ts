@@ -124,6 +124,7 @@ export type QueryResultDebugTrace = { [key: string]: unknown } | null;
 
 export interface AnswerSource {
   sourceFile: string;
+  displayTitle?: string | null;
   pageStart: number;
   pageEnd: number;
   /** @nullable */

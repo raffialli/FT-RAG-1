@@ -355,6 +355,14 @@ export function isMildlyHedged(answer: string): boolean {
     /\bpartial(ly)? (supported|evidence|information)\b/.test(lower) ||
     /\bsome information\b.*\bhowever\b/.test(lower) ||
     /\bnot (explicitly|directly) (addressed|covered|stated)\b/.test(lower) ||
-    /\bclaims may need (verification|further research)\b/.test(lower)
+    /\bclaims may need (verification|further research)\b/.test(lower) ||
+    /\bonly indirect(ly)?\b/.test(lower) ||
+    /\bindirect(ly)? support(ed)?\b/.test(lower) ||
+    /\bdoes not fully (answer|address|cover)\b/.test(lower) ||
+    /\bnot fully support(ed)?\b/.test(lower) ||
+    /\bnot well support(ed)?\b/.test(lower) ||
+    /\bcannot (be )?definitive(ly)?\b/.test(lower) ||
+    /\binsufficient to (fully |definitively )?(answer|address)\b/.test(lower) ||
+    /\bonly partially (address(ed)?|cover(ed)?|answer(ed)?|support(ed)?)\b/.test(lower)
   );
 }

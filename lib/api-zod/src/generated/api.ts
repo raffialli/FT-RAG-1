@@ -123,6 +123,7 @@ export const RagQueryResponse = zod.object({
 }),
   "sources": zod.array(zod.object({
   "sourceFile": zod.string(),
+  "displayTitle": zod.string().nullish(),
   "pageStart": zod.number(),
   "pageEnd": zod.number(),
   "sectionPath": zod.string().nullish(),

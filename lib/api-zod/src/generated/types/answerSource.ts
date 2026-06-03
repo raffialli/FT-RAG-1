@@ -8,6 +8,7 @@
 
 export interface AnswerSource {
   sourceFile: string;
+  displayTitle?: string | null;
   pageStart: number;
   pageEnd: number;
   /** @nullable */

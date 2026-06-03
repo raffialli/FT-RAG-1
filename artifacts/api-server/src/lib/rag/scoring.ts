@@ -352,17 +352,67 @@ export function isMildlyHedged(answer: string): boolean {
   return (
     /\blimited (direct )?information\b/.test(lower) ||
     /\blimited (direct )?evidence\b/.test(lower) ||
+    /\blimited direct evidence\b/.test(lower) ||
     /\bpartial(ly)? (supported|evidence|information)\b/.test(lower) ||
+    /\bpartial(ly)? evidence\b/.test(lower) ||
     /\bsome information\b.*\bhowever\b/.test(lower) ||
     /\bnot (explicitly|directly) (addressed|covered|stated)\b/.test(lower) ||
     /\bclaims may need (verification|further research)\b/.test(lower) ||
     /\bonly indirect(ly)?\b/.test(lower) ||
     /\bindirect(ly)? support(ed)?\b/.test(lower) ||
+    /\bindirect evidence\b/.test(lower) ||
     /\bdoes not fully (answer|address|cover)\b/.test(lower) ||
     /\bnot fully support(ed)?\b/.test(lower) ||
     /\bnot well support(ed)?\b/.test(lower) ||
     /\bcannot (be )?definitive(ly)?\b/.test(lower) ||
     /\binsufficient to (fully |definitively )?(answer|address)\b/.test(lower) ||
-    /\bonly partially (address(ed)?|cover(ed)?|answer(ed)?|support(ed)?)\b/.test(lower)
+    /\bonly partially (address(ed)?|cover(ed)?|answer(ed)?|support(ed)?)\b/.test(lower) ||
+    /\bdoes not (directly|explicitly) (outline|explain|describe|provide)\b/.test(lower) ||
+    /\bnot provide (a )?direct\b/.test(lower) ||
+    /\bevidence does not directly\b/.test(lower) ||
+    /\bonly indirectly (supports?|suggests?|indicates?|addresses?)\b/.test(lower) ||
+    /\bindirectly suggests?\b/.test(lower)
   );
+}
+
+// ── Query-aware support level ─────────────────────────────────────────────────
+
+/**
+ * Determine citation support level from both score and query-term overlap.
+ *
+ * Thresholds (v2 — stricter than v1):
+ *   direct  → score > SCORE_DIRECT AND (≥3 matching content words OR ≥30% overlap)
+ *   partial → score > SCORE_PARTIAL  (or direct score with insufficient text match)
+ *   weak    → score ≤ SCORE_PARTIAL
+ *
+ * "Content words" are query tokens longer than 3 characters.
+ * This prevents high-RRF-rank but thematically tangential chunks
+ * (e.g. gabion walls ranked for a communication query) from being
+ * mislabelled "direct".
+ *
+ * Exported so it can be deterministically tested without the LLM stack.
+ */
+export function querySupportLevel(
+  query: string,
+  score: number,
+  text: string
+): "direct" | "partial" | "weak" {
+  if (score <= SCORE_PARTIAL) return "weak";
+  if (score <= SCORE_DIRECT)  return "partial";
+
+  // Score qualifies as direct — verify with query-term text overlap
+  const queryWords = query
+    .toLowerCase()
+    .split(/\W+/)
+    .filter((w) => w.length > 3);
+
+  if (queryWords.length === 0) return "direct";
+
+  const textLower = text.toLowerCase();
+  const matchCount = queryWords.filter((w) => textLower.includes(w)).length;
+  const overlapRatio = matchCount / queryWords.length;
+
+  // Require ≥3 matching terms OR ≥30% overlap to keep "direct"
+  if (matchCount >= 3 || overlapRatio >= 0.30) return "direct";
+  return "partial";
 }

@@ -14,8 +14,7 @@ import {
   assessEvidenceSufficiency,
   emptyCitationValidation,
   validateCitations,
-  SCORE_DIRECT,
-  SCORE_PARTIAL,
+  querySupportLevel,
 } from "./scoring.js";
 import { getDisplayTitle } from "./source-titles.js";
 
@@ -113,10 +112,8 @@ ANSWER:`;
 /**
  * Build the source list for a query result.
  *
- * Support level is determined by both score and query-term overlap:
- * - "direct"  : score > SCORE_DIRECT AND meaningful term overlap
- * - "partial" : score > SCORE_PARTIAL (or direct score but low overlap)
- * - "weak"    : score ≤ SCORE_PARTIAL
+ * Support level delegates to querySupportLevel() in scoring.ts which
+ * requires both score AND query-term overlap (≥3 terms or ≥30%) for "direct".
  */
 function buildSources(query: string, chunks: RetrievedChunk[]) {
   return chunks.map((c) => ({
@@ -126,39 +123,7 @@ function buildSources(query: string, chunks: RetrievedChunk[]) {
     pageEnd: c.pageEnd,
     sectionPath: c.sectionPath,
     snippet: c.text.substring(0, 300) + (c.text.length > 300 ? "…" : ""),
-    supportLevel: querySupportLevel(query, c),
+    supportLevel: querySupportLevel(query, c.score, c.text),
     score: c.score,
   }));
-}
-
-/**
- * Query-aware support level for a chunk.
- *
- * A chunk whose RRF score exceeds SCORE_DIRECT is still only "partial" if
- * fewer than 25% of query content words appear in the chunk text (threshold:
- * at least 2 terms must match). This prevents high-rank but tangential chunks
- * from being labelled "direct".
- */
-function querySupportLevel(
-  query: string,
-  chunk: RetrievedChunk
-): "direct" | "partial" | "weak" {
-  if (chunk.score <= SCORE_PARTIAL) return "weak";
-  if (chunk.score <= SCORE_DIRECT) return "partial";
-
-  // Score qualifies as direct — verify with query-term overlap
-  const queryWords = query
-    .toLowerCase()
-    .split(/\W+/)
-    .filter((w) => w.length > 3);
-
-  if (queryWords.length === 0) return "direct";
-
-  const chunkLower = chunk.text.toLowerCase();
-  const matchCount = queryWords.filter((w) => chunkLower.includes(w)).length;
-  const overlapRatio = matchCount / queryWords.length;
-
-  // Require at least 2 matching content words OR 25% overlap to keep "direct"
-  if (matchCount >= 2 || overlapRatio >= 0.25) return "direct";
-  return "partial";
 }

@@ -117,6 +117,34 @@ export function classifyChunkNoise(
     return { category: "editorial-frontmatter", noiseScore: 0.88, signals };
   }
 
+  // ── 2b. Acknowledgment section detection ──────────────────────────────────
+  // Acknowledgment/funding chunks have no answer value for content queries.
+  if (
+    sectionPath === "Acknowledgment" ||
+    sectionPath === "Acknowledgements" ||
+    (
+      /^\s*(acknowledgments?|acknowledgements?)\s*$/im.test(trimmed) &&
+      /\b(thank|supported by|funded|grant|gratitude|grateful|appreciate)\b/i.test(trimmed)
+    ) ||
+    (
+      /\b(the authors? (wish(es)?|would like) to (thank|acknowledge)|this (work|study|research) was (supported|funded)|funding (was )?provided by)\b/i.test(trimmed)
+    )
+  ) {
+    signals.push("acknowledgment-section");
+    return { category: "editorial-frontmatter", noiseScore: 0.84, signals };
+  }
+
+  // ── 2c. Subject index / back-of-book index detection ─────────────────────
+  // Subject index chunks: alphabetical entries with page numbers (A...18, B...22).
+  // Pattern: word(s) followed by whitespace/dots and a page number, many such lines.
+  const indexEntries = (
+    trimmed.match(/^[A-Za-z][\w\s,;()-]{1,40}[\s.]{1,5}\d{1,4}$/gm) || []
+  ).length;
+  if (indexEntries / lineCount > 0.30 || sectionPath === "Index") {
+    signals.push(`index-entries:${indexEntries}`);
+    return { category: "toc", noiseScore: 0.86, signals };
+  }
+
   // ── 3. TOC dot-leader detection ────────────────────────────────────────────
   const tocLines = (trimmed.match(/[.]{3,}\s*\d+\s*$/gm) || []).length;
   if (tocLines / lineCount > 0.25) {

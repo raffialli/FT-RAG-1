@@ -2,7 +2,8 @@
  * Deterministic regression tests for scoring.ts functions.
  *
  * These tests do NOT call the LLM. They test parseCitationNumbers,
- * validateCitations, assessEvidenceSufficiency, and assessConfidence
+ * validateCitations, assessEvidenceSufficiency, assessConfidence,
+ * querySupportLevel, isSeverelyHedged, and isMildlyHedged
  * directly with controlled answer text and mock chunks.
  *
  * Run: pnpm --filter @workspace/api-server run test
@@ -17,6 +18,7 @@ import {
   assessConfidence,
   isSeverelyHedged,
   isMildlyHedged,
+  querySupportLevel,
   SCORE_DIRECT,
   SCORE_PARTIAL,
 } from "./scoring.ts";
@@ -217,7 +219,7 @@ const normalAnswer = "The evidence shows relevant flood risk information [1][2][
 
 // ── 4. Hedging detectors ──────────────────────────────────────────────────────
 
-section("isSeverelyHedged / isMildlyHedged");
+section("isSeverelyHedged / isMildlyHedged — v1 patterns");
 
 assert("'no specific information'",             isSeverelyHedged("There is no specific information about this."));
 assert("'does not contain sufficient info'",    isSeverelyHedged("The evidence does not contain sufficient information."));
@@ -231,7 +233,8 @@ assert("'limited direct information'",          isMildlyHedged("There is limited
 assert("'not explicitly addressed'",            isMildlyHedged("This is not explicitly addressed in the sources."));
 assert("'partially supported'",                 isMildlyHedged("The claim is partially supported by evidence."));
 assert("non-hedged not mild",                  !isMildlyHedged("Flood risk factors include storm surge [1] and sea level [2]."));
-// New mild-hedge patterns (Client QA Fixes)
+
+// v2 mild-hedge additions (Client QA Fixes lane)
 assert("'only indirectly'",                     isMildlyHedged("The corpus only indirectly addresses this topic."));
 assert("'indirectly supported'",                isMildlyHedged("The conclusion is only indirectly supported by [1]."));
 assert("'does not fully answer'",               isMildlyHedged("The evidence does not fully answer this question."));
@@ -241,7 +244,24 @@ assert("'cannot definitively'",                 isMildlyHedged("We cannot defini
 assert("'only partially addressed'",            isMildlyHedged("The query is only partially addressed by the corpus."));
 assert("'only partially covered'",              isMildlyHedged("This topic is only partially covered in the documents."));
 
-// ── 5. assessConfidence — sufficiency cap policy (Fix 2) ─────────────────────
+section("isMildlyHedged — followup patterns (Blocker 2)");
+
+assert("'does not directly outline'",           isMildlyHedged("The evidence does not directly outline flood communication strategies."));
+assert("'does not directly explain'",           isMildlyHedged("The corpus does not directly explain how EWS reduce fatalities."));
+assert("'does not directly describe'",          isMildlyHedged("The document does not directly describe this process."));
+assert("'does not explicitly outline'",         isMildlyHedged("The evidence does not explicitly outline the required approach."));
+assert("'does not provide a direct'",           isMildlyHedged("The sources do not provide a direct answer to this question."));
+assert("'evidence does not directly'",          isMildlyHedged("The evidence does not directly support this conclusion."));
+assert("'only indirectly supports'",            isMildlyHedged("The retrieved evidence only indirectly supports this claim."));
+assert("'indirectly suggests'",                 isMildlyHedged("The corpus indirectly suggests some communication strategies."));
+assert("'partial evidence'",                    isMildlyHedged("Only partial evidence is available for this topic."));
+assert("'limited direct evidence'",             isMildlyHedged("There is limited direct evidence for early warning fatality reduction."));
+assert("'indirect evidence'",                   isMildlyHedged("This is based on indirect evidence from the corpus."));
+// Guard: these should NOT fire for confident answers
+assert("clean confident → not mild",           !isMildlyHedged("Flood risk is driven by storm surge intensity [1][2]."));
+assert("clean multi-source → not mild",        !isMildlyHedged("EWS reduce mortality through early evacuation coordination [1][2][3]."));
+
+// ── 5. assessConfidence — sufficiency cap policy ──────────────────────────────
 
 section("assessConfidence — evidence sufficiency caps confidence");
 
@@ -295,14 +315,13 @@ const sufficientChunks = [
   ];
   const ans = "Strong multi-source evidence [1][2][3][4][5].";
   const cv = validateCitations(ans, chunks);
-  // Force partial sufficiency via direct injection
   const conf = assessConfidence("", chunks, ans, cv, "partial");
   assert("partial cap: strong chunks still capped to medium", conf.level !== "high");
   assertEqual("partial cap → medium", conf.level, "medium");
   assert("partial cap reason mentions sufficiency", conf.reason.includes("partial") || conf.reason.includes("capped"));
 }
 
-// ── 6. Benchmark regression checks (Q3 / Q6 / Q7 / Q9 / Q10) ────────────────
+// ── 6. Benchmark regressions (Q3 / Q6 / Q7 / Q9 / Q10) ──────────────────────
 
 section("Benchmark regressions — Q3/Q6/Q7/Q9/Q10 direction checks");
 
@@ -407,11 +426,89 @@ section("Client QA Fixes — hedging-calibrated regression checks");
   assert("Q10 refQuery: 'only indirectly supported' → mild hedge", isMildlyHedged(refAns));
 }
 
+// Followup Q3/Q5: indirect language from Codex audit
+{
+  const q3indirect = "The evidence does not directly outline specific communication strategies for emergency managers [1][2]. It indirectly suggests some approaches through discussion of public awareness campaigns.";
+  assert("Q3/Q5 followup: 'does not directly outline' → mild hedge", isMildlyHedged(q3indirect));
+  assert("Q3/Q5 followup: 'indirectly suggests' → mild hedge",        isMildlyHedged(q3indirect));
+}
+
+// Followup Q6: indirect EWS language
+{
+  const q6indirect = "The evidence does not directly explain how EWS have reduced flood fatalities [1]. It does not provide a direct count of lives saved.";
+  assert("Q6 followup: 'does not directly explain' → mild hedge", isMildlyHedged(q6indirect));
+  assert("Q6 followup: 'does not provide a direct' → mild hedge", isMildlyHedged(q6indirect));
+}
+
 // Confirm new patterns don't fire for clean assertive answers
 {
   const clean = "Flood risk is driven by storm surge intensity [1][2][3]. Early warning systems reduce mortality significantly [4][5].";
   assert("clean answer: new patterns don't fire severe", !isSeverelyHedged(clean));
   assert("clean answer: new patterns don't fire mild", !isMildlyHedged(clean));
+}
+
+// ── 8. querySupportLevel — query-aware support level (Blocker 3) ──────────────
+
+section("querySupportLevel — strict direct/partial/weak classification");
+
+// Strong match: score > SCORE_DIRECT, ≥3 query content words in chunk → direct
+{
+  const query = "How should emergency managers communicate flood risk to the public?";
+  const text = "Emergency managers communicate flood risk to the public through warning dissemination, community outreach programs, and public awareness campaigns targeting vulnerable populations.";
+  assertEqual("strong match (≥3 terms) → direct",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "direct");
+}
+
+// Medium: score > SCORE_DIRECT, only 1 matching term → partial
+{
+  const query = "How should emergency managers communicate flood risk to the public?";
+  const text = "Structural measures such as levees reduce flood damage in coastal areas. Emergency services coordinate response efforts.";
+  assertEqual("only 1 match despite high score → partial",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+}
+
+// Zero match: score > SCORE_DIRECT, no query terms in chunk → partial
+{
+  const query = "How should emergency managers communicate flood risk to the public?";
+  const text = "Gabion walls are retaining structures used to control erosion and stabilize slopes near waterways.";
+  assertEqual("zero match despite high score → partial",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+}
+
+// Score-only partial: SCORE_PARTIAL < score ≤ SCORE_DIRECT → partial regardless of text
+{
+  assertEqual("mid-score range → partial",
+    querySupportLevel("flood risk management communication", SCORE_PARTIAL + 0.01, "any content"), "partial");
+}
+
+// Weak: score ≤ SCORE_PARTIAL → weak regardless of text overlap
+{
+  const query = "flood risk management";
+  const text = "flood risk management is a critical component of emergency planning and disaster preparedness";
+  assertEqual("low score → weak even with good overlap",
+    querySupportLevel(query, SCORE_PARTIAL - 0.01, text), "weak");
+}
+
+// Q3-style: communication chunk with full overlap → direct
+{
+  const query = "communicate flood risk public emergency managers";
+  const text = "Risk communication strategies for emergency managers include public warning systems, community outreach, and educational programs targeting flood-prone areas. Public awareness is crucial.";
+  assertEqual("Q3 comm chunk: full overlap → direct",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "direct");
+}
+
+// Q3-style: structural chunk, no communication terms → partial
+{
+  const query = "communicate flood risk public emergency managers";
+  const text = "Structural mitigation through retention ponds, gabion baskets, and flow control weirs reduces peak discharge.";
+  assertEqual("Q3 structural chunk: no comm terms → partial",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+}
+
+// Empty query edge case
+{
+  assertEqual("empty query → direct (no words to check)",
+    querySupportLevel("", SCORE_DIRECT + 0.05, "some chunk text here"), "direct");
 }
 
 // ── Summary ───────────────────────────────────────────────────────────────────

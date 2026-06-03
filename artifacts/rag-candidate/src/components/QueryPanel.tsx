@@ -76,23 +76,24 @@ export default function QueryPanel() {
             disabled={ragQuery.isPending}
           />
 
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-1.5">
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-slate-400">Try a sample question</p>
               {SAMPLE_QUERIES.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => { setQuery(q); inputRef.current?.focus(); }}
                   title={q}
-                  className="text-xs text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[260px]"
+                  className="w-full rounded border border-slate-700 bg-slate-800/70 px-3 py-2 text-left text-xs leading-relaxed text-slate-200 transition-colors hover:border-blue-500/70 hover:bg-slate-800 hover:text-white"
                 >
-                  {q.substring(0, 40)}…
+                  {q}
                 </button>
               ))}
             </div>
             <Button
               onClick={handleSubmit}
               disabled={ragQuery.isPending || !query.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white shrink-0"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               {ragQuery.isPending ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Querying…</>
@@ -101,7 +102,6 @@ export default function QueryPanel() {
               )}
             </Button>
           </div>
-          <p className="text-xs text-slate-500">⌘+Enter to submit</p>
         </CardContent>
       </Card>
 
@@ -148,7 +148,7 @@ export default function QueryPanel() {
                   {result.warnings.map((w, i) => (
                     <div key={i} className="flex gap-2 text-xs text-amber-400">
                       <AlertCircle className="w-3 h-3 mt-0.5 shrink-0" />
-                      {w}
+                      {prettifyWarning(w, result.sources ?? [])}
                     </div>
                   ))}
                 </div>
@@ -231,6 +231,13 @@ export default function QueryPanel() {
       )}
     </div>
   );
+}
+
+function prettifyWarning(warning: string, sources: AnswerSource[]): string {
+  return sources.reduce((text, source) => {
+    if (!source.displayTitle || source.displayTitle === source.sourceFile) return text;
+    return text.split(source.sourceFile).join(source.displayTitle);
+  }, warning);
 }
 
 function ConfidenceBadge({ level }: { level: string }) {

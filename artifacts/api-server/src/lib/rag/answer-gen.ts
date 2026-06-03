@@ -16,6 +16,7 @@ import {
   validateCitations,
   querySupportLevel,
 } from "./scoring.js";
+import { isReferenceQuery } from "./chunk-classifier.js";
 import { getDisplayTitle } from "./source-titles.js";
 
 // ── Main entry point ──────────────────────────────────────────────────────────
@@ -57,7 +58,7 @@ export async function synthesizeAnswer(
   }
 
   const sources = buildSources(query, topChunks);
-  const citationVal = validateCitations(rawAnswer, topChunks);
+  const citationVal = validateCitations(rawAnswer, topChunks, isReferenceQuery(query));
   const sufficiency = assessEvidenceSufficiency(topChunks, rawAnswer);
   const confidence = assessConfidence(query, topChunks, rawAnswer, citationVal, sufficiency);
 
@@ -123,7 +124,7 @@ function buildSources(query: string, chunks: RetrievedChunk[]) {
     pageEnd: c.pageEnd,
     sectionPath: c.sectionPath,
     snippet: c.text.substring(0, 300) + (c.text.length > 300 ? "…" : ""),
-    supportLevel: querySupportLevel(query, c.score, c.text),
+    supportLevel: querySupportLevel(query, c.score, c.text, c.sectionPath),
     score: c.score,
   }));
 }

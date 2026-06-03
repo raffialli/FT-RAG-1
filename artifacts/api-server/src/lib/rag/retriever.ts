@@ -285,7 +285,9 @@ function rerankResults(
 
         if (ewsHits >= 2) adjustment += 0.12;
         if (ewsHits >= 3) adjustment += 0.06;
-        if (physHits >= 1 && ewsHits === 0) adjustment -= 0.22;
+        if (physHits >= 1) adjustment -= 0.55;
+        if (physHits >= 1 && ewsHits === 0) adjustment -= 0.45;
+        if (physHits >= 1 && ewsHits < 3) adjustment -= 0.18;
       }
 
       // Communication query boost (Q3-style: risk communication, public

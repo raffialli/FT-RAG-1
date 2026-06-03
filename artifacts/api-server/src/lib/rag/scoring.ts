@@ -91,7 +91,11 @@ export function parseCitationNumbers(answer: string): number[] {
 
 // ── Citation validation ───────────────────────────────────────────────────────
 
-export function validateCitations(answer: string, chunks: RetrievedChunk[]): CitationValidation {
+export function validateCitations(
+  answer: string,
+  chunks: RetrievedChunk[],
+  allowReferenceCitations = false
+): CitationValidation {
   const warnings: string[] = [];
   const citedNumbers = parseCitationNumbers(answer);
 
@@ -107,7 +111,11 @@ export function validateCitations(answer: string, chunks: RetrievedChunk[]): Cit
       );
     } else {
       const chunk = chunks[n - 1];
-      if (chunk.noiseScore >= 0.5) {
+      const allowedReferenceCitation =
+        allowReferenceCitations &&
+        ["reference-list", "bibliography", "citation-heavy"].includes(chunk.noiseCategory);
+
+      if (chunk.noiseScore >= 0.5 && !allowedReferenceCitation) {
         noisyCitedChunks.push(n);
         warnings.push(
           `Citation [${n}] references a noisy chunk (noiseScore=${chunk.noiseScore.toFixed(2)}, category=${chunk.noiseCategory}).`
@@ -264,6 +272,7 @@ export function assessConfidence(
       `${lowQualityChunks.length} of ${chunks.length} chunks are from low-evidence-value sections (Key Words, Acknowledgment).`
     );
   }
+  const lowQualityDominant = lowQualityChunks.length >= 3;
 
   // 6. Citation validity
   const hasInvalidCitations =
@@ -298,6 +307,9 @@ export function assessConfidence(
       tentative = "low";
       reason = `Insufficient directly relevant evidence (${directChunks.length} chunks with score > ${SCORE_DIRECT}).`;
     }
+  } else if (lowQualityDominant) {
+    tentative = "medium";
+    reason = `${lowQualityChunks.length} of ${chunks.length} chunks are from low-evidence-value sections; confidence capped at medium.`;
   } else if (singleSourceConcentrated && hqChunks.length < 2) {
     tentative = "medium";
     reason = `${directChunks.length} relevant chunks but all from single source with limited high-quality sections.`;
@@ -395,10 +407,13 @@ export function isMildlyHedged(answer: string): boolean {
 export function querySupportLevel(
   query: string,
   score: number,
-  text: string
+  text: string,
+  sectionPath?: string | null
 ): "direct" | "partial" | "weak" {
   if (score <= SCORE_PARTIAL) return "weak";
   if (score <= SCORE_DIRECT)  return "partial";
+
+  if (sectionPath && LOW_QUALITY_SECTIONS.includes(sectionPath)) return "partial";
 
   // Score qualifies as direct — verify with query-term text overlap
   const queryWords = query
@@ -409,6 +424,13 @@ export function querySupportLevel(
   if (queryWords.length === 0) return "direct";
 
   const textLower = text.toLowerCase();
+  const isEwsQuery =
+    /\b(early warning|forecast\w*|EWS|warning system|hydrological|hydrology|monitoring system|flood detect|inundation model)\b/i.test(query);
+  const physicalMitigationTerms = [
+    "gabion", "retaining wall", "levee", "embankment", "dyke", "bund", "physical mitigation",
+  ];
+  if (isEwsQuery && physicalMitigationTerms.some((t) => textLower.includes(t))) return "partial";
+
   const matchCount = queryWords.filter((w) => textLower.includes(w)).length;
   const overlapRatio = matchCount / queryWords.length;
 

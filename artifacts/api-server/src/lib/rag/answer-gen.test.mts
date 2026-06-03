@@ -87,6 +87,16 @@ function noisyChunk(sourceFile = "doc-a.pdf"): RetrievedChunk {
   return makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile, noiseScore: 0.8, noiseCategory: "reference_list" });
 }
 
+function bibliographyChunk(sourceFile = "book.pdf"): RetrievedChunk {
+  return makeChunk({
+    score: SCORE_DIRECT + 0.05,
+    sourceFile,
+    sectionPath: "Reference",
+    noiseScore: 0.83,
+    noiseCategory: "bibliography",
+  });
+}
+
 // ── 1. parseCitationNumbers ───────────────────────────────────────────────────
 
 section("parseCitationNumbers — comma citation parsing (Fix 1)");
@@ -139,6 +149,17 @@ const fiveClean = [
   const cv = validateCitations("Evidence [1,5] shows this.", chunksWithNoisy);
   assertEqual("noisy chunk [5]",          cv.noisyCitedChunks, [5]);
   assert("allValid=false for noisy",      !cv.allValid);
+}
+
+{
+  const chunksWithBibliography = [bibliographyChunk("frm-book.pdf"), directChunk("doc-b.pdf")];
+  const normalCv = validateCitations("References include [1] and context [2].", chunksWithBibliography);
+  const refCv = validateCitations("References include [1] and context [2].", chunksWithBibliography, true);
+  assertEqual("normal query: bibliography citation marked noisy", normalCv.noisyCitedChunks, [1]);
+  assert("normal query: bibliography allValid=false", !normalCv.allValid);
+  assertEqual("reference query: bibliography citation allowed", refCv.noisyCitedChunks, []);
+  assertEqual("reference query: bibliography valid citations", refCv.validCitations, [1, 2]);
+  assert("reference query: bibliography allValid=true", refCv.allValid);
 }
 
 {
@@ -319,6 +340,21 @@ const sufficientChunks = [
   assert("partial cap: strong chunks still capped to medium", conf.level !== "high");
   assertEqual("partial cap → medium", conf.level, "medium");
   assert("partial cap reason mentions sufficiency", conf.reason.includes("partial") || conf.reason.includes("capped"));
+}
+
+{
+  const chunks = [
+    directChunk("a.pdf", "Key Words"),
+    directChunk("b.pdf", "Key Words"),
+    directChunk("c.pdf", "Key Words"),
+    directChunk("d.pdf", "Results"),
+    directChunk("e.pdf", "Discussion"),
+  ];
+  const ans = "Socioeconomic factors influence flood vulnerability through housing, income, and mobility constraints [1][2][3][4][5].";
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence("socioeconomic vulnerability", chunks, ans, cv, "sufficient");
+  assert("low-value section dominance → not high", conf.level !== "high");
+  assertEqual("low-value section dominance → medium", conf.level, "medium");
 }
 
 // ── 6. Benchmark regressions (Q3 / Q6 / Q7 / Q9 / Q10) ──────────────────────
@@ -503,6 +539,22 @@ section("querySupportLevel — strict direct/partial/weak classification");
   const text = "Structural mitigation through retention ponds, gabion baskets, and flow control weirs reduces peak discharge.";
   assertEqual("Q3 structural chunk: no comm terms → partial",
     querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+}
+
+// Q6-style: physical mitigation chunk with incidental EWS terms → partial
+{
+  const query = "What methods are used for flood forecasting and early warning systems?";
+  const text = "The gabion wall is a physical mitigation project. Disaster risk plans also mention early warning, evacuation, and monitoring alongside structural mitigation.";
+  assertEqual("Q6 physical mitigation chunk → partial",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+}
+
+// Low-value sections should not be labelled direct even with text overlap
+{
+  const query = "How do socioeconomic factors influence flood vulnerability?";
+  const text = "Socioeconomic factors, income, housing affordability, and vulnerability influence flood exposure and recovery.";
+  assertEqual("Key Words section → max partial support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text, "Key Words"), "partial");
 }
 
 // Empty query edge case

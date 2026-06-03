@@ -201,6 +201,24 @@ export function classifyChunkNoise(
 
   // ── 7. Citation-heavy (dense in-text year citations) ─────────────────────
   const yearCitations = (trimmed.match(/\(\d{4}[a-z]?\)/g) || []).length;
+  const looseYears = (trimmed.match(/\b(?:19|20)\d\s?\d\b/g) || []).length;
+  const urlOrAccessCues = (
+    trimmed.match(/https?:\/\/\S+|www\.\S+|Available from|Accessed|doi\b/gi) || []
+  ).length;
+  const publicationCues = (
+    trimmed.match(/\b(Journal|Proceedings|Publisher|Press|Risk Analysis|Macmillan|Collier)\b/g) || []
+  ).length;
+  if (
+    (
+      urlOrAccessCues >= 2 &&
+      (yearCitations >= 1 || publicationCues >= 1)
+    ) ||
+    (publicationCues >= 2 && looseYears >= 2)
+  ) {
+    signals.push(`bibliography-fragment:urls=${urlOrAccessCues},years=${yearCitations},looseYears=${looseYears},pubs=${publicationCues}`);
+    return { category: "bibliography", noiseScore: 0.82, signals };
+  }
+
   const yearCitRatio = yearCitations / Math.max(words, 1);
 
   if (yearCitations > 6 && yearCitRatio > 0.042) {

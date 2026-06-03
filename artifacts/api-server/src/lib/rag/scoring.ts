@@ -168,21 +168,58 @@ export function emptyCitationValidation(): CitationValidation {
 
 export function assessEvidenceSufficiency(
   chunks: RetrievedChunk[],
-  answer: string
+  answer: string,
+  query = ""
 ): EvidenceSufficiency {
   if (chunks.length === 0) return "insufficient";
   if (isSeverelyHedged(answer)) return "insufficient";
 
-  const directChunks = chunks.filter((c) => c.score > SCORE_DIRECT && c.noiseScore < 0.5);
+  const supportLevels = chunks.map((c) =>
+    querySupportLevel(query, c.score, c.text, c.sectionPath)
+  );
+  const directChunks = chunks.filter(
+    (c, i) => supportLevels[i] === "direct" && c.noiseScore < 0.5
+  );
+  const partialChunks = chunks.filter((_, i) => supportLevels[i] === "partial");
+  const weakChunks = chunks.filter((_, i) => supportLevels[i] === "weak");
   const hqSectionChunks = chunks.filter(
     (c) => c.sectionPath && HIGH_QUALITY_SECTIONS.has(c.sectionPath) && c.score > SCORE_PARTIAL
   );
   const uniqueSources = new Set(chunks.map((c) => c.sourceFile)).size;
+  const lowQualityChunks = chunks.filter(
+    (c) => c.sectionPath && LOW_QUALITY_SECTIONS.includes(c.sectionPath)
+  );
+  const mildHedge = isMildlyHedged(answer);
+  const explicitCommunityChunks = chunks.filter((c) =>
+    isExplicitCommunityEngagementEvidence(query, c.text)
+  );
+  const mixedEvidence =
+    weakChunks.length > 0 ||
+    (query ? partialChunks.length > 0 : partialChunks.length > directChunks.length);
 
-  if (directChunks.length >= 3 && uniqueSources >= 2) return "sufficient";
+  if (mildHedge) {
+    if (directChunks.length >= 2 || partialChunks.length >= 3) return "partial";
+    if (directChunks.length >= 1 || partialChunks.length >= 1) return "weak";
+    return "insufficient";
+  }
+
+  if (isCommunityEngagementQuery(query) && explicitCommunityChunks.length < 3) {
+    if (directChunks.length >= 2 || partialChunks.length >= 2) return "partial";
+    if (directChunks.length >= 1 || partialChunks.length >= 1) return "weak";
+    return "insufficient";
+  }
+
+  if (
+    directChunks.length >= 3 &&
+    uniqueSources >= 2 &&
+    !mixedEvidence &&
+    lowQualityChunks.length < 2
+  ) {
+    return "sufficient";
+  }
   if (directChunks.length >= 3 && uniqueSources === 1 && hqSectionChunks.length >= 2) return "partial";
   if (directChunks.length >= 2) return "partial";
-  if (directChunks.length >= 1 || chunks.some((c) => c.score > SCORE_PARTIAL)) return "weak";
+  if (directChunks.length >= 1 || partialChunks.length >= 1 || chunks.some((c) => c.score > SCORE_PARTIAL)) return "weak";
   return "insufficient";
 }
 
@@ -205,7 +242,7 @@ export function assessEvidenceSufficiency(
  *   - Single-source with few HQ sections → medium
  */
 export function assessConfidence(
-  _query: string,
+  query: string,
   chunks: RetrievedChunk[],
   answer: string,
   citationVal: CitationValidation,
@@ -245,7 +282,13 @@ export function assessConfidence(
   }
 
   // 3. Score quality
-  const directChunks = chunks.filter((c) => c.score > SCORE_DIRECT);
+  const supportLevels = chunks.map((c) =>
+    querySupportLevel(query, c.score, c.text, c.sectionPath)
+  );
+  const strictDirectChunks = chunks.filter((_, i) => supportLevels[i] === "direct");
+  const strictPartialChunks = chunks.filter((_, i) => supportLevels[i] === "partial");
+  const strictWeakChunks = chunks.filter((_, i) => supportLevels[i] === "weak");
+  const directChunks = query ? strictDirectChunks : chunks.filter((c) => c.score > SCORE_DIRECT);
   const partialChunks = chunks.filter(
     (c) => c.score > SCORE_PARTIAL && c.score <= SCORE_DIRECT
   );
@@ -273,6 +316,9 @@ export function assessConfidence(
     );
   }
   const lowQualityDominant = lowQualityChunks.length >= 3;
+  const explicitCommunityChunks = chunks.filter((c) =>
+    isExplicitCommunityEngagementEvidence(query, c.text)
+  );
 
   // 6. Citation validity
   const hasInvalidCitations =
@@ -298,14 +344,14 @@ export function assessConfidence(
     reason = r;
   } else if (mildHedge) {
     tentative = "medium";
-    reason = `Answer hedges on evidence quality. ${directChunks.length} chunk(s) with direct scores, ${uniqueSources} source(s).`;
+    reason = `Answer hedges on evidence quality. ${directChunks.length} directly supportive chunk(s), ${uniqueSources} source(s).`;
   } else if (directChunks.length < 2) {
     if (directChunks.length === 1 && topScore > SCORE_PARTIAL) {
       tentative = "medium";
-      reason = `Only ${directChunks.length} directly relevant chunk (score > ${SCORE_DIRECT}); ${partialChunks.length} partial.`;
+      reason = `Only ${directChunks.length} directly supportive chunk(s); ${strictPartialChunks.length || partialChunks.length} partial.`;
     } else {
       tentative = "low";
-      reason = `Insufficient directly relevant evidence (${directChunks.length} chunks with score > ${SCORE_DIRECT}).`;
+      reason = `Insufficient directly supportive evidence (${directChunks.length} direct chunk(s)).`;
     }
   } else if (lowQualityDominant) {
     tentative = "medium";
@@ -315,7 +361,7 @@ export function assessConfidence(
     reason = `${directChunks.length} relevant chunks but all from single source with limited high-quality sections.`;
   } else {
     const reasonParts: string[] = [
-      `${directChunks.length} directly relevant chunk(s) (score > ${SCORE_DIRECT})`,
+      `${directChunks.length} directly supportive chunk(s)`,
     ];
     if (uniqueSources > 1) reasonParts.push(`${uniqueSources} distinct sources`);
     if (hqChunks.length > 0) reasonParts.push(`${hqChunks.length} high-quality section(s)`);
@@ -325,9 +371,24 @@ export function assessConfidence(
   }
 
   // 9. Apply sufficiency cap
-  const finalLevel = capConfidence(tentative, sufficiencyCap);
+  let evidenceMixCap = sufficiencyCap;
+  if (query && sufficiency === "sufficient") {
+    if (
+      strictDirectChunks.length < 3 ||
+      strictWeakChunks.length > 0 ||
+      strictPartialChunks.length > 0 ||
+      (isCommunityEngagementQuery(query) && explicitCommunityChunks.length < 3)
+    ) {
+      evidenceMixCap = capConfidence(evidenceMixCap, "medium");
+      warnings.push(
+        `Confidence capped because query-aware support mix is ${strictDirectChunks.length} direct, ${strictPartialChunks.length} partial, ${strictWeakChunks.length} weak.`
+      );
+    }
+  }
+
+  const finalLevel = capConfidence(tentative, evidenceMixCap);
   if (finalLevel !== tentative) {
-    reason = `${reason} Confidence capped at ${finalLevel} because evidence sufficiency is ${sufficiency}.`;
+    reason = `${reason} Confidence capped at ${finalLevel} because evidence sufficiency/support mix is ${sufficiency}.`;
   }
 
   return { level: finalLevel, reason, warnings };
@@ -416,14 +477,20 @@ export function querySupportLevel(
   if (sectionPath && LOW_QUALITY_SECTIONS.includes(sectionPath)) return "partial";
 
   // Score qualifies as direct — verify with query-term text overlap
-  const queryWords = query
-    .toLowerCase()
-    .split(/\W+/)
-    .filter((w) => w.length > 3);
+  const queryLower = query.toLowerCase();
+  const textLower = text.toLowerCase();
+  const queryWords = contentWords(queryLower);
 
   if (queryWords.length === 0) return "direct";
 
-  const textLower = text.toLowerCase();
+  const normalQuery = !/\b(references?|bibliography|citations?|cite|cited|source list|works cited)\b/i.test(query);
+  if (normalQuery && isReferenceLikeText(textLower)) return "weak";
+  if (!normalQuery) {
+    if (sectionPath === "Reference") return "partial";
+    if (isReferenceLikeText(textLower)) return "partial";
+    return "weak";
+  }
+
   const isEwsQuery =
     /\b(early warning|forecast\w*|EWS|warning system|hydrological|hydrology|monitoring system|flood detect|inundation model)\b/i.test(query);
   const physicalMitigationTerms = [
@@ -434,7 +501,115 @@ export function querySupportLevel(
   const matchCount = queryWords.filter((w) => textLower.includes(w)).length;
   const overlapRatio = matchCount / queryWords.length;
 
-  // Require ≥3 matching terms OR ≥30% overlap to keep "direct"
-  if (matchCount >= 3 || overlapRatio >= 0.30) return "direct";
+  const conceptLevel = conceptSupportLevel(queryLower, textLower);
+  if (conceptLevel === "weak") return "weak";
+  if (conceptLevel === "partial") return "partial";
+
+  // Require ≥4 matching terms OR ≥45% overlap to keep "direct".
+  if (matchCount >= 4 || overlapRatio >= 0.45) return "direct";
   return "partial";
+}
+
+function contentWords(text: string): string[] {
+  const stopwords = new Set([
+    "what", "when", "where", "which", "whose", "should", "does", "from",
+    "that", "this", "with", "into", "about", "used", "role", "play", "book",
+    "flood", "risk", "management",
+  ]);
+  return text
+    .split(/\W+/)
+    .filter((w) => w.length > 3 && !stopwords.has(w));
+}
+
+function isReferenceLikeText(textLower: string): boolean {
+  const citationYears = (textLower.match(/\(\d{4}[a-z]?\)/g) || []).length;
+  const looseYears = (textLower.match(/\b(?:19|20)\d\s?\d\b/g) || []).length;
+  const urlCues = (textLower.match(/https?:\/\/|www\.|available from|doi\b|accessed\b/g) || []).length;
+  const publicationCues = (textLower.match(/\b(journal|proceedings|press|publisher|risk analysis|macmillan|collier)\b/g) || []).length;
+  return (
+    (urlCues >= 2 && (citationYears >= 1 || publicationCues >= 1)) ||
+    citationYears >= 8 ||
+    (publicationCues >= 2 && looseYears >= 2)
+  );
+}
+
+function conceptSupportLevel(
+  queryLower: string,
+  textLower: string
+): "direct" | "partial" | "weak" | null {
+  if (/\bcommunicat|public|emergency managers?|warning|outreach|awareness|messag/i.test(queryLower)) {
+    const directHits = countHits(textLower, [
+      "communicat", "public", "warning", "outreach", "awareness", "messag",
+      "disseminat", "risk perception", "early warning",
+    ]);
+    const partialHits = countHits(textLower, [
+      "emergency manager", "evacuat", "information", "decision maker", "rescue",
+    ]);
+    if (directHits >= 2) return "direct";
+    if (directHits >= 1 || partialHits >= 1) return "partial";
+    return "weak";
+  }
+
+  if (isCommunityEngagementQuery(queryLower)) {
+    const explicitDirect = (
+      /\bcommunity engagement\b/.test(textLower) ||
+      /\bsystematic outreach\b/.test(textLower) ||
+      /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
+      /\bstakeholder engagement\b/.test(textLower) ||
+      /\bcommunity networks?\b/.test(textLower)
+    );
+    const strongEngagementHits = countHits(textLower, [
+      "community engagement", "engagement", "participat", "stakeholder",
+      "outreach", "solicit", "input", "collaborat",
+    ]);
+    const peopleHits = countHits(textLower, [
+      "citizen", "resident", "volunteer", "community", "experience",
+    ]);
+    const backgroundHits = countHits(textLower, [
+      "community", "local", "preparedness", "network", "communication", "vulnerable",
+    ]);
+    if (explicitDirect && strongEngagementHits >= 1 && strongEngagementHits + peopleHits >= 2) return "direct";
+    if (strongEngagementHits >= 1 || peopleHits >= 1 || backgroundHits >= 1) return "partial";
+    return "weak";
+  }
+
+  if (/\bclimate|policy|policies|adaptation\b/i.test(queryLower)) {
+    const climateHits = countHits(textLower, ["climate change", "adaptation", "climate", "future risk", "scenario", "warming"]);
+    const policyHits = countHits(textLower, ["policy", "policies", "planning", "governance", "regulat", "flood control act"]);
+    if (climateHits >= 1 && policyHits >= 1) return "direct";
+    if (climateHits >= 1 || policyHits >= 1) return "partial";
+    return "weak";
+  }
+
+  if (/\bsocioeconomic|socio-economic|vulnerability|poverty|income|housing/i.test(queryLower)) {
+    const hits = countHits(textLower, [
+      "socioeconomic", "socio-economic", "poverty", "income", "housing",
+      "vulnerability", "vulnerable", "deprivation", "mobility", "elderly",
+      "disability", "minority", "social", "afford",
+    ]);
+    if (hits >= 3) return "direct";
+    if (hits >= 1) return "partial";
+    return "weak";
+  }
+
+  return null;
+}
+
+function countHits(textLower: string, terms: string[]): number {
+  return terms.filter((term) => textLower.includes(term)).length;
+}
+
+function isCommunityEngagementQuery(query: string): boolean {
+  return /\bcommunity engagement|engagement|participation|local communit|stakeholder/i.test(query);
+}
+
+function isExplicitCommunityEngagementEvidence(query: string, text: string): boolean {
+  if (!isCommunityEngagementQuery(query)) return false;
+  const textLower = text.toLowerCase();
+  return (
+    /\bcommunity engagement\b/.test(textLower) ||
+    /\bsystematic outreach\b/.test(textLower) ||
+    /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
+    /\bstakeholder engagement\b/.test(textLower)
+  );
 }

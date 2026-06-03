@@ -59,7 +59,7 @@ export async function synthesizeAnswer(
 
   const sources = buildSources(query, topChunks);
   const citationVal = validateCitations(rawAnswer, topChunks, isReferenceQuery(query));
-  const sufficiency = assessEvidenceSufficiency(topChunks, rawAnswer);
+  const sufficiency = assessEvidenceSufficiency(topChunks, rawAnswer, query);
   const confidence = assessConfidence(query, topChunks, rawAnswer, citationVal, sufficiency);
 
   return {
@@ -101,6 +101,7 @@ INSTRUCTIONS:
 - If the evidence partially addresses the question, synthesize what the evidence shows and explicitly note which aspects have stronger vs. weaker support (e.g., "The evidence addresses X [1][2] but does not directly cover Y").
 - Only say "The corpus does not contain sufficient information to answer this question" if NO relevant evidence is found at all — not when evidence is partial or indirect.
 - If evidence is from reference or bibliography sections, list or describe those references as found in the evidence.
+- If reference/bibliography evidence appears OCR-extracted, truncated, or garbled, state that the extracted reference list may be incomplete.
 - Do not invent facts not supported by the evidence.
 - Do not cite page numbers not present in the evidence.
 - Keep the answer focused and clear.

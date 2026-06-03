@@ -256,7 +256,19 @@ function rerankResults(
             .toLowerCase()
             .includes("flood_risk_management");
           if (isFRMChunk) {
-            adjustment += 0.35;
+            if (
+              classification.category === "reference-list" ||
+              classification.category === "bibliography"
+            ) {
+              adjustment += 0.55;
+            } else if (
+              c.record.sectionPath === "Reference" ||
+              classification.category === "citation-heavy"
+            ) {
+              adjustment += 0.28;
+            } else {
+              adjustment += 0.05;
+            }
           } else {
             adjustment -= 0.60;
           }

@@ -22,6 +22,7 @@ import {
   SCORE_DIRECT,
   SCORE_PARTIAL,
 } from "./scoring.ts";
+import { classifyChunkNoise } from "./chunk-classifier.ts";
 import type { RetrievedChunk } from "./types.ts";
 
 // ── Test harness ──────────────────────────────────────────────────────────────
@@ -344,11 +345,11 @@ const sufficientChunks = [
 
 {
   const chunks = [
-    directChunk("a.pdf", "Key Words"),
-    directChunk("b.pdf", "Key Words"),
-    directChunk("c.pdf", "Key Words"),
-    directChunk("d.pdf", "Results"),
-    directChunk("e.pdf", "Discussion"),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "a.pdf", sectionPath: "Key Words", text: "Socioeconomic vulnerability poverty income housing mobility" }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "b.pdf", sectionPath: "Key Words", text: "Socioeconomic vulnerability poverty income housing mobility" }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "c.pdf", sectionPath: "Key Words", text: "Socioeconomic vulnerability poverty income housing mobility" }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "d.pdf", sectionPath: "Results", text: "Socioeconomic vulnerability is shaped by poverty, income, housing, and mobility constraints." }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "e.pdf", sectionPath: "Discussion", text: "Vulnerable households face socioeconomic barriers including income, housing, and recovery affordability." }),
   ];
   const ans = "Socioeconomic factors influence flood vulnerability through housing, income, and mobility constraints [1][2][3][4][5].";
   const cv = validateCitations(ans, chunks);
@@ -495,20 +496,21 @@ section("querySupportLevel — strict direct/partial/weak classification");
     querySupportLevel(query, SCORE_DIRECT + 0.05, text), "direct");
 }
 
-// Medium: score > SCORE_DIRECT, only 1 matching term → partial
+// Medium: score > SCORE_DIRECT, only 1 matching term → weak for Q3 because it
+// lacks communication/public warning evidence.
 {
   const query = "How should emergency managers communicate flood risk to the public?";
   const text = "Structural measures such as levees reduce flood damage in coastal areas. Emergency services coordinate response efforts.";
-  assertEqual("only 1 match despite high score → partial",
-    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+  assertEqual("only 1 match despite high score → weak",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "weak");
 }
 
-// Zero match: score > SCORE_DIRECT, no query terms in chunk → partial
+// Zero match: score > SCORE_DIRECT, no query terms in chunk → weak
 {
   const query = "How should emergency managers communicate flood risk to the public?";
   const text = "Gabion walls are retaining structures used to control erosion and stabilize slopes near waterways.";
-  assertEqual("zero match despite high score → partial",
-    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+  assertEqual("zero match despite high score → weak",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "weak");
 }
 
 // Score-only partial: SCORE_PARTIAL < score ≤ SCORE_DIRECT → partial regardless of text
@@ -537,8 +539,8 @@ section("querySupportLevel — strict direct/partial/weak classification");
 {
   const query = "communicate flood risk public emergency managers";
   const text = "Structural mitigation through retention ponds, gabion baskets, and flow control weirs reduces peak discharge.";
-  assertEqual("Q3 structural chunk: no comm terms → partial",
-    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "partial");
+  assertEqual("Q3 structural chunk: no comm terms → weak",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, text), "weak");
 }
 
 // Q6-style: physical mitigation chunk with incidental EWS terms → partial
@@ -561,6 +563,87 @@ section("querySupportLevel — strict direct/partial/weak classification");
 {
   assertEqual("empty query → direct (no words to check)",
     querySupportLevel("", SCORE_DIRECT + 0.05, "some chunk text here"), "direct");
+}
+
+// Hardening: direct requires answer-claim support, not broad flood/risk overlap
+{
+  const query = "What role does community engagement play in flood resilience?";
+  const directText = "Community engagement improves flood resilience when residents participate in preparedness planning, local outreach, volunteer networks, and stakeholder collaboration.";
+  const partialText = "Preparedness planning can improve flood resilience, but the passage does not describe how people are involved.";
+  const weakText = "Flood hazard maps estimate peak discharge and inundation extent using rainfall-runoff models.";
+  assertEqual("Q4 community engagement direct support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, directText), "direct");
+  assertEqual("Q4 community engagement partial support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, partialText), "partial");
+  assertEqual("Q4 community engagement tangential support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, weakText), "weak");
+}
+
+{
+  const query = "How does climate change affect flood risk management policy?";
+  const directText = "Climate change scenarios are incorporated into flood management planning and policy so adaptation measures account for future risk.";
+  const partialText = "Climate change can increase rainfall extremes and future flood hazard, but this passage stops at hazard drivers.";
+  const weakText = "Warning sirens and evacuation routes are described for current flood response operations.";
+  assertEqual("Q7 climate policy direct support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, directText), "direct");
+  assertEqual("Q7 climate policy partial support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, partialText), "partial");
+  assertEqual("Q7 climate policy weak support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, weakText), "weak");
+}
+
+{
+  const query = "How should emergency managers communicate flood risk to the public?";
+  const ans = "Emergency managers can communicate flood risk through public warnings and outreach [1][2]. The evidence only indirectly supports a full communication strategy.";
+  const chunks = [
+    makeChunk({ score: SCORE_DIRECT + 0.06, sourceFile: "a.pdf", text: "Public warning dissemination and outreach help communicate flood risk to residents before evacuation." }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "b.pdf", text: "Emergency managers use flood maps to plan operations, but the passage does not discuss public messaging." }),
+    makeChunk({ score: SCORE_DIRECT + 0.04, sourceFile: "c.pdf", text: "Hydrologic models estimate inundation depth for flood scenarios." }),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, ans, query);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence(query, chunks, ans, cv, suf);
+  assert("Q3 hardening: indirect answer not sufficient", suf !== "sufficient");
+  assert("Q3 hardening: indirect answer not high confidence", conf.level !== "high");
+  assertEqual("Q3 hardening: first chunk direct", querySupportLevel(query, chunks[0].score, chunks[0].text), "direct");
+  assertEqual("Q3 hardening: model chunk weak", querySupportLevel(query, chunks[2].score, chunks[2].text), "weak");
+}
+
+{
+  const query = "What role does community engagement play in flood resilience?";
+  const ans = "Community engagement appears to support flood resilience [1], but the evidence is partial and does not fully answer how this varies by context [2][3].";
+  const chunks = [
+    makeChunk({ score: SCORE_DIRECT + 0.06, sourceFile: "a.pdf", text: "Community engagement, local participation, stakeholder collaboration, and preparedness outreach improve flood resilience." }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "b.pdf", text: "Preparedness planning improves resilience, but local community participation is not explicitly described." }),
+    makeChunk({ score: SCORE_DIRECT + 0.04, sourceFile: "c.pdf", text: "Inundation models show where flood depths may be highest." }),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, ans, query);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence(query, chunks, ans, cv, suf);
+  assert("Q4 hardening: mixed evidence not sufficient", suf !== "sufficient");
+  assert("Q4 hardening: mixed evidence not high", conf.level !== "high");
+}
+
+{
+  const query = "How does climate change affect flood risk management policy?";
+  const ans = "Climate change is relevant to flood management planning [1], but the evidence only partially addresses policy mechanisms [2][3].";
+  const chunks = [
+    makeChunk({ score: SCORE_DIRECT + 0.06, sourceFile: "a.pdf", text: "Climate change scenarios inform flood risk management planning and adaptation policy." }),
+    makeChunk({ score: SCORE_DIRECT + 0.05, sourceFile: "b.pdf", text: "Climate change may increase future rainfall extremes and flood hazard." }),
+    makeChunk({ score: SCORE_DIRECT + 0.04, sourceFile: "c.pdf", text: "Flood warning systems notify residents before evacuation." }),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, ans, query);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence(query, chunks, ans, cv, suf);
+  assert("Q7 hardening: mixed evidence not sufficient", suf !== "sufficient");
+  assert("Q7 hardening: mixed evidence not high", conf.level !== "high");
+}
+
+{
+  const fragment = "Smith, J. (2019) Flood risk communication. Risk Analysis. Available from: www.example.org. Accessed 2022. Government report.";
+  const cls = classifyChunkNoise(fragment, null);
+  assertEqual("bibliography fragment classified as bibliography", cls.category, "bibliography");
+  assert("bibliography fragment hard-excludable from normal queries", cls.noiseScore >= 0.72);
 }
 
 // ── Summary ───────────────────────────────────────────────────────────────────

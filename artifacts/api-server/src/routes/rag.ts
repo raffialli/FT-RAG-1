@@ -7,6 +7,7 @@ import {
   DocumentDeleteError,
   ingestAllDocuments,
   ingestUploadedFile,
+  reindexActiveDocuments,
   loadDocumentsManifest,
   getSourcePdfPaths,
   getUploadedPdfPaths,
@@ -159,6 +160,19 @@ router.post("/rag/ingest", async (req, res) => {
     req.log.info({ rebuild }, "Starting document ingestion");
     const result = await ingestAllDocuments(rebuild);
     req.log.info({ result }, "Ingestion complete");
+    res.json(result);
+  } catch (e) {
+    req.log.error(e);
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+// POST /api/rag/reindex — rebuild chunks/vectors only for active manifest documents
+router.post("/rag/reindex", async (req, res) => {
+  try {
+    req.log.info("Starting active document reindex");
+    const result = await reindexActiveDocuments();
+    req.log.info({ result }, "Active document reindex complete");
     res.json(result);
   } catch (e) {
     req.log.error(e);

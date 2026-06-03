@@ -385,6 +385,101 @@ export async function ingestAllDocuments(rebuild = false): Promise<IngestResult>
   };
 }
 
+export async function reindexActiveDocuments(): Promise<IngestResult> {
+  const start = Date.now();
+  const activeDocs = loadDocumentsManifest();
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const cleanupReport: Record<string, unknown> = {};
+
+  if (activeDocs.length === 0) {
+    return {
+      success: false,
+      documentsIngested: 0,
+      chunksCreated: 0,
+      vectorsCreated: 0,
+      durationMs: Date.now() - start,
+      errors: ["No active documents are currently indexed."],
+      warnings,
+      cleanupReport,
+    };
+  }
+
+  resetVectorIndex();
+  if (fs.existsSync(CHUNKS_DIR)) {
+    for (const f of fs.readdirSync(CHUNKS_DIR)) {
+      fs.unlinkSync(path.join(CHUNKS_DIR, f));
+    }
+  }
+
+  let totalChunks = 0;
+  let docsIngested = 0;
+  const allChunks: RagChunk[] = [];
+  const nextManifest: RagDocument[] = [];
+
+  for (const activeDoc of activeDocs) {
+    const activePath = activeDoc.filePath;
+    if (!activePath || !fs.existsSync(activePath)) {
+      errors.push(`Missing source PDF for active document ${activeDoc.filename}: ${activePath || "(no path stored)"}`);
+      nextManifest.push({
+        ...activeDoc,
+        chunkCount: 0,
+        ingestedAt: new Date().toISOString(),
+        status: "error",
+      });
+      cleanupReport[activeDoc.filename] = [];
+      continue;
+    }
+
+    try {
+      const result = await ingestPdf(activePath, true);
+      errors.push(...result.errors);
+      warnings.push(...result.warnings.map((w) => `${activeDoc.filename}: ${w}`));
+      cleanupReport[activeDoc.filename] = result.doc.cleaningFlags;
+      nextManifest.push(result.doc);
+
+      if (result.doc.status === "ingested" && result.chunks.length > 0) {
+        docsIngested++;
+        totalChunks += result.chunks.length;
+        allChunks.push(...result.chunks);
+      }
+    } catch (e) {
+      errors.push(`Failed to reindex ${activeDoc.filename}: ${String(e)}`);
+      nextManifest.push({
+        ...activeDoc,
+        chunkCount: 0,
+        ingestedAt: new Date().toISOString(),
+        status: "error",
+      });
+    }
+  }
+
+  let vectorsCreated = 0;
+  if (allChunks.length > 0) {
+    try {
+      const texts = allChunks.map((c) => c.text);
+      const embeddings = await embedBatch(texts);
+      addOrUpdateRecords(allChunks, embeddings);
+      vectorsCreated = allChunks.length;
+    } catch (e) {
+      errors.push(`Embedding failed: ${String(e)}`);
+    }
+  }
+
+  saveDocumentsManifest(nextManifest);
+
+  return {
+    success: errors.filter((e) => !e.includes("Embedding failed")).length === 0 || docsIngested > 0,
+    documentsIngested: docsIngested,
+    chunksCreated: totalChunks,
+    vectorsCreated,
+    durationMs: Date.now() - start,
+    errors,
+    warnings,
+    cleanupReport,
+  };
+}
+
 export async function ingestUploadedFile(filePath: string): Promise<IngestResult> {
   const start = Date.now();
   const result = await ingestPdf(filePath, true);

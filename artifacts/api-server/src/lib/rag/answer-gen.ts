@@ -47,7 +47,7 @@ export async function synthesizeAnswer(
     rawAnswer = await generateAnswer(prompt);
   } catch (e) {
     return {
-      answer: `Answer generation failed: ${String(e)}`,
+      answer: "The model did not return an answer. Please try again.",
       confidence: "insufficient",
       confidenceReason: "LLM call failed.",
       evidenceSufficiency: "insufficient",

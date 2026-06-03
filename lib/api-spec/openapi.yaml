@@ -135,7 +135,7 @@ paths:
     post:
       operationId: ingestDocuments
       tags: [rag]
-      summary: Ingest pre-loaded source PDFs
+      summary: Ingest or restore PDFs from the configured source folders
       requestBody:
         required: false
         content:
@@ -145,6 +145,19 @@ paths:
       responses:
         "200":
           description: Ingestion result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResult"
+
+  /rag/reindex:
+    post:
+      operationId: reindexActiveDocuments
+      tags: [rag]
+      summary: Rebuild chunks and vectors for currently indexed documents only
+      responses:
+        "200":
+          description: Active-document reindex result
           content:
             application/json:
               schema:

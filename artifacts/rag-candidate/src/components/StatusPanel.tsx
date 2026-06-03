@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useGetRagStatus, useIngestDocuments, useResetIndex, useUploadDocument } from "@workspace/api-client-react";
+import { useGetRagStatus, useIngestDocuments, useReindexActiveDocuments, useResetIndex, useUploadDocument } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetRagStatusQueryKey, getListDocumentsQueryKey, getListChunksQueryKey } from "@workspace/api-client-react";
 import { Database, Upload, RefreshCw, Trash2, AlertCircle, CheckCircle, Clock, Info } from "lucide-react";
@@ -39,6 +39,23 @@ export default function StatusPanel() {
         queryClient.invalidateQueries({ queryKey: getListChunksQueryKey() });
         setLog((prev) => ["✓ Index reset", ...prev].slice(0, 50));
       },
+    },
+  });
+
+  const reindex = useReindexActiveDocuments({
+    mutation: {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: getGetRagStatusQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListDocumentsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListChunksQueryKey() });
+        const lines = [
+          `✓ Reindexed ${data.documentsIngested} active docs, ${data.chunksCreated} chunks, ${data.vectorsCreated} vectors in ${(data.durationMs / 1000).toFixed(1)}s`,
+          ...(data.warnings ?? []).map((w) => `⚠ ${w}`),
+          ...(data.errors ?? []).map((e) => `✗ ${e}`),
+        ];
+        setLog((prev) => [...lines, ...prev].slice(0, 50));
+      },
+      onError: (e) => setLog((prev) => [`✗ Reindex failed: ${String(e)}`, ...prev].slice(0, 50)),
     },
   });
 
@@ -77,11 +94,18 @@ export default function StatusPanel() {
     e.target.value = "";
   };
 
-  const handleRebuild = () => {
+  const handleRestoreSampleCorpus = () => {
     const confirmed = window.confirm(
-      "Rebuild the local candidate index?\n\nThis rebuilds chunks and vectors from the current source PDFs and uploaded PDFs in this test environment. It may take several minutes. It does not affect AWS, Demo, or production."
+      "Restore or ingest the sample/source-folder corpus?\n\nThis scans the configured source folders and can bring back documents that were removed from the candidate index. Use this only when you intentionally want to restore sample/source documents. It does not affect AWS, Demo, or production."
     );
-    if (confirmed) ingest.mutate({ data: { rebuild: true } });
+    if (confirmed) ingest.mutate({ data: { rebuild: false } });
+  };
+
+  const handleReindex = () => {
+    const confirmed = window.confirm(
+      "Reindex active documents?\n\nThis rebuilds chunks and vectors only for documents currently listed in the candidate index. Documents you removed from the index will not come back. It may take several minutes and does not affect AWS, Demo, or production."
+    );
+    if (confirmed) reindex.mutate();
   };
 
   const handleReset = () => {
@@ -95,7 +119,7 @@ export default function StatusPanel() {
     }
   };
 
-  const busy = ingest.isPending || reset.isPending;
+  const busy = ingest.isPending || reindex.isPending || reset.isPending;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -178,34 +202,40 @@ export default function StatusPanel() {
         <CardHeader className="pb-3">
           <CardTitle className="text-white text-sm">Actions</CardTitle>
           <CardDescription className="text-slate-400 text-xs">
-            Ingest PDFs from attached_assets/ or upload new documents
+            Rebuild the active candidate index, restore sample PDFs, or upload new documents
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button
-            onClick={() => ingest.mutate({ data: { rebuild: false } })}
+            onClick={handleReindex}
             disabled={busy}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {ingest.isPending ? (
+            {reindex.isPending ? (
               <>
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Ingesting…
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Reindexing…
               </>
             ) : (
               <>
-                <Database className="w-4 h-4 mr-2" /> Ingest Documents
+                <Database className="w-4 h-4 mr-2" /> Reindex Active Documents
               </>
             )}
           </Button>
+          <p className="-mt-1 text-center text-xs text-slate-500">
+            Rebuild chunks and vectors for the currently indexed documents.
+          </p>
 
           <Button
             variant="outline"
-            onClick={handleRebuild}
+            onClick={handleRestoreSampleCorpus}
             disabled={busy}
             className="w-full border-slate-700 text-slate-300 hover:bg-slate-800"
           >
-            <RefreshCw className="w-4 h-4 mr-2" /> Rebuild Index (force re-embed)
+            <RefreshCw className="w-4 h-4 mr-2" /> Restore Sample Corpus
           </Button>
+          <p className="-mt-1 text-center text-xs text-slate-500">
+            Scans source folders and can restore removed sample documents.
+          </p>
 
           <div className="relative">
             <Button
@@ -234,7 +264,7 @@ export default function StatusPanel() {
             <Trash2 className="w-4 h-4 mr-2" /> Reset Index
           </Button>
 
-          {ingest.isPending && (
+          {(ingest.isPending || reindex.isPending) && (
             <div className="space-y-1">
               <Progress value={undefined} className="h-1.5 bg-slate-800" />
               <p className="text-xs text-slate-400 text-center">Extracting text, chunking, and embedding…</p>

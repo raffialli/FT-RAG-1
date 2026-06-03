@@ -523,7 +523,7 @@ export const getIngestDocumentsUrl = () => {
 }
 
 /**
- * @summary Ingest pre-loaded source PDFs
+ * @summary Ingest or restore PDFs from the configured source folders
  */
 export const ingestDocuments = async (ingestInput?: IngestInput, options?: RequestInit): Promise<IngestResult> => {
 
@@ -572,7 +572,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type IngestDocumentsMutationError = ErrorType<unknown>
 
     /**
- * @summary Ingest pre-loaded source PDFs
+ * @summary Ingest or restore PDFs from the configured source folders
  */
 export const useIngestDocuments = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestDocuments>>, TError,{data?: BodyType<IngestInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -583,6 +583,76 @@ export const useIngestDocuments = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getIngestDocumentsMutationOptions(options));
+    }
+
+export const getReindexActiveDocumentsUrl = () => {
+
+
+
+
+  return `/api/rag/reindex`
+}
+
+/**
+ * @summary Rebuild chunks and vectors for currently indexed documents only
+ */
+export const reindexActiveDocuments = async ( options?: RequestInit): Promise<IngestResult> => {
+
+  return customFetch<IngestResult>(getReindexActiveDocumentsUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getReindexActiveDocumentsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reindexActiveDocuments>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reindexActiveDocuments>>, TError,void, TContext> => {
+
+const mutationKey = ['reindexActiveDocuments'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reindexActiveDocuments>>, void> = () => {
+
+
+          return  reindexActiveDocuments(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReindexActiveDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof reindexActiveDocuments>>>
+
+    export type ReindexActiveDocumentsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Rebuild chunks and vectors for currently indexed documents only
+ */
+export const useReindexActiveDocuments = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reindexActiveDocuments>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reindexActiveDocuments>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getReindexActiveDocumentsMutationOptions(options));
     }
 
 export const getResetIndexUrl = () => {

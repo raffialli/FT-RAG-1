@@ -569,10 +569,27 @@ components:
 
     AnswerSource:
       type: object
-      required: [sourceFile, pageStart, pageEnd, snippet, supportLevel]
+      required: [documentId, document_id, document, source, page, sourceFile, rawFilename, pageStart, pageEnd, snippet, supportLevel]
       properties:
+        documentId:
+          type: string
+        document_id:
+          type: string
+          description: Backward-compatible snake_case document identifier alias.
+        document:
+          type: string
+          description: Friendly document title for legacy/raw API clients.
+        source:
+          type: string
+          description: Friendly source title for legacy/raw API clients.
+        page:
+          type: ["string", "null"]
+          description: Formatted page range, for example "p. 4" or "pp. 6-7".
         sourceFile:
           type: string
+        rawFilename:
+          type: string
+          description: Raw source filename preserved for debugging/provenance.
         displayTitle:
           type: string
           nullable: true

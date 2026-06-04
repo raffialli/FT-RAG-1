@@ -23,6 +23,7 @@ import {
   SCORE_PARTIAL,
 } from "./scoring.ts";
 import { classifyChunkNoise } from "./chunk-classifier.ts";
+import { buildSourceProvenanceAliases, formatPageRange } from "./source-provenance-core.ts";
 import type { RetrievedChunk } from "./types.ts";
 
 // ── Test harness ──────────────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ function section(title: string): void {
 function makeChunk(overrides: Partial<RetrievedChunk> & { score: number }): RetrievedChunk {
   return {
     chunkId: "test-chunk",
-    documentId: "test-doc",
+    documentId: overrides.documentId ?? "test-doc",
     sourceFile: overrides.sourceFile ?? "doc-a.pdf",
     pageStart: overrides.pageStart ?? 1,
     pageEnd: overrides.pageEnd ?? 1,
@@ -97,6 +98,38 @@ function bibliographyChunk(sourceFile = "book.pdf"): RetrievedChunk {
     noiseCategory: "bibliography",
   });
 }
+
+// ── 0. source provenance metadata ────────────────────────────────────────────
+
+section("source provenance metadata");
+
+{
+  const chunk = makeChunk({
+    score: SCORE_DIRECT + 0.05,
+    documentId: "JEM_2024_Special_Issue_1780399724235_pdf",
+    sourceFile: "JEM_2024_Special_Issue_1780399724235.pdf",
+    pageStart: 6,
+    pageEnd: 7,
+    sectionPath: "Methodology",
+    text: "Manufactured housing vulnerability is assessed at household, housing structure, and park community levels.",
+  });
+  const source = buildSourceProvenanceAliases({
+    documentId: chunk.documentId,
+    sourceFile: chunk.sourceFile,
+    displayTitle: "JEM 2024 Special Issue",
+    pageStart: chunk.pageStart,
+    pageEnd: chunk.pageEnd,
+  });
+  assertEqual("documentId is exposed", source.documentId, "JEM_2024_Special_Issue_1780399724235_pdf");
+  assertEqual("document_id alias is exposed", source.document_id, "JEM_2024_Special_Issue_1780399724235_pdf");
+  assertEqual("friendly document alias is exposed", source.document, "JEM 2024 Special Issue");
+  assertEqual("friendly source alias is exposed", source.source, "JEM 2024 Special Issue");
+  assertEqual("rawFilename alias is preserved", source.rawFilename, "JEM_2024_Special_Issue_1780399724235.pdf");
+  assertEqual("page alias is formatted", source.page, "pp. 6-7");
+}
+
+assertEqual("single page format", formatPageRange(4, 4), "p. 4");
+assertEqual("missing page format", formatPageRange(0, 0), null);
 
 // ── 1. parseCitationNumbers ───────────────────────────────────────────────────
 

@@ -64,7 +64,13 @@ export interface RetrievedChunk extends RagChunk {
 }
 
 export interface AnswerSource {
+  documentId: string;
+  document_id: string;
+  document: string;
+  source: string;
+  page: string | null;
   sourceFile: string;
+  rawFilename: string;
   displayTitle?: string;
   pageStart: number;
   pageEnd: number;

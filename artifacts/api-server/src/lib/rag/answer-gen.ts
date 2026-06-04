@@ -14,10 +14,9 @@ import {
   assessEvidenceSufficiency,
   emptyCitationValidation,
   validateCitations,
-  querySupportLevel,
 } from "./scoring.js";
 import { isReferenceQuery } from "./chunk-classifier.js";
-import { getDisplayTitle } from "./source-titles.js";
+import { buildAnswerSources } from "./source-provenance.js";
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
@@ -57,7 +56,7 @@ export async function synthesizeAnswer(
     };
   }
 
-  const sources = buildSources(query, topChunks);
+  const sources = buildAnswerSources(query, topChunks);
   const citationVal = validateCitations(rawAnswer, topChunks, isReferenceQuery(query));
   const sufficiency = assessEvidenceSufficiency(topChunks, rawAnswer, query);
   const confidence = assessConfidence(query, topChunks, rawAnswer, citationVal, sufficiency);
@@ -107,25 +106,4 @@ INSTRUCTIONS:
 - Keep the answer focused and clear.
 
 ANSWER:`;
-}
-
-// ── Sources ───────────────────────────────────────────────────────────────────
-
-/**
- * Build the source list for a query result.
- *
- * Support level delegates to querySupportLevel() in scoring.ts which
- * requires both score AND query-term overlap (≥3 terms or ≥30%) for "direct".
- */
-function buildSources(query: string, chunks: RetrievedChunk[]) {
-  return chunks.map((c) => ({
-    sourceFile: c.sourceFile,
-    displayTitle: getDisplayTitle(c.sourceFile),
-    pageStart: c.pageStart,
-    pageEnd: c.pageEnd,
-    sectionPath: c.sectionPath,
-    snippet: c.text.substring(0, 300) + (c.text.length > 300 ? "…" : ""),
-    supportLevel: querySupportLevel(query, c.score, c.text, c.sectionPath),
-    score: c.score,
-  }));
 }

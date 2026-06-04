@@ -626,6 +626,34 @@ section("querySupportLevel — strict direct/partial/weak classification");
 }
 
 {
+  const query = "How does climate change affect flood risk management policy?";
+  const text = "In 2017, the Flood Control Act of Japan was amended, demanding zero evacuation delay and a Council for Large-Scale Flood Mitigation.";
+  assertEqual("Q7 climate policy Japan warning-law support is partial, not direct",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, text), "partial");
+}
+
+{
+  const query = "How does climate change affect flood risk management policy?";
+  const text = "Her research centres on legal geographies. She graduated with an MSc in Water Science, Policy and Management. Earthscan Water Text.";
+  assertEqual("Q7 climate policy frontmatter bio support is partial, not direct",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, text), "partial");
+}
+
+{
+  const query = "How do socioeconomic factors influence flood vulnerability?";
+  const text = "The literature supports that low-income status (poverty) is a leading variable of global vulnerability. People living in poverty are particularly vulnerable to flood and drought shocks.";
+  assertEqual("Q5 socioeconomic Wood poverty source is direct support",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, text, "Finding"), "direct");
+}
+
+{
+  const query = "What role does community engagement play in flood resilience?";
+  const text = "Democratizing data collection and exchange requires a systematic outreach approach and community engagement sustained before, during, and after disaster while soliciting input from citizens and rescue operators.";
+  assertEqual("Q3 community engagement JEM outreach source is direct support",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, text, "Discussion"), "direct");
+}
+
+{
   const query = "How should emergency managers communicate flood risk to the public?";
   const ans = "Emergency managers can communicate flood risk through public warnings and outreach [1][2]. The evidence only indirectly supports a full communication strategy.";
   const chunks = [

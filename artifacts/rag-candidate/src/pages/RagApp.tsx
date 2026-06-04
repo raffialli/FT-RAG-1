@@ -7,6 +7,7 @@ import QueryPanel from "@/components/QueryPanel";
 import DocumentsPanel from "@/components/DocumentsPanel";
 import ReportsPanel from "@/components/ReportsPanel";
 import ModelTestPanel from "@/components/ModelTestPanel";
+import { APP_VERSION } from "@/version";
 import { useGetRagStatus, getGetRagStatusQueryKey } from "@workspace/api-client-react";
 import { Database, Search, FileText, BarChart3, Cpu } from "lucide-react";
 
@@ -27,7 +28,7 @@ export default function RagApp() {
               <Database className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-white leading-none">FalconTrust RAG Candidate</h1>
+              <h1 className="text-sm font-semibold text-white leading-none">FalconTrust RAG Candidate {APP_VERSION}</h1>
               <p className="text-xs text-slate-400 mt-0.5">
                 Hybrid retrieval · {embeddingModel} · {generationLabel}
               </p>
@@ -93,7 +94,7 @@ export default function RagApp() {
 
       <Separator className="bg-slate-800" />
       <footer className="max-w-7xl mx-auto px-4 py-3 text-xs text-slate-500 flex items-center justify-between">
-        <span>FalconTrust RAG Experiment — Hybrid (dense + BM25) + Reranking</span>
+        <span>FalconTrust RAG Experiment {APP_VERSION} — Hybrid (dense + BM25) + Reranking</span>
         <span>{embeddingModel} · {generationLabel}</span>
       </footer>
     </div>

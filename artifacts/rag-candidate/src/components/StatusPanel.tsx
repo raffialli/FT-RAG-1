@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { APP_VERSION } from "@/version";
 import { useGetRagStatus, useIngestDocuments, useReindexActiveDocuments, useResetIndex, useUploadDocument } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetRagStatusQueryKey, getListDocumentsQueryKey, getListChunksQueryKey } from "@workspace/api-client-react";
@@ -149,6 +150,10 @@ export default function StatusPanel() {
               </div>
 
               <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Candidate version</span>
+                  <span className="text-slate-200 font-mono">{APP_VERSION}</span>
+                </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-400">Embedding model</span>
                   <span className="text-slate-200 font-mono">{status.embeddingModel}</span>

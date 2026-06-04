@@ -120,6 +120,9 @@ export default function StatusPanel() {
   };
 
   const busy = ingest.isPending || reindex.isPending || reset.isPending;
+  const providerLabel = status?.generationProvider === "openai" ? "OpenAI" : "Ollama";
+  const endpointLabel = status?.generationProvider === "openai" ? "OpenAI endpoint" : "Ollama endpoint";
+  const endpointValue = status?.generationProvider === "openai" ? status.openaiBaseUrl : status?.ollamaBaseUrl;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,12 +154,16 @@ export default function StatusPanel() {
                   <span className="text-slate-200 font-mono">{status.embeddingModel}</span>
                 </div>
                 <div className="flex justify-between text-xs">
+                  <span className="text-slate-400">Generation provider</span>
+                  <span className="text-slate-200 font-mono">{providerLabel}</span>
+                </div>
+                <div className="flex justify-between text-xs">
                   <span className="text-slate-400">Generation model</span>
                   <span className="text-slate-200 font-mono">{status.generationModel}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Ollama endpoint</span>
-                  <span className="text-slate-200 font-mono truncate max-w-[160px]">{status.ollamaBaseUrl}</span>
+                  <span className="text-slate-400">{endpointLabel}</span>
+                  <span className="text-slate-200 font-mono truncate max-w-[160px]">{endpointValue}</span>
                 </div>
                 {status.lastIngestedAt && (
                   <div className="flex justify-between text-xs">

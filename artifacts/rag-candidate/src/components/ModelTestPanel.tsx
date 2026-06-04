@@ -8,19 +8,21 @@ export default function ModelTestPanel() {
   const test = useTestModel({ query: { queryKey: getTestModelQueryKey(), enabled: false } });
 
   const run = () => test.refetch();
+  const providerLabel = test.data?.generationProvider === "openai" ? "OpenAI" : "Ollama";
+  const endpointLabel = test.data?.generationProvider === "openai" ? "OpenAI endpoint" : "Ollama endpoint";
+  const endpointValue = test.data?.generationProvider === "openai" ? test.data.openaiBaseUrl : test.data?.ollamaBaseUrl;
 
   return (
     <div className="space-y-6 max-w-2xl">
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="text-white text-sm flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-blue-400" /> Ollama Connectivity Test
+            <Cpu className="w-4 h-4 text-blue-400" /> Generation Model Check
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-400 text-sm">
-            Tests both the embedding model (nomic-embed-text) and generation model (qwen3.5:122b)
-            against your configured Ollama Cloud endpoint.
+            Checks the active embedding model and generation provider configured for this candidate app.
           </p>
 
           <Button
@@ -56,15 +58,22 @@ export default function ModelTestPanel() {
                   modelName={test.data.generationModel}
                   ok={test.data.generationOk}
                   error={test.data.generationError}
-                  extra={test.data.generationSample ? `Sample: "${test.data.generationSample}"` : undefined}
+                  extra={[
+                    `Provider: ${providerLabel}`,
+                    test.data.generationSample ? `Sample: "${test.data.generationSample}"` : null,
+                  ].filter(Boolean).join(" · ")}
                 />
               </div>
 
               <div className="bg-slate-800 rounded p-3 space-y-1.5">
                 <p className="text-xs text-slate-400 font-medium">Configuration</p>
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Ollama base URL</span>
-                  <span className="text-slate-200 font-mono">{test.data.ollamaBaseUrl}</span>
+                  <span className="text-slate-500">Generation provider</span>
+                  <span className="text-slate-200 font-mono">{providerLabel}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-500">{endpointLabel}</span>
+                  <span className="text-slate-200 font-mono">{endpointValue}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500">Embedding model</span>
@@ -87,12 +96,12 @@ export default function ModelTestPanel() {
         <CardContent>
           <div className="space-y-2 text-xs text-slate-400">
             {[
-              ["Ingestion", "PDF → pdf-parse → OCR cleanup → section-aware chunking → nomic-embed-text → flat JSON index"],
-              ["Dense retrieval", "Query → nomic-embed-text → cosine similarity top-25"],
+              ["Ingestion", "PDF → pdf-parse → OCR cleanup → section-aware chunking → embeddings → flat JSON index"],
+              ["Dense retrieval", "Query → embeddings → cosine similarity top-25"],
               ["Lexical retrieval", "Query → BM25 scoring → top-25 + exact phrase rescue"],
               ["Score fusion", "Reciprocal Rank Fusion (RRF, k=60) + exact phrase bonus"],
               ["Reranking", "Evidence quality scoring: token overlap · length quality · OCR penalty · page completeness"],
-              ["Answer generation", "Top-5 evidence → grounded prompt → qwen3.5:122b → structured answer + citations"],
+              ["Answer generation", "Top-5 evidence → grounded prompt → active generation model → structured answer + citations"],
             ].map(([stage, desc], i) => (
               <div key={i} className="flex gap-3">
                 <span className="text-blue-500 shrink-0 w-32">{stage}</span>

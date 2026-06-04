@@ -955,7 +955,7 @@ export const getTestModelUrl = () => {
 }
 
 /**
- * @summary Test Ollama model connectivity
+ * @summary Test generation model connectivity
  */
 export const testModel = async ( options?: RequestInit): Promise<ModelTestResult> => {
 
@@ -1002,7 +1002,7 @@ export type TestModelQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Test Ollama model connectivity
+ * @summary Test generation model connectivity
  */
 
 export function useTestModel<TData = Awaited<ReturnType<typeof testModel>>, TError = ErrorType<unknown>>(
@@ -1016,7 +1016,6 @@ export function useTestModel<TData = Awaited<ReturnType<typeof testModel>>, TErr
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
 
 
 

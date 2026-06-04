@@ -233,7 +233,7 @@ paths:
     get:
       operationId: testModel
       tags: [rag]
-      summary: Test Ollama model connectivity
+      summary: Test generation model connectivity
       responses:
         "200":
           description: Model connectivity test result
@@ -254,7 +254,7 @@ components:
 
     RagStatus:
       type: object
-      required: [documentCount, chunkCount, vectorCount, ready, embeddingModel, generationModel, ollamaBaseUrl]
+      required: [documentCount, chunkCount, vectorCount, ready, embeddingModel, generationProvider, generationModel, ollamaBaseUrl]
       properties:
         documentCount:
           type: integer
@@ -266,10 +266,15 @@ components:
           type: boolean
         embeddingModel:
           type: string
+        generationProvider:
+          type: string
+          enum: [ollama, openai]
         generationModel:
           type: string
         ollamaBaseUrl:
           type: string
+        openaiBaseUrl:
+          type: ["string", "null"]
         lastIngestedAt:
           type: ["string", "null"]
         notes:
@@ -675,7 +680,7 @@ components:
 
     ModelTestResult:
       type: object
-      required: [embeddingOk, generationOk, embeddingModel, generationModel, ollamaBaseUrl]
+      required: [embeddingOk, generationOk, embeddingModel, generationProvider, generationModel, ollamaBaseUrl]
       properties:
         embeddingOk:
           type: boolean
@@ -683,10 +688,15 @@ components:
           type: boolean
         embeddingModel:
           type: string
+        generationProvider:
+          type: string
+          enum: [ollama, openai]
         generationModel:
           type: string
         ollamaBaseUrl:
           type: string
+        openaiBaseUrl:
+          type: ["string", "null"]
         embeddingError:
           type: ["string", "null"]
         generationError:

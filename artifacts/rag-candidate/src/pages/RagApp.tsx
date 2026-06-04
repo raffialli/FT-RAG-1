@@ -13,6 +13,9 @@ import { Database, Search, FileText, BarChart3, Cpu } from "lucide-react";
 export default function RagApp() {
   const [activeTab, setActiveTab] = useState("query");
   const { data: status } = useGetRagStatus({ query: { queryKey: getGetRagStatusQueryKey(), refetchInterval: 15000 } });
+  const provider = status?.generationProvider === "openai" ? "OpenAI" : status?.generationProvider === "ollama" ? "Ollama" : null;
+  const embeddingModel = status?.embeddingModel ?? "Xenova/all-MiniLM-L6-v2";
+  const generationLabel = status && provider ? `${provider} / ${status.generationModel}` : "Generation model loading";
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -25,7 +28,9 @@ export default function RagApp() {
             </div>
             <div>
               <h1 className="text-sm font-semibold text-white leading-none">FalconTrust RAG Candidate</h1>
-              <p className="text-xs text-slate-400 mt-0.5">Hybrid retrieval · nomic-embed-text · qwen3.5:122b</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Hybrid retrieval · {embeddingModel} · {generationLabel}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -89,7 +94,7 @@ export default function RagApp() {
       <Separator className="bg-slate-800" />
       <footer className="max-w-7xl mx-auto px-4 py-3 text-xs text-slate-500 flex items-center justify-between">
         <span>FalconTrust RAG Experiment — Hybrid (dense + BM25) + Reranking</span>
-        <span>nomic-embed-text:latest · qwen3.5:122b · Ollama Cloud</span>
+        <span>{embeddingModel} · {generationLabel}</span>
       </footer>
     </div>
   );

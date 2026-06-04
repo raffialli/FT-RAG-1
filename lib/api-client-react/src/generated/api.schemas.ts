@@ -15,8 +15,11 @@ export interface RagStatus {
   vectorCount: number;
   ready: boolean;
   embeddingModel: string;
+  generationProvider: 'ollama' | 'openai';
   generationModel: string;
   ollamaBaseUrl: string;
+  /** @nullable */
+  openaiBaseUrl?: string | null;
   /** @nullable */
   lastIngestedAt?: string | null;
   notes?: string[];
@@ -240,8 +243,11 @@ export interface ModelTestResult {
   embeddingOk: boolean;
   generationOk: boolean;
   embeddingModel: string;
+  generationProvider: 'ollama' | 'openai';
   generationModel: string;
   ollamaBaseUrl: string;
+  /** @nullable */
+  openaiBaseUrl?: string | null;
   /** @nullable */
   embeddingError?: string | null;
   /** @nullable */
@@ -269,4 +275,3 @@ export type ListChunksParams = {
  */
 documentId?: string;
 };
-

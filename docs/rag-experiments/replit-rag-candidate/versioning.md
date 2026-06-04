@@ -1,6 +1,6 @@
 # FalconTrust RAG Candidate Versioning
 
-Current version: `v0.19.0`
+Current version: `v0.19.1`
 
 The active limited-client-test baseline branch is `candidate/client-test-ready`.
 
@@ -11,3 +11,5 @@ Version convention:
 - Patch: small UI, copy, or bug fix.
 
 Future branches should increment the version intentionally when user-facing behavior changes.
+
+`v0.19.1` applies final limited-client-test polish for community-engagement confidence and cautious climate-policy wording.

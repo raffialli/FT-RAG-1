@@ -172,7 +172,10 @@ export function assessEvidenceSufficiency(
   query = ""
 ): EvidenceSufficiency {
   if (chunks.length === 0) return "insufficient";
-  if (isSeverelyHedged(answer)) return "insufficient";
+  const strongCommunityEvidence = hasStrongCommunityEngagementEvidence(query, chunks);
+  if (isSeverelyHedged(answer)) {
+    return strongCommunityEvidence ? "partial" : "insufficient";
+  }
 
   const supportLevels = chunks.map((c) =>
     querySupportLevel(query, c.score, c.text, c.sectionPath)
@@ -254,8 +257,24 @@ export function assessConfidence(
     return { level: "insufficient", reason: "No evidence retrieved.", warnings };
   }
 
-  // 1. Severe hedging → cannot be high or medium
+  // 1. Severe hedging → cannot be high or medium unless the answer over-hedges
+  // a community-engagement result that has multiple strong JEM/network passages.
+  const strongCommunityEvidence = hasStrongCommunityEngagementEvidence(query, chunks);
   if (isSeverelyHedged(answer)) {
+    if (strongCommunityEvidence) {
+      warnings.push(
+        "Answer text over-hedges despite strong community engagement evidence; confidence capped at medium."
+      );
+    } else {
+      return {
+        level: "low",
+        reason: "LLM indicated the corpus does not contain sufficient information to answer.",
+        warnings: ["Answer text signals insufficient evidence despite chunks being retrieved."],
+      };
+    }
+  }
+
+  if (isSeverelyHedged(answer) && sufficiency === "insufficient") {
     return {
       level: "low",
       reason: "LLM indicated the corpus does not contain sufficient information to answer.",
@@ -277,6 +296,13 @@ export function assessConfidence(
     return {
       level: "low",
       reason: "Evidence sufficiency is weak (too few direct-score chunks); confidence capped at low.",
+      warnings,
+    };
+  }
+  if (isSeverelyHedged(answer) && strongCommunityEvidence) {
+    return {
+      level: "medium",
+      reason: "Strong community engagement evidence was retrieved, but the generated answer over-hedged; confidence capped at medium.",
       warnings,
     };
   }
@@ -559,7 +585,10 @@ function conceptSupportLevel(
       /\bsystematic outreach\b/.test(textLower) ||
       /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
       /\bstakeholder engagement\b/.test(textLower) ||
-      /\bcommunity networks?\b/.test(textLower)
+      /\bcommunity networks?\b/.test(textLower) ||
+      /\breliable networks?\b/.test(textLower) ||
+      /\binformation communication networks?\b/.test(textLower) ||
+      /\bsustained community engagement\b/.test(textLower)
     );
     const strongEngagementHits = countHits(textLower, [
       "community engagement", "engagement", "participat", "stakeholder",
@@ -620,8 +649,21 @@ function isExplicitCommunityEngagementEvidence(query: string, text: string): boo
     /\bcommunity engagement\b/.test(textLower) ||
     /\bsystematic outreach\b/.test(textLower) ||
     /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
-    /\bstakeholder engagement\b/.test(textLower)
+    /\bstakeholder engagement\b/.test(textLower) ||
+    /\breliable networks?\b/.test(textLower) ||
+    /\bcommunity networks?\b/.test(textLower) ||
+    /\binformation communication networks?\b/.test(textLower) ||
+    /\bvulnerable populations?.{0,120}communication networks?\b/.test(textLower) ||
+    /\bsustained community engagement\b/.test(textLower)
   );
+}
+
+function hasStrongCommunityEngagementEvidence(query: string, chunks: RetrievedChunk[]): boolean {
+  if (!isCommunityEngagementQuery(query)) return false;
+  const strongChunks = chunks.filter(
+    (c) => c.noiseScore < 0.5 && isExplicitCommunityEngagementEvidence(query, c.text)
+  );
+  return strongChunks.length >= 2;
 }
 
 function isValidatedSocioeconomicEvidence(queryLower: string, textLower: string): boolean {

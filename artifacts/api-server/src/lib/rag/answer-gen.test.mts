@@ -22,6 +22,7 @@ import {
   SCORE_DIRECT,
   SCORE_PARTIAL,
 } from "./scoring.ts";
+import { applyClimatePolicyCaution, climatePolicyInstruction } from "./answer-polish.ts";
 import { classifyChunkNoise } from "./chunk-classifier.ts";
 import { buildSourceProvenanceAliases, formatPageRange } from "./source-provenance-core.ts";
 import type { RetrievedChunk } from "./types.ts";
@@ -651,6 +652,43 @@ section("querySupportLevel — strict direct/partial/weak classification");
   const text = "Democratizing data collection and exchange requires a systematic outreach approach and community engagement sustained before, during, and after disaster while soliciting input from citizens and rescue operators.";
   assertEqual("Q3 community engagement JEM outreach source is direct support",
     querySupportLevel(query, SCORE_DIRECT + 0.08, text, "Discussion"), "direct");
+}
+
+{
+  const query = "What role does community engagement play in flood resilience?";
+  const ans = "The corpus does not contain sufficient information for a complete cross-context answer, but JEM 2024 shows systematic outreach and reliable community information networks [1][2].";
+  const chunks = [
+    makeChunk({ score: SCORE_DIRECT + 0.08, sourceFile: "jem.pdf", text: "Reliable information communication networks reaching vulnerable populations improve community preparedness and resilience." }),
+    makeChunk({ score: SCORE_DIRECT + 0.07, sourceFile: "jem.pdf", text: "A systematic outreach approach and sustained community engagement solicits input from citizens and rescue operators." }),
+    makeChunk({ score: SCORE_DIRECT + 0.04, sourceFile: "frm.pdf", text: "Local preparedness planning can improve flood resilience." }),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, ans, query);
+  const cv = validateCitations(ans, chunks);
+  const conf = assessConfidence(query, chunks, ans, cv, suf);
+  assertEqual("Q3 strong JEM engagement evidence is at least partial", suf, "partial");
+  assertEqual("Q3 strong JEM engagement evidence reaches medium", conf.level, "medium");
+}
+
+section("answer polish — climate policy attribution caution");
+
+{
+  const query = "How does climate change affect flood risk management policy?";
+  assert("Q4 climate query adds attribution instruction", climatePolicyInstruction(query).includes("Do not state or imply"));
+}
+
+{
+  const query = "How does climate change affect flood risk management policy?";
+  const answer = "Significant flood events linked to climate change, such as Superstorm Sandy, have catalyzed policy responses. Climate change-driven floods also require adaptation.";
+  const polished = applyClimatePolicyCaution(query, answer);
+  assert("Q4 polish removes named-event climate linkage", !/linked to climate change, such as Superstorm Sandy/i.test(polished));
+  assert("Q4 polish removes climate change-driven flood phrasing", !/climate change-driven floods/i.test(polished));
+  assert("Q4 polish preserves policy catalyst wording", /catalyzed policy responses/i.test(polished));
+}
+
+{
+  const query = "What methods are used for flood forecasting and early warning systems?";
+  const answer = "Significant flood events linked to climate change, such as Superstorm Sandy, have catalyzed policy responses.";
+  assertEqual("non-climate-policy answer is unchanged", applyClimatePolicyCaution(query, answer), answer);
 }
 
 {

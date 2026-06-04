@@ -17,6 +17,7 @@ import {
 } from "./scoring.js";
 import { isReferenceQuery } from "./chunk-classifier.js";
 import { buildAnswerSources } from "./source-provenance.js";
+import { applyClimatePolicyCaution, climatePolicyInstruction } from "./answer-polish.js";
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
@@ -56,13 +57,14 @@ export async function synthesizeAnswer(
     };
   }
 
+  const answer = applyClimatePolicyCaution(query, rawAnswer);
   const sources = buildAnswerSources(query, topChunks);
-  const citationVal = validateCitations(rawAnswer, topChunks, isReferenceQuery(query));
-  const sufficiency = assessEvidenceSufficiency(topChunks, rawAnswer, query);
-  const confidence = assessConfidence(query, topChunks, rawAnswer, citationVal, sufficiency);
+  const citationVal = validateCitations(answer, topChunks, isReferenceQuery(query));
+  const sufficiency = assessEvidenceSufficiency(topChunks, answer, query);
+  const confidence = assessConfidence(query, topChunks, answer, citationVal, sufficiency);
 
   return {
-    answer: rawAnswer,
+    answer,
     confidence: confidence.level,
     confidenceReason: confidence.reason,
     evidenceSufficiency: sufficiency,
@@ -103,7 +105,7 @@ INSTRUCTIONS:
 - If reference/bibliography evidence appears OCR-extracted, truncated, or garbled, state that the extracted reference list may be incomplete.
 - Do not invent facts not supported by the evidence.
 - Do not cite page numbers not present in the evidence.
-- Keep the answer focused and clear.
+- Keep the answer focused and clear.${climatePolicyInstruction(query)}
 
 ANSWER:`;
 }

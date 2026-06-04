@@ -67,8 +67,14 @@ router.get("/rag/status", async (req, res) => {
       vectorCount: index.records.length,
       ready: index.records.length > 0,
       embeddingModel: process.env.EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2",
-      generationModel: process.env.GENERATION_MODEL ?? "qwen3.5:397b",
+      generationProvider: process.env.GENERATION_PROVIDER === "openai" ? "openai" : "ollama",
+      generationModel: process.env.GENERATION_PROVIDER === "openai"
+        ? (process.env.OPENAI_GENERATION_MODEL ?? "gpt-4.1-mini")
+        : (process.env.GENERATION_MODEL ?? "qwen3.5:397b"),
       ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? "https://ollama.com",
+      openaiBaseUrl: process.env.GENERATION_PROVIDER === "openai"
+        ? (process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1")
+        : null,
       lastIngestedAt: lastIngestedDoc?.ingestedAt ?? null,
       notes,
     });

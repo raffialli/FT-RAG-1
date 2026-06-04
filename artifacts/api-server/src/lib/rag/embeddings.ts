@@ -1,6 +1,6 @@
 /**
  * Embeddings: Xenova/all-MiniLM-L6-v2 via @huggingface/transformers (local ONNX, ~23 MB q8)
- * Generation: Ollama Cloud /api/chat  (qwen3.5:397b or configured model)
+ * Generation: Ollama Cloud /api/chat or OpenAI Chat Completions
  *
  * Why this model:
  *  - nomic-embed-text-v1.5 (~135 MB) + ONNX Runtime initialization exceeds Replit's memory limit
@@ -59,9 +59,15 @@ export async function embedBatch(texts: string[]): Promise<number[][]> {
   return results;
 }
 
-// ── Ollama Cloud generation ───────────────────────────────────────────────────
+// ── Answer generation providers ───────────────────────────────────────────────
 
 const DEFAULT_BASE_URL = "https://ollama.com";
+const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
+type GenerationProvider = "ollama" | "openai";
+
+function generationProvider(): GenerationProvider {
+  return process.env.GENERATION_PROVIDER === "openai" ? "openai" : "ollama";
+}
 
 function ollamaConfig() {
   return {
@@ -78,7 +84,24 @@ function ollamaHeaders(): Record<string, string> {
   return h;
 }
 
-export async function generateAnswer(prompt: string, timeoutMs = 180000): Promise<string> {
+function openAIConfig() {
+  return {
+    baseUrl: (process.env.OPENAI_BASE_URL ?? DEFAULT_OPENAI_BASE_URL).replace(/\/$/, ""),
+    apiKey: process.env.OPENAI_API_KEY ?? "",
+    generationModel: process.env.OPENAI_GENERATION_MODEL ?? "gpt-4.1-mini",
+  };
+}
+
+function openAIHeaders(): Record<string, string> {
+  const { apiKey } = openAIConfig();
+  if (!apiKey) throw new Error("OPENAI_API_KEY is not configured");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${apiKey}`,
+  };
+}
+
+async function generateWithOllama(prompt: string, timeoutMs: number): Promise<string> {
   const { baseUrl, generationModel } = ollamaConfig();
   const response = await fetch(`${baseUrl}/api/chat`, {
     method: "POST",
@@ -102,6 +125,55 @@ export async function generateAnswer(prompt: string, timeoutMs = 180000): Promis
   return answer;
 }
 
+function extractOpenAIContent(data: { choices?: Array<{ message?: { content?: unknown } }> }): string {
+  const content = data.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content.trim();
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && "text" in part) {
+          const text = (part as { text?: unknown }).text;
+          return typeof text === "string" ? text : "";
+        }
+        return "";
+      })
+      .join("")
+      .trim();
+  }
+  return "";
+}
+
+async function generateWithOpenAI(prompt: string, timeoutMs: number): Promise<string> {
+  const { baseUrl, generationModel } = openAIConfig();
+  const response = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: openAIHeaders(),
+    body: JSON.stringify({
+      model: generationModel,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.15,
+      top_p: 0.9,
+      max_tokens: 1200,
+    }),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  if (!response.ok) {
+    const err = await response.text().catch(() => "");
+    throw new Error(`OpenAI chat failed ${response.status}: ${err}`);
+  }
+  const data = (await response.json()) as { choices?: Array<{ message?: { content?: unknown } }> };
+  const answer = extractOpenAIContent(data);
+  if (!answer) throw new Error("OpenAI returned empty generation");
+  return answer;
+}
+
+export async function generateAnswer(prompt: string, timeoutMs = 180000): Promise<string> {
+  return generationProvider() === "openai"
+    ? generateWithOpenAI(prompt, timeoutMs)
+    : generateWithOllama(prompt, timeoutMs);
+}
+
 // ── Connectivity test ─────────────────────────────────────────────────────────
 
 export async function testConnectivity(): Promise<{
@@ -111,11 +183,15 @@ export async function testConnectivity(): Promise<{
   generationError: string | null;
   embeddingDims: number | null;
   generationSample: string | null;
+  generationProvider: GenerationProvider;
   embeddingModel: string;
   generationModel: string;
   ollamaBaseUrl: string;
+  openaiBaseUrl: string | null;
 }> {
-  const { baseUrl, generationModel } = ollamaConfig();
+  const provider = generationProvider();
+  const ollama = ollamaConfig();
+  const openai = openAIConfig();
 
   let embeddingOk = false, embeddingError: string | null = null, embeddingDims: number | null = null;
   try {
@@ -135,8 +211,10 @@ export async function testConnectivity(): Promise<{
     embeddingOk, generationOk,
     embeddingError, generationError,
     embeddingDims, generationSample,
+    generationProvider: provider,
     embeddingModel: EMBED_MODEL,
-    generationModel,
-    ollamaBaseUrl: baseUrl,
+    generationModel: provider === "openai" ? openai.generationModel : ollama.generationModel,
+    ollamaBaseUrl: ollama.baseUrl,
+    openaiBaseUrl: provider === "openai" ? openai.baseUrl : null,
   };
 }

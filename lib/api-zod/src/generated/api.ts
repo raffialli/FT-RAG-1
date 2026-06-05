@@ -216,13 +216,22 @@ export const RagQueryResponse = zod.object({
   "warnings": zod.array(zod.string())
 }),
   "sources": zod.array(zod.object({
+  "title": zod.string(),
+  "documentId": zod.string(),
+  "document_id": zod.string(),
+  "document": zod.string(),
+  "source": zod.string(),
+  "page": zod.string().nullable(),
+  "pageRange": zod.string().nullable(),
   "sourceFile": zod.string(),
+  "rawFilename": zod.string(),
   "displayTitle": zod.string().nullish(),
   "pageStart": zod.number(),
   "pageEnd": zod.number(),
   "sectionPath": zod.string().nullish(),
   "snippet": zod.string(),
   "supportLevel": zod.string(),
+  "supportLabel": zod.string(),
   "score": zod.number().optional()
 })),
   "retrievedChunks": zod.array(zod.object({

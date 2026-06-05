@@ -114,25 +114,31 @@ export default function ReportsPanel() {
                               Sources ({report.candidateSources.length})
                             </p>
                             {(report.candidateSources as {
+                              title?: string;
+                              document?: string;
+                              source?: string;
                               sourceFile: string;
+                              page?: string | null;
+                              pageRange?: string | null;
                               pageStart: number;
                               pageEnd: number;
                               supportLevel: string;
+                              supportLabel?: string;
                             }[]).map((src, i) => (
                               <div
                                 key={i}
                                 className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/30 rounded px-2 py-1"
                               >
                                 <span className="font-mono">[{i + 1}]</span>
-                                <span className="truncate">{src.sourceFile}</span>
+                                <span className="truncate">{src.title ?? src.document ?? src.source ?? src.sourceFile}</span>
                                 <span className="text-slate-600 shrink-0">
-                                  p.{src.pageStart}
+                                  {src.pageRange ?? src.page ?? (src.pageStart === src.pageEnd ? `p. ${src.pageStart}` : `pp. ${src.pageStart}-${src.pageEnd}`)}
                                 </span>
                                 <span className={`shrink-0 ${
-                                  src.supportLevel === "direct" ? "text-emerald-400" :
-                                  src.supportLevel === "partial" ? "text-blue-400" : "text-amber-400"
+                                  (src.supportLabel ?? src.supportLevel) === "direct" ? "text-emerald-400" :
+                                  (src.supportLabel ?? src.supportLevel) === "partial" ? "text-blue-400" : "text-amber-400"
                                 }`}>
-                                  {src.supportLevel}
+                                  {src.supportLabel ?? src.supportLevel}
                                 </span>
                               </div>
                             ))}

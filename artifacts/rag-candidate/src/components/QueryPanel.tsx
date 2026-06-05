@@ -330,17 +330,20 @@ function CitationValidationRow({ cv, totalChunks }: { cv: CitationValidation; to
 }
 
 function SourceCard({ index, source }: { index: number; source: AnswerSource }) {
+  const supportLabel = source.supportLabel ?? source.supportLevel;
   const supportCls = {
     direct: "text-emerald-400",
     partial: "text-blue-400",
     weak: "text-amber-400",
-  }[source.supportLevel] ?? "text-slate-400";
+  }[supportLabel] ?? "text-slate-400";
 
-  const pageRange = source.pageStart === source.pageEnd
-    ? `p. ${source.pageStart}`
-    : `pp. ${source.pageStart}–${source.pageEnd}`;
+  const pageRange = source.pageRange ?? source.page ?? (
+    source.pageStart === source.pageEnd
+      ? `p. ${source.pageStart}`
+      : `pp. ${source.pageStart}-${source.pageEnd}`
+  );
 
-  const title = source.displayTitle ?? source.sourceFile;
+  const title = source.title ?? source.displayTitle ?? source.document ?? source.source ?? source.sourceFile;
 
   return (
     <div className="bg-slate-800/50 rounded p-3 space-y-2">
@@ -353,7 +356,7 @@ function SourceCard({ index, source }: { index: number; source: AnswerSource }) 
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-xs text-slate-500">{pageRange}</span>
-          <span className={`text-xs font-medium ${supportCls}`}>{source.supportLevel}</span>
+          <span className={`text-xs font-medium ${supportCls}`}>{supportLabel}</span>
           <span className="text-xs text-slate-600">{(source.score ?? 0).toFixed(4)}</span>
         </div>
       </div>

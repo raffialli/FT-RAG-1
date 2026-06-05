@@ -7,7 +7,17 @@
  */
 
 export interface AnswerSource {
+  title: string;
+  documentId: string;
+  document_id: string;
+  document: string;
+  source: string;
+  /** @nullable */
+  page: string | null;
+  /** @nullable */
+  pageRange: string | null;
   sourceFile: string;
+  rawFilename: string;
   displayTitle?: string | null;
   pageStart: number;
   pageEnd: number;
@@ -15,5 +25,6 @@ export interface AnswerSource {
   sectionPath?: string | null;
   snippet: string;
   supportLevel: string;
+  supportLabel: string;
   score?: number;
 }

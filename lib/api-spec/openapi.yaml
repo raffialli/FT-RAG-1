@@ -574,8 +574,11 @@ components:
 
     AnswerSource:
       type: object
-      required: [documentId, document_id, document, source, page, sourceFile, rawFilename, pageStart, pageEnd, snippet, supportLevel]
+      required: [title, documentId, document_id, document, source, page, pageRange, sourceFile, rawFilename, pageStart, pageEnd, snippet, supportLevel, supportLabel]
       properties:
+        title:
+          type: string
+          description: Friendly source title for client-facing provenance cards.
         documentId:
           type: string
         document_id:
@@ -590,6 +593,9 @@ components:
         page:
           type: ["string", "null"]
           description: Formatted page range, for example "p. 4" or "pp. 6-7".
+        pageRange:
+          type: ["string", "null"]
+          description: Formatted page range alias for clients that expect page-range provenance.
         sourceFile:
           type: string
         rawFilename:
@@ -608,6 +614,9 @@ components:
           type: string
         supportLevel:
           type: string
+        supportLabel:
+          type: string
+          description: Backward-compatible support label alias for public QA/source-card validators.
         score:
           type: number
 

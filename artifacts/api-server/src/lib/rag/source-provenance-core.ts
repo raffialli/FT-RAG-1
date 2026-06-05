@@ -1,9 +1,11 @@
 export interface SourceProvenanceAliases {
+  title: string;
   documentId: string;
   document_id: string;
   document: string;
   source: string;
   page: string | null;
+  pageRange: string | null;
   rawFilename: string;
 }
 
@@ -22,12 +24,15 @@ export function buildSourceProvenanceAliases(input: {
   pageEnd: number;
 }): SourceProvenanceAliases {
   const title = input.displayTitle || input.sourceFile;
+  const pageRange = formatPageRange(input.pageStart, input.pageEnd);
   return {
+    title,
     documentId: input.documentId,
     document_id: input.documentId,
     document: title,
     source: title,
-    page: formatPageRange(input.pageStart, input.pageEnd),
+    page: pageRange,
+    pageRange,
     rawFilename: input.sourceFile,
   };
 }

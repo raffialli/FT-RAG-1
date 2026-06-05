@@ -173,8 +173,9 @@ export function assessEvidenceSufficiency(
 ): EvidenceSufficiency {
   if (chunks.length === 0) return "insufficient";
   const strongCommunityEvidence = hasStrongCommunityEngagementEvidence(query, chunks);
+  const strongFirmEvidence = hasStrongFloodInsuranceMapEvidence(query, chunks);
   if (isSeverelyHedged(answer)) {
-    return strongCommunityEvidence ? "partial" : "insufficient";
+    return (strongCommunityEvidence || strongFirmEvidence) ? "partial" : "insufficient";
   }
 
   const supportLevels = chunks.map((c) =>
@@ -196,6 +197,9 @@ export function assessEvidenceSufficiency(
   const explicitCommunityChunks = chunks.filter((c) =>
     isExplicitCommunityEngagementEvidence(query, c.text)
   );
+  const firmDirectChunks = chunks.filter((c) =>
+    c.noiseScore < 0.72 && isDirectFloodInsuranceMapEvidence(query, c.text)
+  );
   const mixedEvidence =
     weakChunks.length > 0 ||
     (query ? partialChunks.length > 0 : partialChunks.length > directChunks.length);
@@ -210,6 +214,10 @@ export function assessEvidenceSufficiency(
     if (directChunks.length >= 2 || partialChunks.length >= 2) return "partial";
     if (directChunks.length >= 1 || partialChunks.length >= 1) return "weak";
     return "insufficient";
+  }
+
+  if (isFloodInsuranceMapQuery(query) && firmDirectChunks.length >= 2) {
+    return "partial";
   }
 
   if (
@@ -260,10 +268,11 @@ export function assessConfidence(
   // 1. Severe hedging → cannot be high or medium unless the answer over-hedges
   // a community-engagement result that has multiple strong JEM/network passages.
   const strongCommunityEvidence = hasStrongCommunityEngagementEvidence(query, chunks);
+  const strongFirmEvidence = hasStrongFloodInsuranceMapEvidence(query, chunks);
   if (isSeverelyHedged(answer)) {
-    if (strongCommunityEvidence) {
+    if (strongCommunityEvidence || strongFirmEvidence) {
       warnings.push(
-        "Answer text over-hedges despite strong community engagement evidence; confidence capped at medium."
+        "Answer text over-hedges despite strong retrieved evidence; confidence capped at medium."
       );
     } else {
       return {
@@ -299,10 +308,10 @@ export function assessConfidence(
       warnings,
     };
   }
-  if (isSeverelyHedged(answer) && strongCommunityEvidence) {
+  if (isSeverelyHedged(answer) && (strongCommunityEvidence || strongFirmEvidence)) {
     return {
       level: "medium",
-      reason: "Strong community engagement evidence was retrieved, but the generated answer over-hedged; confidence capped at medium.",
+      reason: "Strong evidence was retrieved, but the generated answer over-hedged; confidence capped at medium.",
       warnings,
     };
   }
@@ -524,6 +533,9 @@ export function querySupportLevel(
   ];
   if (isEwsQuery && physicalMitigationTerms.some((t) => textLower.includes(t))) return "partial";
 
+  const firmLevel = floodInsuranceMapSupportLevel(queryLower, textLower);
+  if (firmLevel) return firmLevel;
+
   const matchCount = queryWords.filter((w) => textLower.includes(w)).length;
   const overlapRatio = matchCount / queryWords.length;
 
@@ -662,6 +674,49 @@ function hasStrongCommunityEngagementEvidence(query: string, chunks: RetrievedCh
   if (!isCommunityEngagementQuery(query)) return false;
   const strongChunks = chunks.filter(
     (c) => c.noiseScore < 0.5 && isExplicitCommunityEngagementEvidence(query, c.text)
+  );
+  return strongChunks.length >= 2;
+}
+
+function isFloodInsuranceMapQuery(query: string): boolean {
+  const queryLower = query.toLowerCase();
+  return /\bflood insurance (?:rate )?maps?\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bspecial flood hazard\b/.test(queryLower) ||
+    (
+      /\bflood\b/.test(queryLower) &&
+      /\binsurance\b/.test(queryLower) &&
+      /\bmap|public|understand|awareness|risk communication\b/.test(queryLower)
+    );
+}
+
+function floodInsuranceMapSupportLevel(
+  queryLower: string,
+  textLower: string
+): "direct" | "partial" | "weak" | null {
+  if (!isFloodInsuranceMapQuery(queryLower)) return null;
+  if (isDirectFloodInsuranceMapText(textLower)) return "direct";
+  if (
+    /\bflood insurance\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bspecial flood hazard\b|\bpublic awareness\b|\bpublic participation\b|\bknowledge production\b/.test(textLower)
+  ) {
+    return "partial";
+  }
+  return "weak";
+}
+
+function isDirectFloodInsuranceMapEvidence(query: string, text: string): boolean {
+  return isFloodInsuranceMapQuery(query) && isDirectFloodInsuranceMapText(text.toLowerCase());
+}
+
+function isDirectFloodInsuranceMapText(textLower: string): boolean {
+  const mapHits = /\bflood insurance (?:rate )?maps?\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bspecial flood hazard\b/.test(textLower);
+  const problemHits =
+    /\bmisguided indication of flood risk\b|\black of public awareness\b|\bpublic understanding\b|\bmisunderstanding of flood risk\b|\bproactive flood risk behaviours\b|\bknowledge production\b|\bpublic is kept at arm's length\b|\blimits the public's ability\b|\bco-production\b|\bcommunity input\b|\bdoes not provide emergency managers with information necessary for estimating the social, economic, or environmental impact\b|\binsurance rates do not reflect the true risk\b/.test(textLower);
+  return mapHits && problemHits;
+}
+
+function hasStrongFloodInsuranceMapEvidence(query: string, chunks: RetrievedChunk[]): boolean {
+  if (!isFloodInsuranceMapQuery(query)) return false;
+  const strongChunks = chunks.filter(
+    (c) => c.noiseScore < 0.72 && isDirectFloodInsuranceMapText(c.text.toLowerCase())
   );
   return strongChunks.length >= 2;
 }

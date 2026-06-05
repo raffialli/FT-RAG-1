@@ -64,11 +64,13 @@ export interface RetrievedChunk extends RagChunk {
 }
 
 export interface AnswerSource {
+  title: string;
   documentId: string;
   document_id: string;
   document: string;
   source: string;
   page: string | null;
+  pageRange: string | null;
   sourceFile: string;
   rawFilename: string;
   displayTitle?: string;
@@ -77,6 +79,7 @@ export interface AnswerSource {
   sectionPath: string | null;
   snippet: string;
   supportLevel: "direct" | "partial" | "weak";
+  supportLabel: "direct" | "partial" | "weak";
   score: number;
 }
 

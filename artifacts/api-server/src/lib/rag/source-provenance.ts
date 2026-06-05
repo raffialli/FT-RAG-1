@@ -5,6 +5,7 @@ import { buildSourceProvenanceAliases } from "./source-provenance-core.js";
 
 export function buildAnswerSource(query: string, chunk: RetrievedChunk): AnswerSource {
   const displayTitle = getDisplayTitle(chunk.sourceFile);
+  const supportLevel = querySupportLevel(query, chunk.score, chunk.text, chunk.sectionPath);
   const provenance = buildSourceProvenanceAliases({
     documentId: chunk.documentId,
     sourceFile: chunk.sourceFile,
@@ -21,7 +22,8 @@ export function buildAnswerSource(query: string, chunk: RetrievedChunk): AnswerS
     pageEnd: chunk.pageEnd,
     sectionPath: chunk.sectionPath,
     snippet: chunk.text.substring(0, 300) + (chunk.text.length > 300 ? "..." : ""),
-    supportLevel: querySupportLevel(query, chunk.score, chunk.text, chunk.sectionPath),
+    supportLevel,
+    supportLabel: supportLevel,
     score: chunk.score,
   };
 }

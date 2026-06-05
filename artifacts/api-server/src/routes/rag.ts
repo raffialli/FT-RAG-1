@@ -137,11 +137,32 @@ router.delete("/rag/documents/:documentId", (req, res) => {
 
 // GET /api/rag/chunks
 router.get("/rag/chunks", (req, res) => {
-  const { documentId } = req.query as { documentId?: string };
+  const { documentId, search, limit } = req.query as {
+    documentId?: string;
+    search?: string;
+    limit?: string;
+  };
   const index = loadVectorIndex();
-  const records = documentId
+  let records = documentId
     ? index.records.filter((r) => r.documentId === documentId)
     : index.records;
+  const searchTerm = search?.trim().toLowerCase();
+  if (searchTerm) {
+    records = records.filter((r) =>
+      [
+        r.chunkId,
+        r.documentId,
+        r.sourceFile,
+        r.sectionPath,
+        r.text,
+      ].filter(Boolean).some((value) => String(value).toLowerCase().includes(searchTerm))
+    );
+  }
+  const parsedLimit = Number.parseInt(limit ?? "", 10);
+  const cappedLimit = Number.isFinite(parsedLimit)
+    ? Math.max(1, Math.min(parsedLimit, 200))
+    : records.length;
+  records = records.slice(0, cappedLimit);
 
   res.json(
     records.map((r) => ({

@@ -255,6 +255,20 @@ function conceptRescueSearch(
     );
   }
 
+  if (isFloodInsuranceMapQuery(queryLower)) {
+    addIf((_, textLower, sourceLower) =>
+      (
+        sourceLower.includes("flood_risk_management") &&
+        isFirmChapterEvidence(textLower)
+      ) ||
+      (
+        sourceLower.includes("jem_v3n2") &&
+        /\bflood insurance rate maps?\b|\bfirms?\b|\bhazus-mh\b/.test(textLower) &&
+        /\bsocial, economic, or environmental impact\b|\bvisible illustration\b|\bmore detailed illustration\b/.test(textLower)
+      )
+    );
+  }
+
   const seen = new Set<string>();
   return rescues
     .filter(({ record }) => {
@@ -480,6 +494,26 @@ function rerankResults(
         }
       }
 
+      if (isFloodInsuranceMapQuery(queryLower)) {
+        const isFrmBook = sourceLower.includes("flood_risk_management");
+        const isHazusFirm = sourceLower.includes("jem_v3n2");
+        if (isFrmBook && isFirmChapterEvidence(textLower)) adjustment += 0.34;
+        if (isFirmProblemEvidence(textLower)) adjustment += 0.18;
+        if (
+          isHazusFirm &&
+          /\bflood insurance rate maps?\b|\bfirms?\b/.test(textLower) &&
+          /\bsocial, economic, or environmental impact\b|\bvisible illustration\b/.test(textLower)
+        ) {
+          adjustment += 0.18;
+        }
+        if (
+          /\bflood insurance\b/.test(textLower) &&
+          !/\bflood insurance maps?\b|\bflood insurance rate maps?\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bpublic understanding\b|\bpublic awareness\b/.test(textLower)
+        ) {
+          adjustment -= 0.12;
+        }
+      }
+
       const rerankScore = adjustment;
 
       return {
@@ -623,4 +657,25 @@ function recordToRetrievedChunk(r: ScoredRecord): RetrievedChunk {
     noiseCategory: r.noiseCategory,
     retrievalMethod: "hybrid-rrf",
   };
+}
+
+function isFloodInsuranceMapQuery(queryLower: string): boolean {
+  return /\bflood insurance (?:rate )?maps?\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bspecial flood hazard\b/.test(queryLower) ||
+    (
+      /\bflood\b/.test(queryLower) &&
+      /\binsurance\b/.test(queryLower) &&
+      /\bmap|public|understand|awareness|risk communication\b/.test(queryLower)
+    );
+}
+
+function isFirmChapterEvidence(textLower: string): boolean {
+  return (
+    /\bflood insurance (?:rate )?maps?\b|\bfirms?\b|\bnfip\b|\brisk map\b|\bspecial flood hazard\b/.test(textLower)
+  ) && (
+    /\bpublic awareness\b|\bpublic understanding\b|\bmisunderstanding of flood risk\b|\bmisguided indication of flood risk\b|\bknowledge production\b|\bco-production\b|\bcommunity input\b|\bproactive flood risk behaviours\b|\bpublic participation\b/.test(textLower)
+  );
+}
+
+function isFirmProblemEvidence(textLower: string): boolean {
+  return /\bmisguided indication of flood risk\b|\black of public awareness\b|\bmisunderstanding of flood risk\b|\bpublic is kept at arm's length\b|\blimits the public's ability\b|\bdoes not provide emergency managers with information necessary for estimating the social, economic, or environmental impact\b|\binsurance rates do not reflect the true risk\b/.test(textLower);
 }

@@ -125,8 +125,10 @@ section("source provenance metadata");
   assertEqual("document_id alias is exposed", source.document_id, "JEM_2024_Special_Issue_1780399724235_pdf");
   assertEqual("friendly document alias is exposed", source.document, "JEM 2024 Special Issue");
   assertEqual("friendly source alias is exposed", source.source, "JEM 2024 Special Issue");
+  assertEqual("title alias is exposed", source.title, "JEM 2024 Special Issue");
   assertEqual("rawFilename alias is preserved", source.rawFilename, "JEM_2024_Special_Issue_1780399724235.pdf");
   assertEqual("page alias is formatted", source.page, "pp. 6-7");
+  assertEqual("pageRange alias is formatted", source.pageRange, "pp. 6-7");
 }
 
 assertEqual("single page format", formatPageRange(4, 4), "p. 4");
@@ -645,6 +647,28 @@ section("querySupportLevel — strict direct/partial/weak classification");
   const text = "The literature supports that low-income status (poverty) is a leading variable of global vulnerability. People living in poverty are particularly vulnerable to flood and drought shocks.";
   assertEqual("Q5 socioeconomic Wood poverty source is direct support",
     querySupportLevel(query, SCORE_DIRECT + 0.08, text, "Finding"), "direct");
+}
+
+{
+  const query = "What problems do flood insurance rate maps create for public understanding of flood risk?";
+  const firmText = "Recent legislative reforms to the NFIP have sought to improve the accuracy of flood insurance rate maps (FIRMs), which are the centrepiece of the program. Political pressures have restricted adoption and enforcement of FIRMs that reflect actuarial risk. Thus, the NFIP's key risk-communication and decision-making support tool offers a misguided indication of flood risk to communities, and lack of public awareness and understanding is how the NFIP falters.";
+  const riskMapText = "Risk MAP aims to provide higher-quality data to vulnerable populations to raise public awareness and improve mitigation strategies, but community input is limited and FIRMs are developed outside the proximity of the relevant community.";
+  assertEqual("out-of-sample FIRM/NFIP passage is direct despite Reference label",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, firmText, "Reference"), "direct");
+  assertEqual("out-of-sample Risk MAP community-input passage is direct",
+    querySupportLevel(query, SCORE_DIRECT + 0.08, riskMapText, "Reference"), "direct");
+
+  const hedged = "The corpus does not contain sufficient information to answer this question.";
+  const chunks = [
+    makeChunk({ score: SCORE_DIRECT + 0.08, sourceFile: "Flood_Risk_Management-OCR_1780399724237.pdf", sectionPath: "Reference", text: firmText, noiseScore: 0.68 }),
+    makeChunk({ score: SCORE_DIRECT + 0.07, sourceFile: "Flood_Risk_Management-OCR_1780399724237.pdf", sectionPath: "Reference", text: riskMapText, noiseScore: 0.68 }),
+    makeChunk({ score: SCORE_DIRECT + 0.06, sourceFile: "bdevito67,+JEM_V3N2_3_1780399724236.pdf", sectionPath: "Introduction", text: "Flood insurance rate maps provide a visible illustration of the geographic extent of flooding but do not provide emergency managers with information necessary for estimating the social, economic, or environmental impact of a flood hazard." }),
+  ];
+  const suf = assessEvidenceSufficiency(chunks, hedged, query);
+  const cv = validateCitations("Relevant map evidence is available [1][2][3].", chunks);
+  const conf = assessConfidence(query, chunks, hedged, cv, suf);
+  assertEqual("out-of-sample FIRM false-insufficient is corrected to partial", suf, "partial");
+  assertEqual("out-of-sample FIRM over-hedge reaches medium confidence", conf.level, "medium");
 }
 
 {

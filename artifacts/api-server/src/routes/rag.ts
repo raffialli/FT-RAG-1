@@ -388,20 +388,68 @@ router.post("/rag/query", async (req, res) => {
     const tracePath = persistTraceIfEnabled(trace, traceConfig);
     if (tracePath) trace.warnings.push(`Trace persisted to ${tracePath}`);
     const langSmithConfig = getLangSmithExportConfig();
+    const langSmithEndpointHost = endpointHost(langSmithConfig.endpoint);
     if (langSmithConfig.enabled) {
+      req.log.info(
+        {
+          traceId: trace.traceId,
+          project: langSmithConfig.project,
+          endpointHost: langSmithEndpointHost,
+          includeText: langSmithConfig.includeText,
+          workspaceConfigured: Boolean(langSmithConfig.workspaceId),
+        },
+        "LangSmith RAG trace export invoked"
+      );
       void exportTraceToLangSmith(trace, { config: langSmithConfig }).then((exportResult) => {
-        if (!exportResult.success) {
+        if (exportResult.success) {
+          req.log.info(
+            {
+              traceId: trace.traceId,
+              runId: exportResult.runId,
+              httpStatus: exportResult.httpStatus,
+              project: langSmithConfig.project,
+              endpointHost: langSmithEndpointHost,
+              workspaceConfigured: Boolean(langSmithConfig.workspaceId),
+            },
+            "LangSmith RAG trace export succeeded"
+          );
+        } else {
           req.log.warn(
-            { traceId: trace.traceId, runId: exportResult.runId, error: exportResult.error },
+            {
+              traceId: trace.traceId,
+              runId: exportResult.runId,
+              httpStatus: exportResult.httpStatus,
+              project: langSmithConfig.project,
+              endpointHost: langSmithEndpointHost,
+              workspaceConfigured: Boolean(langSmithConfig.workspaceId),
+              error: exportResult.error,
+            },
             "LangSmith RAG trace export failed"
           );
         }
       }).catch((error) => {
         req.log.warn(
-          { traceId: trace.traceId, error: error instanceof Error ? error.message : String(error) },
+          {
+            traceId: trace.traceId,
+            project: langSmithConfig.project,
+            endpointHost: langSmithEndpointHost,
+            workspaceConfigured: Boolean(langSmithConfig.workspaceId),
+            error: error instanceof Error ? error.message : String(error),
+          },
           "LangSmith RAG trace export threw unexpectedly"
         );
       });
+    } else {
+      req.log.info(
+        {
+          traceId: trace.traceId,
+          project: langSmithConfig.project,
+          endpointHost: langSmithEndpointHost,
+          workspaceConfigured: Boolean(langSmithConfig.workspaceId),
+          missing: langSmithConfig.missing,
+        },
+        "LangSmith RAG trace export disabled"
+      );
     }
 
     const result = {
@@ -535,3 +583,11 @@ function removeTempUploadIfSafe(filePath: string): void {
 }
 
 export default router;
+
+function endpointHost(endpoint: string): string {
+  try {
+    return new URL(endpoint).host;
+  } catch {
+    return "invalid-endpoint";
+  }
+}

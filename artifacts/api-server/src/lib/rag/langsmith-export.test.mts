@@ -136,6 +136,7 @@ section("payload privacy");
       enabled: true,
       endpoint: "https://api.smith.langchain.com",
       project: "falcontrust-rag-candidate",
+      workspaceId: null,
       includeText: false,
       timeoutMs: 2500,
       missing: [],
@@ -156,6 +157,7 @@ section("text opt-in");
       enabled: true,
       endpoint: "https://api.smith.langchain.com",
       project: "falcontrust-rag-candidate",
+      workspaceId: null,
       includeText: true,
       timeoutMs: 2500,
       missing: [],
@@ -173,6 +175,7 @@ section("failure containment");
       enabled: true,
       endpoint: "https://api.smith.langchain.com",
       project: "falcontrust-rag-candidate",
+      workspaceId: null,
       includeText: false,
       timeoutMs: 2500,
       missing: [],
@@ -184,7 +187,8 @@ section("failure containment");
       return { ok: false, status: 500 } as Response;
     },
   });
-  assert("failed export returns a non-throwing failure result", result.attempted && !result.success);
+  assert("failed export returns a non-throwing failure result",
+    result.attempted && !result.success && result.httpStatus === 500);
 }
 
 console.log(`\n${"-".repeat(60)}`);

@@ -8,6 +8,7 @@ export interface LangSmithExportConfig {
   enabled: boolean;
   endpoint: string;
   project: string | null;
+  workspaceId: string | null;
   includeText: boolean;
   timeoutMs: number;
   missing: string[];
@@ -17,6 +18,7 @@ export interface LangSmithExportResult {
   attempted: boolean;
   success: boolean;
   runId: string | null;
+  httpStatus?: number;
   error?: string;
 }
 
@@ -31,6 +33,7 @@ export function getLangSmithExportConfig(env: NodeJS.ProcessEnv = process.env): 
     enabled: missing.length === 0,
     endpoint: (env.LANGSMITH_ENDPOINT ?? DEFAULT_ENDPOINT).replace(/\/$/, ""),
     project: env.LANGSMITH_PROJECT ?? null,
+    workspaceId: env.LANGSMITH_WORKSPACE_ID ?? env.LANGCHAIN_WORKSPACE_ID ?? null,
     includeText: envFlag(env.RAG_TRACE_INCLUDE_TEXT),
     timeoutMs: parseTimeout(env.RAG_LANGSMITH_TIMEOUT_MS),
     missing,
@@ -59,6 +62,7 @@ export async function exportTraceToLangSmith(
       headers: {
         "Content-Type": "application/json",
         "x-api-key": env.LANGSMITH_API_KEY ?? "",
+        ...(config.workspaceId ? { "x-tenant-id": config.workspaceId } : {}),
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
@@ -68,10 +72,11 @@ export async function exportTraceToLangSmith(
         attempted: true,
         success: false,
         runId,
-        error: `LangSmith export failed with HTTP ${response.status}`,
+        httpStatus: response.status,
+        error: langSmithHttpError(response.status, config),
       };
     }
-    return { attempted: true, success: true, runId };
+    return { attempted: true, success: true, runId, httpStatus: response.status };
   } catch (error) {
     return {
       attempted: true,
@@ -82,6 +87,13 @@ export async function exportTraceToLangSmith(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function langSmithHttpError(status: number, config: LangSmithExportConfig): string {
+  if (status === 403 && !config.workspaceId) {
+    return "LangSmith export failed with HTTP 403. If this API key is scoped to, or can access, multiple workspaces, set LANGSMITH_WORKSPACE_ID.";
+  }
+  return `LangSmith export failed with HTTP ${status}`;
 }
 
 export function buildLangSmithRunPayload(

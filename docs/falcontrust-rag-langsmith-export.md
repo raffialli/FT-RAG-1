@@ -13,6 +13,13 @@ export LANGSMITH_API_KEY="<service-key>"
 export LANGSMITH_PROJECT="falcontrust-rag-candidate"
 ```
 
+If the API key is scoped to a workspace or can access multiple workspaces,
+also set the workspace/tenant id:
+
+```bash
+export LANGSMITH_WORKSPACE_ID="<workspace-id>"
+```
+
 For non-US LangSmith regions, also set:
 
 ```bash
@@ -55,6 +62,7 @@ By default, LangSmith does not receive:
 - full selected excerpts
 - Basic Auth credentials
 - API keys
+- workspace ids
 - local filesystem paths
 - runtime corpus files or uploads
 
@@ -96,3 +104,7 @@ LangSmith export is separate from eval pass/fail. Use LangSmith to inspect trace
 ## Failure Handling
 
 Export is non-blocking. The app posts the sanitized run to LangSmith in the background. HTTP errors, timeouts, or network failures are logged as warnings with trace id/run id only; they do not change the user-facing RAG answer.
+
+If exports return HTTP 403 while `LANGSMITH_API_KEY` is present, verify that
+`LANGSMITH_WORKSPACE_ID` is configured for workspace-scoped or multi-workspace
+API keys.

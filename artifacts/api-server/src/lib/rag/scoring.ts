@@ -542,8 +542,11 @@ export function querySupportLevel(
   const conceptLevel = conceptSupportLevel(queryLower, textLower);
   if (conceptLevel === "weak") return "weak";
   if (conceptLevel === "partial") return "partial";
-  if (conceptLevel === "direct" && isValidatedSocioeconomicEvidence(queryLower, textLower)) {
-    return "direct";
+  if (conceptLevel === "direct") {
+    if (!/\bsocioeconomic|socio-economic|vulnerability|poverty|income|housing/i.test(queryLower) ||
+      isValidatedSocioeconomicEvidence(queryLower, textLower)) {
+      return "direct";
+    }
   }
 
   // Require ≥4 matching terms OR ≥45% overlap to keep "direct".
@@ -594,20 +597,25 @@ function conceptSupportLevel(
   if (isCommunityEngagementQuery(queryLower)) {
     const explicitDirect = (
       /\bcommunity engagement\b/.test(textLower) ||
+      /\bpublic engagement\b/.test(textLower) ||
+      /\bpublic participation\b/.test(textLower) ||
       /\bsystematic outreach\b/.test(textLower) ||
       /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
       /\bstakeholder engagement\b/.test(textLower) ||
       /\bcommunity networks?\b/.test(textLower) ||
+      /\bcommunity partners?\b/.test(textLower) ||
+      /\blocal knowledge\b/.test(textLower) ||
       /\breliable networks?\b/.test(textLower) ||
       /\binformation communication networks?\b/.test(textLower) ||
       /\bsustained community engagement\b/.test(textLower)
     );
     const strongEngagementHits = countHits(textLower, [
       "community engagement", "engagement", "participat", "stakeholder",
-      "outreach", "solicit", "input", "collaborat",
+      "outreach", "solicit", "input", "collaborat", "local knowledge",
     ]);
     const peopleHits = countHits(textLower, [
-      "citizen", "resident", "volunteer", "community", "experience",
+      "citizen", "resident", "volunteer", "community", "public", "people",
+      "lay people", "experience",
     ]);
     const backgroundHits = countHits(textLower, [
       "community", "local", "preparedness", "network", "communication", "vulnerable",
@@ -651,7 +659,7 @@ function countHits(textLower: string, terms: string[]): number {
 }
 
 function isCommunityEngagementQuery(query: string): boolean {
-  return /\bcommunity engagement|engagement|participation|local communit|stakeholder/i.test(query);
+  return /\bcommunity engagement|engagement|participation|public engagement|public participation|local communit|stakeholder|local knowledge/i.test(query);
 }
 
 function isExplicitCommunityEngagementEvidence(query: string, text: string): boolean {
@@ -659,11 +667,15 @@ function isExplicitCommunityEngagementEvidence(query: string, text: string): boo
   const textLower = text.toLowerCase();
   return (
     /\bcommunity engagement\b/.test(textLower) ||
+    /\bpublic engagement\b/.test(textLower) ||
+    /\bpublic participation\b/.test(textLower) ||
     /\bsystematic outreach\b/.test(textLower) ||
     /\bsolicit(?:ing)? (?:the )?input\b/.test(textLower) ||
     /\bstakeholder engagement\b/.test(textLower) ||
     /\breliable networks?\b/.test(textLower) ||
     /\bcommunity networks?\b/.test(textLower) ||
+    /\bcommunity partners?\b/.test(textLower) ||
+    /\blocal knowledge\b/.test(textLower) ||
     /\binformation communication networks?\b/.test(textLower) ||
     /\bvulnerable populations?.{0,120}communication networks?\b/.test(textLower) ||
     /\bsustained community engagement\b/.test(textLower)

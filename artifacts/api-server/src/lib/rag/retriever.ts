@@ -300,15 +300,15 @@ function conceptRescueSearch(
     );
   }
 
-  if (/\bcommunity engagement|community participation|local communit|stakeholder|outreach\b/i.test(queryLower)) {
+  if (/\bcommunity engagement|community participation|public engagement|public participation|local communit|stakeholder|outreach|local knowledge\b/i.test(queryLower)) {
     addIf((_, textLower, sourceLower) =>
       (
         sourceLower.includes("jem_2024_special_issue") &&
-        /\bsystematic outreach\b|\bcommunity engagement\b|\breliable networks?\b|\bcommunity networks?\b|\bsolicit(?:ing)? (?:the )?input\b/.test(textLower)
+        /\bsystematic outreach\b|\bcommunity engagement\b|\bpublic engagement\b|\bpublic participation\b|\breliable networks?\b|\bcommunity networks?\b|\bcommunity partners?\b|\bsolicit(?:ing)? (?:the )?input\b|\blocal knowledge\b/.test(textLower)
       ) ||
       (
         sourceLower.includes("flood_risk_management") &&
-        /\bco-production\b|\blocal knowledge\b|\blay publics?\b|\btwo-way process\b|\btrust\b/.test(textLower)
+        /\bco-production\b|\blocal knowledge\b|\blay publics?\b|\bpublic engagement\b|\bpublic participation\b|\btwo-way process\b|\btrust\b/.test(textLower)
       )
     );
   }
@@ -486,17 +486,17 @@ function rerankResults(
       const sourceLower = c.record.sourceFile.toLowerCase();
 
       const isCommunityEngagementQuery =
-        /\bcommunity engagement|community participation|local communit|stakeholder|outreach\b/i.test(query);
+        /\bcommunity engagement|community participation|public engagement|public participation|local communit|stakeholder|outreach|local knowledge\b/i.test(query);
       if (isCommunityEngagementQuery) {
         const isJem2024 = sourceLower.includes("jem_2024_special_issue");
         const isWood = sourceLower.includes("jem_20-8-08-wood-practical");
         const isFrm = sourceLower.includes("flood_risk_management");
         const jemEngagement =
-          /\bsystematic outreach\b|\bcommunity engagement\b|\breliable networks?\b|\bcommunity networks?\b|\bsolicit(?:ing)? (?:the )?input\b/i.test(text);
+          /\bsystematic outreach\b|\bcommunity engagement\b|\bpublic engagement\b|\bpublic participation\b|\breliable networks?\b|\bcommunity networks?\b|\bcommunity partners?\b|\bsolicit(?:ing)? (?:the )?input\b|\blocal knowledge\b/i.test(text);
         const localOrgEngagement =
           /\bcommunity[- ]?and faith[- ]?based organizations?\b|\beffective relationships with community\b|\btrusted organizations?\b|\bvolunteers?\b/i.test(text);
         const frmEngagement =
-          /\bco-production\b|\blocal knowledge\b|\blay publics?\b|\btwo-way process\b|\btrust\b/i.test(text);
+          /\bco-production\b|\blocal knowledge\b|\blay publics?\b|\bpublic engagement\b|\bpublic participation\b|\btwo-way process\b|\btrust\b/i.test(text);
 
         if (isJem2024 && jemEngagement) adjustment += 0.18;
         if (isWood && localOrgEngagement) adjustment += 0.10;

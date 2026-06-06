@@ -160,27 +160,42 @@ export function exactPhraseSearch(query: string, records: VectorRecord[]): BM25R
 }
 
 export function matchesNormalizedSearch(search: string, values: Array<string | null | undefined>): boolean {
+  return scoreNormalizedSearch(search, values) > 0;
+}
+
+export function scoreNormalizedSearch(search: string, values: Array<string | null | undefined>): number {
   const normalizedSearch = normalizeForSearch(search).trim();
-  if (!normalizedSearch) return true;
+  if (!normalizedSearch) return 1;
 
   const haystack = normalizeForSearch(values.filter(Boolean).join(" "));
-  if (haystack.includes(normalizedSearch)) return true;
+  if (haystack.includes(normalizedSearch)) return 100 + normalizedSearch.length / 1000;
 
   const asksForEvent = /\bearthquakes?|quakes?|floods?|storms?|hurricanes?|wildfires?|disasters?\b/.test(normalizedSearch);
   const asksForMagnitude = /\bmagnitudes?|mw|richter\b/.test(normalizedSearch);
   const hasEvent = /\bearthquakes?|quakes?|floods?|storms?|hurricanes?|wildfires?|disasters?\b/.test(haystack);
-  const hasMagnitudeEvidence = /\bmw\b|\bmagnitude\b|\b\d+(?:\.\d+)?\b/.test(haystack);
+  const hasExplicitMagnitudeEvidence =
+    /\bmw\b|\bmagnitude\b|\brichter\b|\bM\s*w\s*[=:]?\s*\d+(?:\.\d+)?\b/i.test(haystack);
+  const hasDecimalMagnitudeEvidence = /\b\d\.\d\b/.test(haystack);
+  const hasMagnitudeEvidence = hasExplicitMagnitudeEvidence || hasDecimalMagnitudeEvidence;
+  let score = 0;
   if (asksForEvent && asksForMagnitude && hasEvent && hasMagnitudeEvidence) {
-    return true;
+    score += hasExplicitMagnitudeEvidence ? 8 : 4;
+    if (/\bmw\b|\brichter\b/.test(haystack)) score += 3;
+    if (/\bmagnitude\b/.test(haystack)) score += 2;
+    if (/\b\d\.\d\b/.test(haystack)) score += 2;
+    if (/\bpazarcik|pazarcık|elbistan|kahramanmaras|kahramanmaraş|turkiye|türkiye\b/.test(haystack)) score += 3;
   }
 
   const queryTokens = [...new Set(tokenize(search).filter((token) => token.length > 2 || /\d/.test(token)))];
-  if (queryTokens.length === 0) return false;
+  if (queryTokens.length === 0) return score;
 
   const haystackTokens = new Set(tokenize(haystack));
   const matchCount = queryTokens.filter((token) =>
     haystackTokens.has(token) || haystack.includes(token)
   ).length;
   const requiredMatches = Math.max(2, Math.min(4, Math.ceil(queryTokens.length * 0.5)));
-  return matchCount >= requiredMatches;
+  if (matchCount >= requiredMatches) {
+    score += matchCount + matchCount / queryTokens.length;
+  }
+  return score;
 }

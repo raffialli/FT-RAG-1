@@ -1,7 +1,9 @@
 import { build } from "esbuild";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { bm25Search, exactPhraseSearch, matchesNormalizedSearch, normalizeForSearch, tokenize } from "./bm25.ts";
+import { bm25Search, exactPhraseSearch, matchesNormalizedSearch, normalizeForSearch, scoreNormalizedSearch, tokenize } from "./bm25.ts";
+import { classifyChunkNoise } from "./chunk-classifier.ts";
+import { querySupportLevel, SCORE_DIRECT } from "./scoring.ts";
 import { selectRelevantExcerpt } from "./prompt-context.ts";
 import { isLikelyPdfUpload, safePdfUploadFilename, uniquePdfUploadFilename } from "./upload-safety.ts";
 import { isCandidateIndexResetAllowed } from "./destructive-action-safety.ts";
@@ -168,6 +170,68 @@ section("diagnostic chunk search matching");
     matchesNormalizedSearch("Pazarcık earthquakes magnitudes locations", [answerText]));
   assert("diagnostic search rejects unrelated chunks",
     !matchesNormalizedSearch("earthquake magnitude location", ["South Sudan flood mitigation and community preparedness."]));
+}
+
+section("diagnostic chunk search ranking");
+
+{
+  const noisyContext =
+    "Flood policy process in Jakarta 79 A revolving door of policy evolution 91 Flood insurance maps and the US National Flood Insurance Program 177.";
+  const answerText =
+    "Geotechnical reconnaissance of the February 6, 2023, Pazarcik Mw = 7.7 and Elbistan Mw = 7.6, Kahramanmaras-Turkiye earthquakes.";
+  const noisyScore = scoreNormalizedSearch("earthquake magnitude location", ["Flood Risk Management.pdf", noisyContext]);
+  const answerScore = scoreNormalizedSearch("earthquake magnitude location", ["JEM May-June 2025.pdf", answerText]);
+  assert("diagnostic ranking scores answer-bearing numeric/entity evidence above broad event/noise matches",
+    answerScore > noisyScore,
+    `answerScore=${answerScore}, noisyScore=${noisyScore}`);
+
+  const broadDisasterResponse =
+    "Of pre- and post-disaster management and recovery for the Turkey and Syria earthquakes of February 2023. Fourth, embracing technology and innovation can improve disaster response operations, including satellite imaging and real-time data.";
+  const unrelatedMethod =
+    "First, we contacted potential interviewees by letter. Second, we made follow-up phone calls to determine interest and set times and places for interviews. Third, we conducted the interview.";
+  const broadScore = scoreNormalizedSearch("earthquake magnitude location", ["JEM May-June 2025.pdf", broadDisasterResponse]);
+  const methodScore = scoreNormalizedSearch("earthquake magnitude location", ["JEM interview methods", unrelatedMethod]);
+  assert("diagnostic ranking prefers explicit Mw magnitude/location chunk over broad earthquake response text",
+    answerScore > broadScore,
+    `answerScore=${answerScore}, broadScore=${broadScore}`);
+  assert("diagnostic ranking prefers explicit Mw magnitude/location chunk over unrelated ordinal/method text",
+    answerScore > methodScore,
+    `answerScore=${answerScore}, methodScore=${methodScore}`);
+}
+
+section("retrieval-time noise classification");
+
+{
+  const inlineIndex =
+    "INDEX Flood Risk Management accountability 7-10 actor mapping 43-8 adaptation 43-57 advocacy coalition framework 79 flood insurance maps 177 local knowledge 201 vulnerability 222 warning systems 132.";
+  const inlineToc =
+    "POLICY AND IMPLEMENTATION 7 Flood policy process in Jakarta, Indonesia 79 A revolving door of policy evolution 91 Policy belief change and learning 103 Emergency intentional flooding 141 Flood insurance maps 177 The effect of public engagement 201";
+  const authorBio =
+    "Her research centres on legal geographies of mineral exploration in the Canadian Arctic. Matilda previously worked as a research assistant on a public engagement project for flood risk management in Yorkshire, England. She graduated from the University of Oxford with an MSc in Water Science, Policy and Management.";
+  assert("inline OCR subject indexes are classified as TOC/noise",
+    classifyChunkNoise(inlineIndex, "Introduction").noiseScore >= 0.72);
+  assert("inline OCR tables of contents are classified as TOC/noise",
+    classifyChunkNoise(inlineToc, null).noiseScore >= 0.72);
+  assert("author bio/frontmatter engagement mentions are classified as noise",
+    classifyChunkNoise(authorBio, null).noiseScore >= 0.72);
+}
+
+section("community engagement synonym support");
+
+{
+  const query = "What role does community engagement play in flood resilience?";
+  const publicEngagement =
+    "Public engagement techniques are used to enhance flood risk communication between experts and lay people, build trust in risk-analysis decisions, and avoid alienating participants.";
+  const localKnowledge =
+    "The project used a bottom-up survey to incorporate local knowledge from citizens and rescue operators into a decision-support knowledge base.";
+  const outreach =
+    "A systematic outreach approach and sustained community engagement solicits input from citizens and rescue operators before, during, and after disaster.";
+  assert("public engagement is direct support for community-engagement query",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, publicEngagement) === "direct");
+  assert("local knowledge is direct support for community-engagement query",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, localKnowledge) === "direct");
+  assert("systematic outreach remains direct community-engagement support",
+    querySupportLevel(query, SCORE_DIRECT + 0.05, outreach) === "direct");
 }
 
 section("upload filename safety");

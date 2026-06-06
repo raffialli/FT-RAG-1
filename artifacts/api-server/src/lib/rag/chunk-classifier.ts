@@ -111,7 +111,8 @@ export function classifyChunkNoise(
   if (
     /Copyright.*\d{4}|All rights reserved|Weston Medical Publishing/i.test(trimmed) ||
     saWestonStandalone ||
-    /\bEditor(?:ial)?\s+(?:Board|in\s+Chief|Advisory)/i.test(trimmed)
+    /\bEditor(?:ial)?\s+(?:Board|in\s+Chief|Advisory)/i.test(trimmed) ||
+    /\b(research centres?|research interests?|previously worked|worked as a research assistant|graduated from|holds an? (?:MSc|PhD|MA|BA))\b/i.test(trimmed)
   ) {
     signals.push("editorial-frontmatter-language");
     return { category: "editorial-frontmatter", noiseScore: 0.88, signals };
@@ -140,14 +141,30 @@ export function classifyChunkNoise(
   const indexEntries = (
     trimmed.match(/^[A-Za-z][\w\s,;()-]{1,40}[\s.]{1,5}\d{1,4}$/gm) || []
   ).length;
-  if (indexEntries / lineCount > 0.30 || sectionPath === "Index") {
+  const inlineIndexLike =
+    /^\s*(?:INDEX|Index)\b/.test(trimmed) &&
+    (
+      (trimmed.match(/\b[a-z][a-z-]{2,}(?:\s+[a-z][a-z-]{2,}){0,4}\s+\d{1,4}(?:-\d{1,4})?/g) || []).length >= 8 ||
+      /\baccountability\s+\d|actor mapping\s+\d|adaptation\s+\d|advocacy coalition framework\b/i.test(trimmed)
+    );
+  if (indexEntries / lineCount > 0.30 || sectionPath === "Index" || inlineIndexLike) {
     signals.push(`index-entries:${indexEntries}`);
     return { category: "toc", noiseScore: 0.86, signals };
   }
 
   // ── 3. TOC dot-leader detection ────────────────────────────────────────────
   const tocLines = (trimmed.match(/[.]{3,}\s*\d+\s*$/gm) || []).length;
-  if (tocLines / lineCount > 0.25) {
+  const inlineTocLike =
+    (
+      /^\s*(?:contents|table of contents|policy and implementation|list of illustrations)\b/i.test(trimmed) ||
+      /\blist of illustrations\b/i.test(trimmed.slice(0, 800))
+    ) &&
+    (
+      (trimmed.match(/\b\d{1,3}\s+[A-Z][A-Za-z'’.-]+(?:\s+[A-Z][A-Za-z'’.-]+){1,4}/g) || []).length >= 5 ||
+      (trimmed.match(/\b[A-Z][A-Za-z'’.-]+(?:\s+[A-Z][A-Za-z'’.-]+){1,8}\s+\d{1,3}\b/g) || []).length >= 5 ||
+      ((trimmed.match(/\b\d{1,3}\b/g) || []).length >= 6 && trimmed.length < 1800)
+    );
+  if (tocLines / lineCount > 0.25 || inlineTocLike) {
     signals.push(`toc-dotleader-lines:${tocLines}`);
     return { category: "toc", noiseScore: 0.85, signals };
   }

@@ -19,7 +19,8 @@ import { testConnectivity } from "../lib/rag/embeddings.js";
 import { loadReports, saveReport } from "../lib/rag/reports.js";
 import { generateCorpusArtifactReport } from "../lib/rag/ocr-detector.js";
 import { getDisplayTitle } from "../lib/rag/source-titles.js";
-import { matchesNormalizedSearch } from "../lib/rag/bm25.js";
+import { scoreNormalizedSearch } from "../lib/rag/bm25.js";
+import { classifyChunkNoise, isReferenceQuery, NOISE_HARD_EXCLUSION_THRESHOLD } from "../lib/rag/chunk-classifier.js";
 import { isLikelyPdfUpload, safePdfUploadFilename, uniquePdfUploadFilename } from "../lib/rag/upload-safety.js";
 import { isCandidateIndexResetAllowed } from "../lib/rag/destructive-action-safety.js";
 import type { CleanupQuality } from "../lib/rag/types.js";
@@ -151,15 +152,30 @@ router.get("/rag/chunks", (req, res) => {
     : index.records;
   const searchTerm = search?.trim().toLowerCase();
   if (searchTerm) {
-    records = records.filter((r) =>
-      matchesNormalizedSearch(searchTerm, [
-        r.chunkId,
-        r.documentId,
-        r.sourceFile,
-        r.sectionPath,
-        r.text,
-      ])
-    );
+    const refQuery = isReferenceQuery(searchTerm);
+    records = records
+      .map((record, originalIndex) => ({
+        record,
+        originalIndex,
+        searchScore: scoreNormalizedSearch(searchTerm, [
+          record.chunkId,
+          record.documentId,
+          record.sourceFile,
+          record.sectionPath,
+          record.text,
+        ]),
+        noise: classifyChunkNoise(record.text, record.sectionPath),
+      }))
+      .filter((candidate) =>
+        candidate.searchScore > 0 &&
+        (refQuery || candidate.noise.noiseScore < NOISE_HARD_EXCLUSION_THRESHOLD)
+      )
+      .sort((a, b) =>
+        (b.searchScore - b.noise.noiseScore * 5) -
+        (a.searchScore - a.noise.noiseScore * 5) ||
+        a.originalIndex - b.originalIndex
+      )
+      .map((candidate) => candidate.record);
   }
   const parsedLimit = Number.parseInt(limit ?? "", 10);
   const cappedLimit = Number.isFinite(parsedLimit)

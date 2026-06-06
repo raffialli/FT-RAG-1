@@ -13,7 +13,7 @@ import {
   getUploadedPdfPaths,
 } from "../lib/rag/ingester.js";
 import { hybridRetrieve } from "../lib/rag/retriever.js";
-import { synthesizeAnswer } from "../lib/rag/answer-gen.js";
+import { generationTraceConfig, synthesizeAnswerWithTrace } from "../lib/rag/answer-gen.js";
 import { loadVectorIndex, resetVectorIndex } from "../lib/rag/vector-store.js";
 import { testConnectivity } from "../lib/rag/embeddings.js";
 import { loadReports, saveReport } from "../lib/rag/reports.js";
@@ -24,6 +24,15 @@ import { classifyChunkNoise, isReferenceQuery, NOISE_HARD_EXCLUSION_THRESHOLD } 
 import { isLikelyPdfUpload, safePdfUploadFilename, uniquePdfUploadFilename } from "../lib/rag/upload-safety.js";
 import { isCandidateIndexResetAllowed } from "../lib/rag/destructive-action-safety.js";
 import type { CleanupQuality } from "../lib/rag/types.js";
+import {
+  buildQueryTrace,
+  classifyTraceFailure,
+  getTraceRuntimeConfig,
+  makeTraceId,
+  persistTraceIfEnabled,
+  summarizeChunk,
+  type RagTrace,
+} from "../lib/rag/rag-trace.js";
 
 const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
@@ -265,6 +274,7 @@ router.post("/rag/query", async (req, res) => {
       topK?: number;
       includeEvidence?: boolean;
       includeDebug?: boolean;
+      includeTrace?: boolean;
     };
 
     if (!body.query?.trim()) {
@@ -275,14 +285,114 @@ router.post("/rag/query", async (req, res) => {
     const topK = Math.min(body.topK ?? 5, 10);
     req.log.info({ query: body.query.substring(0, 100) }, "RAG query");
 
+    const traceConfig = getTraceRuntimeConfig();
+    const traceId = makeTraceId();
+    const docs = loadDocumentsManifest();
+    const index = loadVectorIndex();
+    const retrievalStart = Date.now();
     const { chunks, debug } = await hybridRetrieve(body.query, topK);
-    const answer = await synthesizeAnswer(body.query, chunks);
+    const retrievalMs = Date.now() - retrievalStart;
+    const generationStart = Date.now();
+    const { result: answer, trace: answerTrace } = await synthesizeAnswerWithTrace(body.query, chunks, {
+      includeTraceFullText: traceConfig.includeFullText,
+    });
+    const generationMs = Date.now() - generationStart;
+    const queryTrace = buildQueryTrace(body.query);
+    const retrievalTrace = {
+      counts: {
+        vectorCandidates: debug.vectorCandidates,
+        bm25Candidates: debug.bm25Candidates,
+        exactRescueCandidates: debug.exactRescueCandidates,
+        conceptRescueCandidates: debug.conceptRescueCandidates,
+        attributeRescueCandidates: debug.attributeRescueCandidates,
+        fusedCandidates: debug.fusedCandidates,
+        afterRerank: debug.afterRerank,
+        afterFilter: debug.afterFilter,
+        noiseExcluded: debug.noiseExcluded,
+      },
+      referenceQuery: debug.referenceQuery,
+      diversityApplied: debug.diversityApplied,
+      vectorCandidates: debug.vectorCandidateDetails,
+      bm25Candidates: debug.bm25CandidateDetails,
+      exactRescueCandidates: debug.exactRescueCandidateDetails,
+      conceptRescueCandidates: debug.conceptRescueCandidateDetails,
+      attributeRescueCandidates: debug.attributeRescueCandidateDetails,
+      fusedCandidates: debug.fusedCandidateDetails,
+      rerankedCandidates: debug.rerankedCandidateDetails,
+      topCandidates: debug.topCandidates,
+      finalChunks: chunks.map((chunk, index) =>
+        summarizeChunk(chunk, {
+          rank: index + 1,
+          includeFullText: traceConfig.includeFullText,
+          reason: "final-selected",
+        })
+      ),
+    };
+    const trace: RagTrace = {
+      traceId,
+      timestamp: new Date().toISOString(),
+      app: {
+        version: process.env.npm_package_version ?? null,
+        branch: process.env.REPLIT_GIT_BRANCH ?? process.env.GIT_BRANCH ?? null,
+        commit: process.env.REPLIT_GIT_COMMIT ?? process.env.COMMIT_SHA ?? process.env.GIT_COMMIT ?? null,
+        nodeEnv: process.env.NODE_ENV ?? null,
+      },
+      request: {
+        requestId: requestIdFromHeader(req.headers["x-request-id"]),
+        query: body.query,
+        normalizedQuery: queryTrace.normalizedQuery,
+        expandedTerms: queryTrace.expandedTerms,
+        topK,
+        includeEvidence: body.includeEvidence !== false,
+        includeDebug: body.includeDebug === true,
+      },
+      corpus: {
+        documentCount: docs.length,
+        manifestChunkCount: docs.reduce((sum, doc) => sum + doc.chunkCount, 0),
+        vectorCount: index.records.length,
+        embeddingModel: process.env.EMBEDDING_MODEL ?? "Xenova/all-MiniLM-L6-v2",
+        scope: "candidate-runtime-corpus",
+      },
+      config: {
+        retrieval: {
+          topK,
+          vectorTopK: 50,
+          bm25TopK: 50,
+          fusion: "rrf",
+          reranker: "heuristic-noise-aware",
+          finalSelection: "diversity-aware",
+        },
+        generation: generationTraceConfig(),
+        tracing: {
+          enabled: traceConfig.traceEnabled,
+          persisted: traceConfig.persistTrace,
+          fullText: traceConfig.includeFullText,
+        },
+      },
+      retrieval: retrievalTrace,
+      answer: answerTrace,
+      latencyMs: {
+        retrieval: retrievalMs,
+        generation: generationMs,
+        total: Date.now() - start,
+      },
+      failure: classifyTraceFailure({
+        retrievedChunks: chunks,
+        answer: answerTrace,
+        retrievalDebug: debug as unknown as Record<string, unknown>,
+      }),
+      errors: [],
+      warnings: [],
+    };
+    const tracePath = persistTraceIfEnabled(trace, traceConfig);
+    if (tracePath) trace.warnings.push(`Trace persisted to ${tracePath}`);
 
     const result = {
       ...answer,
       retrievedChunks: (body.includeEvidence !== false) ? chunks : [],
       durationMs: Date.now() - start,
       debugTrace: body.includeDebug ? debug : null,
+      trace: body.includeTrace || body.includeDebug ? trace : null,
     };
 
     // Auto-save to reports
@@ -302,6 +412,11 @@ router.post("/rag/query", async (req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+function requestIdFromHeader(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+}
 
 // POST /api/rag/upload
 router.post("/rag/upload", upload.single("file"), async (req, res) => {

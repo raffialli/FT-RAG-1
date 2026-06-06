@@ -28,6 +28,7 @@ export * from './queryInput';
 export * from './queryResult';
 export * from './queryResultConfidence';
 export * from './queryResultDebugTrace';
+export * from './queryResultTrace';
 export * from './ragChunk';
 export * from './ragDocument';
 export * from './ragStatus';

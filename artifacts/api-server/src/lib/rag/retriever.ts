@@ -72,6 +72,14 @@ export interface RetrievalDebug {
   referenceQuery: boolean;
   diversityApplied: boolean;
   topCandidates: RetrievalDebugCandidate[];
+  vectorCandidateDetails: RetrievalDebugCandidate[];
+  bm25CandidateDetails: RetrievalDebugCandidate[];
+  exactRescueCandidateDetails: RetrievalDebugCandidate[];
+  conceptRescueCandidateDetails: RetrievalDebugCandidate[];
+  attributeRescueCandidateDetails: RetrievalDebugCandidate[];
+  fusedCandidateDetails: RetrievalDebugCandidate[];
+  rerankedCandidateDetails: RetrievalDebugCandidate[];
+  finalChunkDetails: RetrievalDebugCandidate[];
 }
 
 export interface RetrievalDebugCandidate {
@@ -87,6 +95,7 @@ export interface RetrievalDebugCandidate {
   rerankScore: number;
   noiseScore: number;
   noiseCategory: ChunkCategory;
+  retrievalStage?: string;
   textPreview: string;
 }
 
@@ -105,6 +114,14 @@ export async function hybridRetrieve(
         exactRescueCandidates: 0, conceptRescueCandidates: 0, attributeRescueCandidates: 0,
         afterRerank: 0, afterFilter: 0, noiseExcluded: 0,
         referenceQuery: false, diversityApplied: false, topCandidates: [],
+        vectorCandidateDetails: [],
+        bm25CandidateDetails: [],
+        exactRescueCandidateDetails: [],
+        conceptRescueCandidateDetails: [],
+        attributeRescueCandidateDetails: [],
+        fusedCandidateDetails: [],
+        rerankedCandidateDetails: [],
+        finalChunkDetails: [],
       },
     };
   }
@@ -157,6 +174,45 @@ export async function hybridRetrieve(
       diversityApplied,
       topCandidates: kept.slice(0, Math.max(topK, 10)).map((candidate, index) =>
         recordToDebugCandidate(candidate, index + 1)
+      ),
+      vectorCandidateDetails: vectorResults.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidateFromRecord(candidate.record, index + 1, "vector", {
+          score: candidate.score,
+          vectorScore: candidate.score,
+        })
+      ),
+      bm25CandidateDetails: bm25Results.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidateFromRecord(candidate.record, index + 1, "bm25", {
+          score: candidate.score,
+          bm25Score: candidate.score,
+        })
+      ),
+      exactRescueCandidateDetails: exactResults.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidateFromRecord(candidate.record, index + 1, "exact-rescue", {
+          score: candidate.score,
+          bm25Score: candidate.score,
+        })
+      ),
+      conceptRescueCandidateDetails: conceptResults.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidateFromRecord(candidate.record, index + 1, "concept-rescue", {
+          score: candidate.score,
+          bm25Score: candidate.score,
+        })
+      ),
+      attributeRescueCandidateDetails: attributeResults.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidateFromRecord(candidate.record, index + 1, "attribute-rescue", {
+          score: candidate.score,
+          bm25Score: candidate.score,
+        })
+      ),
+      fusedCandidateDetails: fused.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidate(candidate, index + 1, "fused")
+      ),
+      rerankedCandidateDetails: reranked.slice(0, 25).map((candidate, index) =>
+        recordToDebugCandidate(candidate, index + 1, "reranked")
+      ),
+      finalChunkDetails: diversified.map((candidate, index) =>
+        recordToDebugCandidate(candidate, index + 1, "final")
       ),
     },
   };
@@ -731,7 +787,11 @@ function recordToRetrievedChunk(r: ScoredRecord): RetrievedChunk {
   };
 }
 
-function recordToDebugCandidate(r: ScoredRecord, rank: number): RetrievalDebugCandidate {
+function recordToDebugCandidate(
+  r: ScoredRecord,
+  rank: number,
+  retrievalStage?: string
+): RetrievalDebugCandidate {
   return {
     rank,
     chunkId: r.record.chunkId,
@@ -745,7 +805,33 @@ function recordToDebugCandidate(r: ScoredRecord, rank: number): RetrievalDebugCa
     rerankScore: r.rerankScore,
     noiseScore: r.noiseScore,
     noiseCategory: r.noiseCategory,
+    retrievalStage,
     textPreview: r.record.text.replace(/\s+/g, " ").slice(0, 240),
+  };
+}
+
+function recordToDebugCandidateFromRecord(
+  record: VectorRecord,
+  rank: number,
+  retrievalStage: string,
+  scores: { score: number; vectorScore?: number; bm25Score?: number }
+): RetrievalDebugCandidate {
+  const noise = classifyChunkNoise(record.text, record.sectionPath);
+  return {
+    rank,
+    chunkId: record.chunkId,
+    sourceFile: record.sourceFile,
+    pageStart: record.pageStart,
+    pageEnd: record.pageEnd,
+    sectionPath: record.sectionPath,
+    score: scores.score,
+    vectorScore: scores.vectorScore ?? 0,
+    bm25Score: scores.bm25Score ?? 0,
+    rerankScore: 0,
+    noiseScore: noise.noiseScore,
+    noiseCategory: noise.category,
+    retrievalStage,
+    textPreview: record.text.replace(/\s+/g, " ").slice(0, 240),
   };
 }
 

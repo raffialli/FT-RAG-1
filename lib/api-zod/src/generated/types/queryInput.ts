@@ -11,4 +11,5 @@ export interface QueryInput {
   topK?: number;
   includeEvidence?: boolean;
   includeDebug?: boolean;
+  includeTrace?: boolean;
 }

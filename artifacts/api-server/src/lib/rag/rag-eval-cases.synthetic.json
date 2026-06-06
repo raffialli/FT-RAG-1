@@ -1,0 +1,24 @@
+[
+  {
+    "id": "curated-earthquake-main-events",
+    "question": "What were the two main earthquakes discussed, including their magnitudes and locations?",
+    "expectedFacts": ["7.7", "7.6"],
+    "requiredCitationSupport": true,
+    "minConfidence": "low",
+    "tags": ["curated", "numeric", "entity", "diacritic"]
+  },
+  {
+    "id": "curated-community-engagement-evidence",
+    "question": "What does the corpus say about community engagement or public participation in flood risk mapping?",
+    "expectedFacts": ["community"],
+    "requiredCitationSupport": true,
+    "minConfidence": "low",
+    "tags": ["curated", "community-engagement", "citation-support"]
+  },
+  {
+    "id": "synthetic-absent-fact-refusal",
+    "question": "According to the uploaded documents, what is the serial number of the cobalt-blue turbine in Appendix Z?",
+    "negative": true,
+    "tags": ["synthetic", "absent-evidence", "refusal"]
+  }
+]

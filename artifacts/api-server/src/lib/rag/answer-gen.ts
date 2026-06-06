@@ -20,16 +20,30 @@ import {
 import { isReferenceQuery } from "./chunk-classifier.js";
 import { buildAnswerSources } from "./source-provenance.js";
 import { applyClimatePolicyCaution, climatePolicyInstruction } from "./answer-polish.js";
-import { buildEvidenceBlock } from "./prompt-context.js";
+import { buildEvidenceBlockWithMetadata, EXCERPT_CHARS } from "./prompt-context.js";
+import { preview, type AnswerTrace } from "./rag-trace.js";
+
+type GeneratedAnswerResult = Omit<QueryResult, "retrievedChunks" | "durationMs" | "debugTrace" | "trace">;
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
 export async function synthesizeAnswer(
   query: string,
   chunks: RetrievedChunk[]
-): Promise<Omit<QueryResult, "retrievedChunks" | "durationMs" | "debugTrace">> {
+): Promise<GeneratedAnswerResult> {
+  return (await synthesizeAnswerWithTrace(query, chunks)).result;
+}
+
+export async function synthesizeAnswerWithTrace(
+  query: string,
+  chunks: RetrievedChunk[],
+  options: { includeTraceFullText?: boolean } = {}
+): Promise<{
+  result: GeneratedAnswerResult;
+  trace: AnswerTrace;
+}> {
   if (chunks.length === 0) {
-    return {
+    const result: GeneratedAnswerResult = {
       answer:
         "I do not have sufficient evidence in the ingested documents to answer this question. Please ingest relevant documents or refine your query.",
       confidence: "insufficient",
@@ -39,17 +53,28 @@ export async function synthesizeAnswer(
       sources: [],
       warnings: ["No evidence found in the document corpus for this query."],
     };
+    return {
+      result,
+      trace: buildAnswerTrace({
+        prompt: "",
+        evidenceBlock: "",
+        selectedExcerpts: [],
+        result,
+      }),
+    };
   }
 
   const topChunks = chunks.slice(0, 5);
-  const evidenceBlock = buildEvidenceBlock(query, topChunks);
+  const { evidenceBlock, selectedExcerpts } = buildEvidenceBlockWithMetadata(query, topChunks, {
+    includeFullText: options.includeTraceFullText,
+  });
   const prompt = buildPrompt(query, evidenceBlock);
 
   let rawAnswer: string;
   try {
     rawAnswer = await generateAnswer(prompt);
   } catch (e) {
-    return {
+    const result: GeneratedAnswerResult = {
       answer: "The model did not return an answer. Please try again.",
       confidence: "insufficient",
       confidenceReason: "LLM call failed.",
@@ -57,6 +82,15 @@ export async function synthesizeAnswer(
       citationValidation: emptyCitationValidation(),
       sources: [],
       warnings: [`Generation error: ${String(e)}`],
+    };
+    return {
+      result,
+      trace: buildAnswerTrace({
+        prompt,
+        evidenceBlock,
+        selectedExcerpts,
+        result,
+      }),
     };
   }
 
@@ -77,7 +111,7 @@ export async function synthesizeAnswer(
   const sufficiency = assessEvidenceSufficiency(topChunks, answer, query);
   const confidence = assessConfidence(query, topChunks, answer, citationVal, sufficiency);
 
-  return {
+  const result: GeneratedAnswerResult = {
     answer,
     confidence: confidence.level,
     confidenceReason: confidence.reason,
@@ -85,6 +119,15 @@ export async function synthesizeAnswer(
     citationValidation: citationVal,
     sources,
     warnings: [...confidence.warnings, ...citationVal.warnings],
+  };
+  return {
+    result,
+    trace: buildAnswerTrace({
+      prompt,
+      evidenceBlock,
+      selectedExcerpts,
+      result,
+    }),
   };
 }
 
@@ -155,4 +198,43 @@ function isFloodInsuranceMapQuery(query: string): boolean {
       /\binsurance\b/.test(queryLower) &&
       /\bmap|public|understand|awareness|risk communication\b/.test(queryLower)
     );
+}
+
+function buildAnswerTrace(input: {
+  prompt: string;
+  evidenceBlock: string;
+  selectedExcerpts: AnswerTrace["selectedExcerpts"];
+  result: GeneratedAnswerResult;
+}): AnswerTrace {
+  return {
+    modelProvider: process.env.GENERATION_PROVIDER === "openai" ? "openai" : "ollama",
+    model: process.env.GENERATION_PROVIDER === "openai"
+      ? (process.env.OPENAI_GENERATION_MODEL ?? "gpt-4.1-mini")
+      : (process.env.GENERATION_MODEL ?? "qwen3.5:397b"),
+    promptChars: input.prompt.length,
+    evidenceBlockChars: input.evidenceBlock.length,
+    selectedExcerpts: input.selectedExcerpts,
+    answerChars: input.result.answer.length,
+    answerPreview: preview(input.result.answer, 500),
+    refusal: isInsufficientRefusal(input.result.answer),
+    confidence: input.result.confidence,
+    confidenceReason: input.result.confidenceReason,
+    evidenceSufficiency: input.result.evidenceSufficiency,
+    citationValidation: input.result.citationValidation,
+    warnings: input.result.warnings,
+  };
+}
+
+export function generationTraceConfig(): { provider: string; model: string; promptMaxExcerptChars: number } {
+  return {
+    provider: process.env.GENERATION_PROVIDER === "openai" ? "openai" : "ollama",
+    model: process.env.GENERATION_PROVIDER === "openai"
+      ? (process.env.OPENAI_GENERATION_MODEL ?? "gpt-4.1-mini")
+      : (process.env.GENERATION_MODEL ?? "qwen3.5:397b"),
+    promptMaxExcerptChars: EXCERPT_CHARS,
+  };
+}
+
+function isInsufficientRefusal(answer: string): boolean {
+  return /does not contain sufficient information|do not have sufficient evidence|insufficient evidence/i.test(answer);
 }

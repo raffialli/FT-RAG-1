@@ -106,6 +106,7 @@ export interface QueryResult {
   warnings: string[];
   durationMs: number;
   debugTrace?: Record<string, unknown>;
+  trace?: Record<string, unknown> | null;
 }
 
 export interface ComparisonReport {

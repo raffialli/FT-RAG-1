@@ -501,6 +501,8 @@ components:
           type: boolean
         includeDebug:
           type: boolean
+        includeTrace:
+          type: boolean
 
     EvidenceSufficiency:
       type: string
@@ -580,6 +582,10 @@ components:
         durationMs:
           type: integer
         debugTrace:
+          type: object
+          additionalProperties: true
+          nullable: true
+        trace:
           type: object
           additionalProperties: true
           nullable: true

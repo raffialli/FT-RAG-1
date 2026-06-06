@@ -1,18 +1,42 @@
+import crypto from "node:crypto";
 import type { RetrievedChunk } from "./types.js";
+import type { PromptExcerptTrace } from "./rag-trace.js";
 
-const EXCERPT_CHARS = 1400;
+export const EXCERPT_CHARS = 1400;
 const WINDOW_STEP_CHARS = 350;
 
 export function buildEvidenceBlock(query: string, chunks: RetrievedChunk[]): string {
-  return chunks
+  return buildEvidenceBlockWithMetadata(query, chunks).evidenceBlock;
+}
+
+export function buildEvidenceBlockWithMetadata(
+  query: string,
+  chunks: RetrievedChunk[],
+  options: { includeFullText?: boolean } = {}
+): { evidenceBlock: string; selectedExcerpts: PromptExcerptTrace[] } {
+  const selectedExcerpts: PromptExcerptTrace[] = [];
+  const evidenceBlock = chunks
     .map((c, i) => {
       const pageRange =
         c.pageStart === c.pageEnd ? `p. ${c.pageStart}` : `pp. ${c.pageStart}-${c.pageEnd}`;
       const section = c.sectionPath ? ` § ${c.sectionPath}` : "";
       const excerpt = selectRelevantExcerpt(query, c.text, EXCERPT_CHARS);
+      selectedExcerpts.push({
+        citationIndex: i + 1,
+        chunkId: c.chunkId,
+        sourceFile: c.sourceFile,
+        pageStart: c.pageStart,
+        pageEnd: c.pageEnd,
+        sectionPath: c.sectionPath,
+        excerptChars: excerpt.length,
+        excerptHash: hashText(excerpt),
+        excerptPreview: preview(excerpt),
+        excerpt: options.includeFullText ? excerpt : undefined,
+      });
       return `[${i + 1}] Source: ${c.sourceFile} (${pageRange}${section})\n${excerpt}`;
     })
     .join("\n\n---\n\n");
+  return { evidenceBlock, selectedExcerpts };
 }
 
 export function selectRelevantExcerpt(
@@ -132,4 +156,12 @@ function clampToWordBoundary(text: string, start: number): number {
   const priorBreak = text.lastIndexOf(" ", start);
   if (priorBreak < 0 || start - priorBreak > 80) return start;
   return priorBreak + 1;
+}
+
+function hashText(text: string): string {
+  return crypto.createHash("sha256").update(text).digest("hex");
+}
+
+function preview(text: string, chars = 240): string {
+  return text.replace(/\s+/g, " ").trim().slice(0, chars);
 }

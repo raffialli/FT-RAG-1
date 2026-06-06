@@ -132,6 +132,7 @@ export interface QueryInput {
   topK?: number;
   includeEvidence?: boolean;
   includeDebug?: boolean;
+  includeTrace?: boolean;
 }
 
 /**
@@ -180,6 +181,7 @@ export const QueryResultConfidence = {
 } as const;
 
 export type QueryResultDebugTrace = { [key: string]: unknown } | null;
+export type QueryResultTrace = { [key: string]: unknown } | null;
 
 export interface AnswerSource {
   title: string;
@@ -232,6 +234,7 @@ export interface QueryResult {
   warnings: string[];
   durationMs: number;
   debugTrace?: QueryResultDebugTrace;
+  trace?: QueryResultTrace;
 }
 
 export interface UploadInput {

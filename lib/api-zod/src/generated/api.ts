@@ -206,7 +206,8 @@ export const RagQueryBody = zod.object({
   "query": zod.string(),
   "topK": zod.number().optional(),
   "includeEvidence": zod.boolean().optional(),
-  "includeDebug": zod.boolean().optional()
+  "includeDebug": zod.boolean().optional(),
+  "includeTrace": zod.boolean().optional()
 })
 
 export const RagQueryResponse = zod.object({
@@ -259,7 +260,8 @@ export const RagQueryResponse = zod.object({
 })),
   "warnings": zod.array(zod.string()),
   "durationMs": zod.number(),
-  "debugTrace": zod.record(zod.string(), zod.unknown()).nullish()
+  "debugTrace": zod.record(zod.string(), zod.unknown()).nullish(),
+  "trace": zod.record(zod.string(), zod.unknown()).nullish()
 })
 
 
@@ -313,5 +315,4 @@ export const TestModelResponse = zod.object({
   "embeddingDims": zod.number().nullish(),
   "generationSample": zod.string().nullish()
 })
-
 

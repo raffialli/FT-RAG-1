@@ -33,6 +33,7 @@ import {
   summarizeChunk,
   type RagTrace,
 } from "../lib/rag/rag-trace.js";
+import { exportTraceToLangSmith, getLangSmithExportConfig } from "../lib/rag/langsmith-export.js";
 
 const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
@@ -386,6 +387,22 @@ router.post("/rag/query", async (req, res) => {
     };
     const tracePath = persistTraceIfEnabled(trace, traceConfig);
     if (tracePath) trace.warnings.push(`Trace persisted to ${tracePath}`);
+    const langSmithConfig = getLangSmithExportConfig();
+    if (langSmithConfig.enabled) {
+      void exportTraceToLangSmith(trace, { config: langSmithConfig }).then((exportResult) => {
+        if (!exportResult.success) {
+          req.log.warn(
+            { traceId: trace.traceId, runId: exportResult.runId, error: exportResult.error },
+            "LangSmith RAG trace export failed"
+          );
+        }
+      }).catch((error) => {
+        req.log.warn(
+          { traceId: trace.traceId, error: error instanceof Error ? error.message : String(error) },
+          "LangSmith RAG trace export threw unexpectedly"
+        );
+      });
+    }
 
     const result = {
       ...answer,

@@ -151,9 +151,9 @@ export const ListChunksResponse = zod.array(ListChunksResponseItem)
  * @summary Ingest or restore PDFs from the configured source folders
  */
 export const IngestDocumentsBody = zod.object({
-  "rebuild": zod.boolean().optional(),
-  "documentIds": zod.array(zod.string()).optional()
-})
+    "rebuild": zod.boolean().optional(),
+    "documentIds": zod.array(zod.string()).optional()
+  })
 
 export const IngestDocumentsResponse = zod.object({
   "success": zod.boolean(),
@@ -179,7 +179,15 @@ export const ReindexActiveDocumentsResponse = zod.object({
   "errors": zod.array(zod.string()).optional(),
   "warnings": zod.array(zod.string()).optional(),
   "cleanupReport": zod.record(zod.string(), zod.unknown()).optional()
-})
+  })
+
+
+/**
+ * @summary Reset the vector index and all ingested data
+ */
+export const ResetIndexBody = zod.object({
+    "confirmation": zod.string().optional()
+  })
 
 
 /**

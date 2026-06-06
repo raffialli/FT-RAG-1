@@ -168,6 +168,12 @@ paths:
       operationId: resetIndex
       tags: [rag]
       summary: Reset the vector index and all ingested data
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetInput"
       responses:
         "200":
           description: Reset result
@@ -441,6 +447,12 @@ components:
           type: array
           items:
             type: string
+
+    ResetInput:
+      type: object
+      properties:
+        confirmation:
+          type: string
 
     IngestResult:
       type: object

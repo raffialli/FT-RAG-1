@@ -8,7 +8,7 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --experimental-strip-types src/lib/rag/answer-gen.test.mts"
+    "test": "node --experimental-strip-types src/lib/rag/answer-gen.test.mts && node --experimental-strip-types src/lib/rag/retrieval-hardening.test.mts && node --experimental-strip-types src/lib/rag/chunker-pipeline.test.mts"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",

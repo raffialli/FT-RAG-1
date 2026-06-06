@@ -105,6 +105,10 @@ export interface IngestInput {
   documentIds?: string[];
 }
 
+export interface ResetInput {
+  confirmation?: string;
+}
+
 export type IngestResultCleanupReport = { [key: string]: unknown };
 
 export interface IngestResult {

@@ -114,7 +114,7 @@ export default function StatusPanel() {
       "Reset the local candidate index?\n\nThis clears local manifest, chunks, and vectors for this candidate test environment only. It does not affect AWS, Demo, or production.\n\nType RESET to continue."
     );
     if (confirmation === "RESET") {
-      reset.mutate();
+      reset.mutate({ data: { confirmation } });
     } else if (confirmation !== null) {
       setLog((prev) => ["Reset cancelled: confirmation text did not match RESET.", ...prev].slice(0, 50));
     }

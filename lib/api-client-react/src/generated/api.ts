@@ -34,6 +34,7 @@ import type {
   RagChunk,
   RagDocument,
   RagStatus,
+  ResetInput,
   ResetResult,
   UploadInput
 } from './api.schemas';
@@ -666,23 +667,26 @@ export const getResetIndexUrl = () => {
 /**
  * @summary Reset the vector index and all ingested data
  */
-export const resetIndex = async ( options?: RequestInit): Promise<ResetResult> => {
+ export const resetIndex = async (resetInput?: ResetInput, options?: RequestInit): Promise<ResetResult> => {
 
   return customFetch<ResetResult>(getResetIndexUrl(),
-  {
-    ...options,
-    method: 'POST'
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(
+        resetInput,)
 
 
-  }
-);}
+    }
+  );}
 
 
 
 
 export const getResetIndexMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,{data?: BodyType<ResetInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,{data?: BodyType<ResetInput>}, TContext> => {
 
 const mutationKey = ['resetIndex'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -694,11 +698,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetIndex>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetIndex>>, {data?: BodyType<ResetInput>}> = (props) => {
+            const {data} = props ?? {};
 
 
-          return  resetIndex(requestOptions)
-        }
+          return  resetIndex(data,requestOptions)
+          }
 
 
 
@@ -709,19 +714,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type ResetIndexMutationResult = NonNullable<Awaited<ReturnType<typeof resetIndex>>>
 
+    export type ResetIndexMutationBody = BodyType<ResetInput> | undefined
     export type ResetIndexMutationError = ErrorType<unknown>
 
     /**
  * @summary Reset the vector index and all ingested data
  */
 export const useResetIndex = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetIndex>>, TError,{data?: BodyType<ResetInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+   ): UseMutationResult<
         Awaited<ReturnType<typeof resetIndex>>,
-        TError,
-        void,
-        TContext
-      > => {
+         TError,
+         {data?: BodyType<ResetInput>},
+         TContext
+       > => {
       return useMutation(getResetIndexMutationOptions(options));
     }
 

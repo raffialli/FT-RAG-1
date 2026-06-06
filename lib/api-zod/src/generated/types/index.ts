@@ -31,6 +31,7 @@ export * from './queryResultDebugTrace';
 export * from './ragChunk';
 export * from './ragDocument';
 export * from './ragStatus';
+export * from './resetInput';
 export * from './resetResult';
 export * from './retrievedChunk';
 export * from './uploadInput';

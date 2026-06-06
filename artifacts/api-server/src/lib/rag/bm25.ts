@@ -16,17 +16,76 @@ const STOP_WORDS = new Set([
   "they", "them", "their", "we", "our", "you", "your", "not", "no",
 ]);
 
+const IMPORTANT_SHORT_TOKENS = new Set(["mw", "m", "km"]);
+
 export interface BM25Result {
   record: VectorRecord;
   score: number;
 }
 
-export function tokenize(text: string): string[] {
+export function normalizeForSearch(text: string): string {
   return text
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ıİ]/g, "i")
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, " ")
-    .split(/\s+/)
-    .filter((t) => t.length > 2 && !STOP_WORDS.has(t));
+    .replace(/[’‘]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, "-");
+}
+
+export function tokenize(text: string): string[] {
+  const normalized = normalizeForSearch(text);
+  const rawTokens = normalized.match(/[a-z0-9]+(?:[.-][a-z0-9]+)*/g) ?? [];
+  const tokens: string[] = [];
+
+  for (const rawToken of rawTokens) {
+    for (const token of expandToken(rawToken)) {
+      if (STOP_WORDS.has(token)) continue;
+      if (token.length > 2 || IMPORTANT_SHORT_TOKENS.has(token) || /\d/.test(token)) {
+        tokens.push(token);
+      }
+    }
+  }
+
+  return tokens;
+}
+
+function expandToken(rawToken: string): string[] {
+  const expanded = new Set<string>();
+  const add = (token: string) => {
+    const clean = token.trim();
+    if (!clean) return;
+    expanded.add(clean);
+    expanded.add(stemToken(clean));
+  };
+
+  add(rawToken);
+  for (const part of rawToken.split(/[.-]/)) add(part);
+
+  if (rawToken === "mw") {
+    add("magnitude");
+    add("moment-magnitude");
+  }
+  if (rawToken === "magnitude" || rawToken === "magnitudes") add("mw");
+  if (rawToken === "earthquake" || rawToken === "earthquakes") add("quake");
+  if (rawToken === "quake" || rawToken === "quakes") add("earthquake");
+  if (rawToken === "location" || rawToken === "locations") {
+    add("place");
+    add("city");
+    add("district");
+    add("zone");
+  }
+
+  return [...expanded];
+}
+
+function stemToken(token: string): string {
+  if (/\d/.test(token)) return token;
+  if (token.length > 5 && token.endsWith("ies")) return `${token.slice(0, -3)}y`;
+  if (token.length > 5 && /(ches|shes|xes|zes|ses)$/.test(token)) return token.slice(0, -2);
+  if (token.length > 4 && token.endsWith("s")) return token.slice(0, -1);
+  return token;
 }
 
 export function bm25Search(query: string, records: VectorRecord[], topK = 20): BM25Result[] {
@@ -64,8 +123,8 @@ export function bm25Search(query: string, records: VectorRecord[], topK = 20): B
     }
 
     // Boost for exact phrase match
-    const queryLower = query.toLowerCase();
-    if (record.text.toLowerCase().includes(queryLower)) {
+    const queryLower = normalizeForSearch(query);
+    if (normalizeForSearch(record.text).includes(queryLower)) {
       score *= 1.5;
     }
 
@@ -78,22 +137,50 @@ export function bm25Search(query: string, records: VectorRecord[], topK = 20): B
 
 export function exactPhraseSearch(query: string, records: VectorRecord[]): BM25Result[] {
   // Rescue exact phrases, proper nouns, quoted terms
-  const lower = query.toLowerCase();
+  const lower = normalizeForSearch(query);
+  const queryTokens = tokenize(query);
   const results: BM25Result[] = [];
 
   for (const record of records) {
-    const textLower = record.text.toLowerCase();
+    const textLower = normalizeForSearch(record.text);
     if (textLower.includes(lower)) {
       results.push({ record, score: 1.0 });
     } else {
       // Check for key entities from query
-      const words = lower.split(/\s+/).filter((w) => w.length > 4);
+      const words = queryTokens.filter((w) => w.length > 3 || /\d/.test(w));
       const matchCount = words.filter((w) => textLower.includes(w)).length;
-      if (matchCount >= Math.ceil(words.length * 0.6)) {
+      const requiredMatches = Math.max(2, Math.min(4, Math.ceil(words.length * 0.5)));
+      if (matchCount >= requiredMatches) {
         results.push({ record, score: matchCount / words.length });
       }
     }
   }
 
   return results;
+}
+
+export function matchesNormalizedSearch(search: string, values: Array<string | null | undefined>): boolean {
+  const normalizedSearch = normalizeForSearch(search).trim();
+  if (!normalizedSearch) return true;
+
+  const haystack = normalizeForSearch(values.filter(Boolean).join(" "));
+  if (haystack.includes(normalizedSearch)) return true;
+
+  const asksForEvent = /\bearthquakes?|quakes?|floods?|storms?|hurricanes?|wildfires?|disasters?\b/.test(normalizedSearch);
+  const asksForMagnitude = /\bmagnitudes?|mw|richter\b/.test(normalizedSearch);
+  const hasEvent = /\bearthquakes?|quakes?|floods?|storms?|hurricanes?|wildfires?|disasters?\b/.test(haystack);
+  const hasMagnitudeEvidence = /\bmw\b|\bmagnitude\b|\b\d+(?:\.\d+)?\b/.test(haystack);
+  if (asksForEvent && asksForMagnitude && hasEvent && hasMagnitudeEvidence) {
+    return true;
+  }
+
+  const queryTokens = [...new Set(tokenize(search).filter((token) => token.length > 2 || /\d/.test(token)))];
+  if (queryTokens.length === 0) return false;
+
+  const haystackTokens = new Set(tokenize(haystack));
+  const matchCount = queryTokens.filter((token) =>
+    haystackTokens.has(token) || haystack.includes(token)
+  ).length;
+  const requiredMatches = Math.max(2, Math.min(4, Math.ceil(queryTokens.length * 0.5)));
+  return matchCount >= requiredMatches;
 }

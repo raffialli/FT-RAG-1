@@ -13,7 +13,7 @@
 
 import { embedQuery } from "./embeddings.js";
 import { loadVectorIndex, vectorSearch } from "./vector-store.js";
-import { bm25Search, exactPhraseSearch, tokenize } from "./bm25.js";
+import { bm25Search, exactPhraseSearch, normalizeForSearch, tokenize } from "./bm25.js";
 import {
   classifyChunkNoise,
   isReferenceQuery,
@@ -62,12 +62,32 @@ const DIVERSITY_SECTION_PENALTY = 0.03;
 export interface RetrievalDebug {
   vectorCandidates: number;
   bm25Candidates: number;
+  exactRescueCandidates: number;
+  conceptRescueCandidates: number;
+  attributeRescueCandidates: number;
   fusedCandidates: number;
   afterRerank: number;
   afterFilter: number;
   noiseExcluded: number;
   referenceQuery: boolean;
   diversityApplied: boolean;
+  topCandidates: RetrievalDebugCandidate[];
+}
+
+export interface RetrievalDebugCandidate {
+  rank: number;
+  chunkId: string;
+  sourceFile: string;
+  pageStart: number;
+  pageEnd: number;
+  sectionPath: string | null;
+  score: number;
+  vectorScore: number;
+  bm25Score: number;
+  rerankScore: number;
+  noiseScore: number;
+  noiseCategory: ChunkCategory;
+  textPreview: string;
 }
 
 export async function hybridRetrieve(
@@ -82,28 +102,30 @@ export async function hybridRetrieve(
       chunks: [],
       debug: {
         vectorCandidates: 0, bm25Candidates: 0, fusedCandidates: 0,
+        exactRescueCandidates: 0, conceptRescueCandidates: 0, attributeRescueCandidates: 0,
         afterRerank: 0, afterFilter: 0, noiseExcluded: 0,
-        referenceQuery: false, diversityApplied: false,
+        referenceQuery: false, diversityApplied: false, topCandidates: [],
       },
     };
   }
 
   // 1. Dense vector search
   const queryEmbedding = await embedQuery(query);
-  const vectorResults = vectorSearch(queryEmbedding, 25);
+  const vectorResults = vectorSearch(queryEmbedding, 50);
 
   // 2. BM25 lexical search
-  const bm25Results = bm25Search(query, allRecords, 25);
+  const bm25Results = bm25Search(query, allRecords, 50);
 
   // 3. Exact phrase rescue
   const exactResults = exactPhraseSearch(query, allRecords);
   const conceptResults = conceptRescueSearch(query, allRecords);
+  const attributeResults = attributeRescueSearch(query, allRecords);
 
   // 4. RRF score fusion
   const fused = rrfFusion(
     vectorResults.map((r) => ({ record: r.record, score: r.score })),
     bm25Results.map((r) => ({ record: r.record, score: r.score })),
-    [...exactResults, ...conceptResults]
+    [...exactResults, ...conceptResults, ...attributeResults]
   );
 
   // 5. Rerank with noise-aware scoring
@@ -124,12 +146,18 @@ export async function hybridRetrieve(
     debug: {
       vectorCandidates: vectorResults.length,
       bm25Candidates: bm25Results.length,
+      exactRescueCandidates: exactResults.length,
+      conceptRescueCandidates: conceptResults.length,
+      attributeRescueCandidates: attributeResults.length,
       fusedCandidates: fused.length,
       afterRerank: reranked.length,
       afterFilter: kept.length,
       noiseExcluded: excluded,
       referenceQuery: refQuery,
       diversityApplied,
+      topCandidates: kept.slice(0, Math.max(topK, 10)).map((candidate, index) =>
+        recordToDebugCandidate(candidate, index + 1)
+      ),
     },
   };
 }
@@ -187,7 +215,51 @@ function rrfFusion(
 
   const results = Array.from(scoreMap.values());
   results.sort((a, b) => b.score - a.score);
-  return results.slice(0, 30);
+  return results.slice(0, 60);
+}
+
+export function attributeRescueSearch(
+  query: string,
+  records: VectorRecord[]
+): { record: VectorRecord; score: number }[] {
+  const queryLower = normalizeForSearch(query);
+  const queryTokens = new Set(tokenize(query));
+  const asksForNamedItems = /\b(two|three|main|primary|principal|which|what were|identify|discussed)\b/.test(queryLower);
+  const asksForMagnitude = /\b(magnitude|magnitudes|mw|richter)\b/.test(queryLower);
+  const asksForLocation = /\b(location|locations|where|place|places|city|cities|district|region|zone)\b/.test(queryLower);
+  const eventTokens = ["earthquake", "quake", "flood", "storm", "hurricane", "wildfire", "disaster"]
+    .filter((token) => queryTokens.has(token));
+
+  if (!asksForNamedItems || eventTokens.length === 0 || (!asksForMagnitude && !asksForLocation)) {
+    return [];
+  }
+
+  const scored: { record: VectorRecord; score: number }[] = [];
+  for (const record of records) {
+    const textLower = normalizeForSearch(record.text);
+    const hasEvent = eventTokens.some((token) => textLower.includes(token));
+    if (!hasEvent) continue;
+
+    const magnitudeEvidence =
+      !asksForMagnitude ||
+      /\bmw\b|\bmagnitude\b|\brichter\b|\b\d+(?:\.\d+)?\s*(?:mw|magnitude)?\b/.test(textLower);
+    const locationEvidence =
+      !asksForLocation ||
+      /\b(location|city|district|region|zone|province|fault|country)\b/.test(textLower) ||
+      /[A-Z][a-z]+(?:[ -][A-Z][a-z]+){0,2}/.test(record.text);
+    if (!magnitudeEvidence || !locationEvidence) continue;
+
+    const titleOrAbstract =
+      /abstract|introduction|title/i.test(record.sectionPath ?? "") ||
+      /\babstract\b|\bintroduction\b/.test(textLower);
+    const decimalCount = (textLower.match(/\b\d+(?:\.\d+)?\b/g) ?? []).length;
+    const queryOverlap = [...queryTokens].filter((token) => textLower.includes(token)).length;
+    const score = 1 + queryOverlap * 0.05 + Math.min(decimalCount, 6) * 0.03 + (titleOrAbstract ? 0.15 : 0);
+    scored.push({ record, score });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, 16);
 }
 
 function conceptRescueSearch(
@@ -656,6 +728,24 @@ function recordToRetrievedChunk(r: ScoredRecord): RetrievedChunk {
     noiseScore: r.noiseScore,
     noiseCategory: r.noiseCategory,
     retrievalMethod: "hybrid-rrf",
+  };
+}
+
+function recordToDebugCandidate(r: ScoredRecord, rank: number): RetrievalDebugCandidate {
+  return {
+    rank,
+    chunkId: r.record.chunkId,
+    sourceFile: r.record.sourceFile,
+    pageStart: r.record.pageStart,
+    pageEnd: r.record.pageEnd,
+    sectionPath: r.record.sectionPath,
+    score: r.score,
+    vectorScore: r.vectorScore,
+    bm25Score: r.bm25Score,
+    rerankScore: r.rerankScore,
+    noiseScore: r.noiseScore,
+    noiseCategory: r.noiseCategory,
+    textPreview: r.record.text.replace(/\s+/g, " ").slice(0, 240),
   };
 }
 

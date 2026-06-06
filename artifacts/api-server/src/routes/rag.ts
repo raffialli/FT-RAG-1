@@ -19,6 +19,9 @@ import { testConnectivity } from "../lib/rag/embeddings.js";
 import { loadReports, saveReport } from "../lib/rag/reports.js";
 import { generateCorpusArtifactReport } from "../lib/rag/ocr-detector.js";
 import { getDisplayTitle } from "../lib/rag/source-titles.js";
+import { matchesNormalizedSearch } from "../lib/rag/bm25.js";
+import { isLikelyPdfUpload, safePdfUploadFilename, uniquePdfUploadFilename } from "../lib/rag/upload-safety.js";
+import { isCandidateIndexResetAllowed } from "../lib/rag/destructive-action-safety.js";
 import type { CleanupQuality } from "../lib/rag/types.js";
 
 const DATA_DIR = process.env.RAG_DATA_DIR ?? path.join(path.resolve(process.cwd(), "..", ".."), "candidate-rag", "data");
@@ -32,7 +35,7 @@ const upload = multer({
   dest: UPLOADS_DIR,
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype === "application/pdf" || file.originalname.endsWith(".pdf")) {
+    if (isLikelyPdfUpload({ mimetype: file.mimetype, originalName: file.originalname })) {
       cb(null, true);
     } else {
       cb(new Error("Only PDF files are supported"));
@@ -149,13 +152,13 @@ router.get("/rag/chunks", (req, res) => {
   const searchTerm = search?.trim().toLowerCase();
   if (searchTerm) {
     records = records.filter((r) =>
-      [
+      matchesNormalizedSearch(searchTerm, [
         r.chunkId,
         r.documentId,
         r.sourceFile,
         r.sectionPath,
         r.text,
-      ].filter(Boolean).some((value) => String(value).toLowerCase().includes(searchTerm))
+      ])
     );
   }
   const parsedLimit = Number.parseInt(limit ?? "", 10);
@@ -208,8 +211,19 @@ router.post("/rag/reindex", async (req, res) => {
 });
 
 // POST /api/rag/reset
-router.post("/rag/reset", (_req, res) => {
+router.post("/rag/reset", (req, res) => {
   try {
+    const body = req.body as { confirmation?: string } | undefined;
+    const query = req.query as { confirmation?: string };
+    const confirmation = body?.confirmation ?? query.confirmation ?? null;
+    if (!isCandidateIndexResetAllowed({ confirmation })) {
+      res.status(403).json({
+        success: false,
+        message:
+          "Candidate index reset is disabled. Set RAG_ALLOW_DESTRUCTIVE_RESET=true and send confirmation=RESET to allow it.",
+      });
+      return;
+    }
     resetVectorIndex();
     // Clear manifests and chunks
     const manifestPath = path.join(DATA_DIR, "manifests", "documents.json");
@@ -281,15 +295,18 @@ router.post("/rag/upload", upload.single("file"), async (req, res) => {
   }
 
   try {
-    // Rename to original filename
-    const originalName = req.file.originalname;
-    const destPath = path.join(UPLOADS_DIR, originalName);
+    const safeName = safePdfUploadFilename(req.file.originalname);
+    const uploadName = uniquePdfUploadFilename(safeName, (candidate) =>
+      fs.existsSync(path.join(UPLOADS_DIR, candidate))
+    );
+    const destPath = path.join(UPLOADS_DIR, uploadName);
     fs.renameSync(req.file.path, destPath);
 
-    req.log.info({ filename: originalName }, "Processing uploaded PDF");
+    req.log.info({ filename: uploadName, originalName: req.file.originalname }, "Processing uploaded PDF");
     const result = await ingestUploadedFile(destPath);
     res.json(result);
   } catch (e) {
+    removeTempUploadIfSafe(req.file.path);
     req.log.error(e);
     res.status(500).json({ error: String(e) });
   }
@@ -358,6 +375,15 @@ function classifyQuestion(query: string): string {
   if (/climate|sea level|temperature|precipitation/.test(q)) return "climate";
   if (/building|structure|infrastructure/.test(q)) return "infrastructure";
   return "general";
+}
+
+function removeTempUploadIfSafe(filePath: string): void {
+  const resolvedPath = path.resolve(filePath);
+  const uploadsDir = path.resolve(UPLOADS_DIR);
+  const relative = path.relative(uploadsDir, resolvedPath);
+  if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) return;
+  if (path.extname(resolvedPath)) return;
+  if (fs.existsSync(resolvedPath)) fs.unlinkSync(resolvedPath);
 }
 
 export default router;

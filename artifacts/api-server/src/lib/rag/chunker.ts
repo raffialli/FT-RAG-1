@@ -56,7 +56,7 @@ function splitIntoSections(text: string): Section[] {
 
   for (const line of lines) {
     const heading = detectSectionHeading(line);
-    if (heading && currentLines.join("").trim().length > 100) {
+    if (heading && currentLines.join("").trim().length > MIN_CHUNK_CHARS) {
       sections.push({ heading: currentHeading, text: currentLines.join("\n").trim() });
       currentHeading = heading;
       currentLines = [];

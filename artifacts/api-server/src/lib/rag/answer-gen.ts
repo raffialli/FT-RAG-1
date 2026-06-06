@@ -20,6 +20,7 @@ import {
 import { isReferenceQuery } from "./chunk-classifier.js";
 import { buildAnswerSources } from "./source-provenance.js";
 import { applyClimatePolicyCaution, climatePolicyInstruction } from "./answer-polish.js";
+import { buildEvidenceBlock } from "./prompt-context.js";
 
 // ── Main entry point ──────────────────────────────────────────────────────────
 
@@ -41,7 +42,7 @@ export async function synthesizeAnswer(
   }
 
   const topChunks = chunks.slice(0, 5);
-  const evidenceBlock = buildEvidenceBlock(topChunks);
+  const evidenceBlock = buildEvidenceBlock(query, topChunks);
   const prompt = buildPrompt(query, evidenceBlock);
 
   let rawAnswer: string;
@@ -85,19 +86,6 @@ export async function synthesizeAnswer(
     sources,
     warnings: [...confidence.warnings, ...citationVal.warnings],
   };
-}
-
-// ── Evidence block & prompt ───────────────────────────────────────────────────
-
-function buildEvidenceBlock(chunks: RetrievedChunk[]): string {
-  return chunks
-    .map((c, i) => {
-      const pageRange =
-        c.pageStart === c.pageEnd ? `p. ${c.pageStart}` : `pp. ${c.pageStart}–${c.pageEnd}`;
-      const section = c.sectionPath ? ` § ${c.sectionPath}` : "";
-      return `[${i + 1}] Source: ${c.sourceFile} (${pageRange}${section})\n${c.text.substring(0, 1000)}`;
-    })
-    .join("\n\n---\n\n");
 }
 
 function buildPrompt(query: string, evidenceBlock: string, forceUseEvidence = false): string {
